@@ -25,7 +25,7 @@ sys.path.insert(0, SCRIPT_DIR)
 
 def cmd_version(args):
     manifest_path = os.path.join(REPO_ROOT, "skills_manifest.json")
-    version = "2.1.0"
+    version = "2.1.1"
     if os.path.exists(manifest_path):
         try:
             import json

@@ -11,6 +11,7 @@ on:
 permissions:
   contents: read
   packages: write
+  id-token: write
 
 jobs:
   build-and-verify:
@@ -42,6 +43,9 @@ jobs:
     name: Publish to GitHub Packages
     needs: build-and-verify
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -63,9 +67,12 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish-npm:
-    name: Publish to NPM Registry
+    name: Publish to NPM Registry (Trusted Publishing OIDC)
     needs: build-and-verify
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -76,8 +83,5 @@ jobs:
           node-version: '20.x'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Publish to NPM
-        continue-on-error: true
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish to NPM via Trusted Publishing (Zero-Token OIDC)
+        run: npm publish --provenance --access public
