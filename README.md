@@ -1,8 +1,10 @@
-# 🧠 Synapse Hub — AI Agent Intelligence Core & Skill Network
+# 🧠 Synapse Hub — Trung Tâm Trí Tuệ & Mạng Lưới Kỹ Năng Cho AI Agent
 
-> **The shared intelligence core and autonomous skill hub empowering AI coding assistants (Google Antigravity / Cursor / Windsurf / Claude Code) across automated testing suites.**  
-> **Tác giả / Author:** Thế Vị ([@TeeVee998](https://github.com/TeeVee998))  
-> **Phiên bản Hub:** `v2.0.0` (Semantic Versioning) | **Chỉ số toàn vẹn:** 27 Skills, 6 Agent Swarm Roles, 7 Core Rules, 20+ Python Tools.
+[🇻🇳 Tiếng Việt](#-synapse-hub--trung-tâm-trí-tuệ--mạng-lưới-kỹ-năng-cho-ai-agent) | [🇬🇧 English Edition](#-english-edition)
+
+> **Bộ não trí tuệ dùng chung và mạng lưới kỹ năng tự hành, tăng cường năng lực cho các trợ lý AI (Google Antigravity, Cursor, Windsurf, Claude Code) trên mọi hệ sinh thái kiểm thử tự động.**  
+> **Tác giả:** Thế Vị ([@TeeVee998](https://github.com/TeeVee998))  
+> **Phiên bản Hub:** `v2.0.0` | **Quy mô:** 27 Kỹ năng chuẩn hóa, 6 Vai trò AI Swarm, 7 Quy tắc cốt lõi, 20+ Công cụ tự động.
 
 ---
 
