@@ -4,7 +4,7 @@
 
 > **Bộ não trí tuệ dùng chung và mạng lưới kỹ năng tự hành, tăng cường năng lực cho các trợ lý AI (Google Antigravity, Cursor, Windsurf, Claude Code) trên mọi hệ sinh thái kiểm thử tự động.**  
 > **Tác giả:** Thế Vị ([@TeeVee998](https://github.com/TeeVee998))  
-> **Phiên bản Hub:** `v2.0.1` | **Quy mô:** 27 Kỹ năng chuẩn hóa, 6 Vai trò AI Swarm, 7 Quy tắc cốt lõi, 20+ Công cụ tự động.
+> **Phiên bản Hub:** `v2.1.0` | **Quy mô:** 27 Kỹ năng chuẩn hóa, 6 Vai trò AI Swarm, 7 Quy tắc cốt lõi, 20+ Công cụ tự động.
 
 ---
 
@@ -14,7 +14,7 @@
 
 ```mermaid
 flowchart TD
-    subgraph Hub["🧠 Synapse Hub (Intelligence Core v2.0.1)"]
+    subgraph Hub["🧠 Synapse Hub (Intelligence Core v2.1.0)"]
         Skills[".agents/skills/ (27 Skills)"]
         Agents[".agents/agents/ (6 Specialized Roles)"]
         Rules[".agents/rules/ (7 Core Rules)"]
@@ -274,7 +274,7 @@ Dự án **Synapse Hub** được tổng hợp, kế thừa và phát triển d�
 
 > **The shared intelligence core and autonomous skill hub empowering AI coding assistants (Google Antigravity / Cursor / Windsurf / Claude Code) across automated testing suites.**  
 > **Author:** Thế Vị ([@TeeVee998](https://github.com/TeeVee998))  
-> **Hub Version:** `v2.0.1` (Semantic Versioning) | **Integrity Index:** 27 Skills, 6 Agent Swarm Roles, 7 Core Rules, 20+ Python Tools.
+> **Hub Version:** `v2.1.0` (Semantic Versioning) | **Integrity Index:** 27 Skills, 6 Agent Swarm Roles, 7 Core Rules, 20+ Python Tools.
 
 ---
 
@@ -284,7 +284,7 @@ Dự án **Synapse Hub** được tổng hợp, kế thừa và phát triển d�
 
 ```mermaid
 flowchart TD
-    subgraph Hub["🧠 Synapse Hub (Intelligence Core v2.0.1)"]
+    subgraph Hub["🧠 Synapse Hub (Intelligence Core v2.1.0)"]
         Skills[".agents/skills/ (27 Skills)"]
         Agents[".agents/agents/ (6 Specialized Roles)"]
         Rules[".agents/rules/ (7 Core Rules)"]

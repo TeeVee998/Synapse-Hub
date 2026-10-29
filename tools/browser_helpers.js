@@ -13,7 +13,7 @@
 (function () {
   'use strict';
 
-  if (window.__qa && window.__qa.__version === '2.0.1') {
+  if (window.__qa && window.__qa.__version === '2.1.0') {
     return window.__qa;
   }
 
@@ -47,7 +47,7 @@
   }
 
   const qa = {
-    __version: '2.0.1',
+    __version: '2.1.0',
 
     /**
      * 1. Smart Action Batching
