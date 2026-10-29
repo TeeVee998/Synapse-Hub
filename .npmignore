@@ -1,0 +1,27 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Caches and DBs
+*.db
+*.sqlite
+*.sqlite3
+.pytest_cache/
+.mypy_cache/
+
+# Test artifacts and benchmarks
+tests/
+benchmarks/
+reports/
+Reports/
+allure-results/
+allure-report/
+
+# OS and IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.venv/

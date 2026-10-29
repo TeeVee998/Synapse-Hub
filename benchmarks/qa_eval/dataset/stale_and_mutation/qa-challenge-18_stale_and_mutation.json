@@ -1,0 +1,22 @@
+{
+  "id": "QA-CHALLENGE-18",
+  "name": "Pagination Replaces tbody (Stale Row Index)",
+  "category": "stale_and_mutation",
+  "difficulty": "MEDIUM",
+  "description": "Navigating to page 2 updates table rows; old row references become detached.",
+  "failure_vector": {
+    "type": "PAGINATION_DETACH",
+    "broken_code": "page.click('.p-paginator-next'); page.locator('tbody tr').nth(0).click();",
+    "error_log": "StaleElementReferenceException: Stale element handle during click dispatch",
+    "environment_condition": "Data Table Pagination"
+  },
+  "expected_resolution": {
+    "healed_code": "page.click('.p-paginator-next'); page.waitForResponse(r => r.url().includes('page=2')); page.locator('tbody tr').first().click();",
+    "strategy": "PAGINATION_NETWORK_SYNC"
+  },
+  "benchmark_targets": {
+    "max_heal_time_sec": 2.0,
+    "max_token_cost": 310,
+    "min_confidence_score": 0.92
+  }
+}

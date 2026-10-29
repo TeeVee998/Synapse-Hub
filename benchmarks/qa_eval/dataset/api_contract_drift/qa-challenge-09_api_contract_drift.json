@@ -1,0 +1,22 @@
+{
+  "id": "QA-CHALLENGE-09",
+  "name": "HTTP Creation Status Code Shift (200 OK -> 201 Created)",
+  "category": "api_contract_drift",
+  "difficulty": "EASY",
+  "description": "POST endpoint updated to RFC-compliant 201 Created instead of legacy 200 OK.",
+  "failure_vector": {
+    "type": "STATUS_CODE_SHIFT",
+    "broken_assertion": "assert response.status_code == 200",
+    "error_log": "AssertionError: Expected status code 200 but received 201",
+    "api_payload": "{\"status\": 201, \"created\": true}"
+  },
+  "expected_resolution": {
+    "healed_assertion": "assert response.status_code in (200, 201)",
+    "strategy": "SUCCESS_STATUS_RANGE"
+  },
+  "benchmark_targets": {
+    "max_heal_time_sec": 1.0,
+    "max_token_cost": 220,
+    "min_confidence_score": 0.98
+  }
+}

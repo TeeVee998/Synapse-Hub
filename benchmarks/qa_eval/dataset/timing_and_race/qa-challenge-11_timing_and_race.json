@@ -1,0 +1,22 @@
+{
+  "id": "QA-CHALLENGE-11",
+  "name": "Network Latency Spike (3,500ms Throttle) Breaking Static Sleep",
+  "category": "timing_and_race",
+  "difficulty": "MEDIUM",
+  "description": "Microservice latency under load takes 3.5s; test had Thread.sleep(2000).",
+  "failure_vector": {
+    "type": "STATIC_SLEEP_TIMEOUT",
+    "broken_code": "Thread.sleep(2000); assert WebUI.verifyElementPresent('#result')",
+    "error_log": "ElementNotFoundException: Element '#result' not present after 2000ms delay",
+    "environment_condition": "CDP Network Throttling 3500ms delay"
+  },
+  "expected_resolution": {
+    "healed_code": "page.waitForSelector('#result', timeout: 10000); page.waitForLoadState('networkidle')",
+    "strategy": "DYNAMIC_SMART_WAIT"
+  },
+  "benchmark_targets": {
+    "max_heal_time_sec": 2.5,
+    "max_token_cost": 320,
+    "min_confidence_score": 0.92
+  }
+}

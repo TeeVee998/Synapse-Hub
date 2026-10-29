@@ -1,0 +1,23 @@
+{
+  "id": "QA-CHALLENGE-02",
+  "name": "Nested Shadow DOM Component Piercing",
+  "category": "locator_drift",
+  "difficulty": "HARD",
+  "description": "Input field moved inside Web Component with '#shadow-root (open)'.",
+  "failure_vector": {
+    "type": "SHADOW_DOM_ISOLATION",
+    "broken_locator": "#customer-email",
+    "error_log": "NoSuchElementException: Element '#customer-email' not found in document root",
+    "dom_snapshot": "<user-profile-card><template shadowrootmode='open'><input id='customer-email' type='email' data-testid='user-email'/></template></user-profile-card>"
+  },
+  "expected_resolution": {
+    "healed_locator": "user-profile-card >> internal:control=enter-shadow >> input#customer-email",
+    "fallback_locator": "user-profile-card >> input[type='email']",
+    "strategy": "SHADOW_DOM_PIERCING"
+  },
+  "benchmark_targets": {
+    "max_heal_time_sec": 3.0,
+    "max_token_cost": 400,
+    "min_confidence_score": 0.88
+  }
+}

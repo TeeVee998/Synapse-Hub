@@ -1,0 +1,21 @@
+{
+  "id": "QA-CHALLENGE-25",
+  "name": "Unbounded Relational Assertion (status >= 200)",
+  "category": "fake_pass_tautology",
+  "difficulty": "EASY",
+  "description": "Assertion checks 'status >= 200' without ceiling, so HTTP 500 error causes false pass.",
+  "failure_vector": {
+    "type": "UNBOUNDED_STATUS_ASSERTION",
+    "code_snippet": "def resp = client.send(); assert resp.statusCode >= 200; // Passes on 500!",
+    "detection_rule": "MUTATION_BOUNDARY_SHIFT"
+  },
+  "expected_resolution": {
+    "healed_code": "def resp = client.send(); assert resp.statusCode >= 200 && resp.statusCode < 300;",
+    "strategy": "BOUNDED_INTERVAL_ASSERTION"
+  },
+  "benchmark_targets": {
+    "max_heal_time_sec": 1.2,
+    "max_token_cost": 230,
+    "min_confidence_score": 0.98
+  }
+}

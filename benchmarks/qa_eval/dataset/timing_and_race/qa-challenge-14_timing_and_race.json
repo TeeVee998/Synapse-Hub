@@ -1,0 +1,22 @@
+{
+  "id": "QA-CHALLENGE-14",
+  "name": "Async Chart SVG Animation Race Condition",
+  "category": "timing_and_race",
+  "difficulty": "MEDIUM",
+  "description": "Financial chart takes 1200ms to calculate series and render SVG paths.",
+  "failure_vector": {
+    "type": "ASYNC_RENDER_RACE",
+    "broken_code": "page.click('.chart-bar:last-child')",
+    "error_log": "ElementNotFoundException: Selector '.chart-bar:last-child' not found",
+    "environment_condition": "Highcharts Rendering Animation"
+  },
+  "expected_resolution": {
+    "healed_code": "page.waitForSelector('.highcharts-series path', state: 'visible'); page.click('.chart-bar:last-child')",
+    "strategy": "SVG_VISIBILITY_SMART_WAIT"
+  },
+  "benchmark_targets": {
+    "max_heal_time_sec": 2.0,
+    "max_token_cost": 310,
+    "min_confidence_score": 0.9
+  }
+}

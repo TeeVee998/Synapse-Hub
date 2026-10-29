@@ -1,0 +1,23 @@
+{
+  "id": "QA-CHALLENGE-01",
+  "name": "Dynamic CSS-in-JS Hash Locator Shift",
+  "category": "locator_drift",
+  "difficulty": "MEDIUM",
+  "description": "Button class changed from '.btn-submit' to dynamic hashed class '.btn-submit_a8f9x2'.",
+  "failure_vector": {
+    "type": "LOCATOR_DRIFT",
+    "broken_locator": "button.btn-submit",
+    "error_log": "ElementNotFoundException: Cannot locate element with selector 'button.btn-submit' within 5000ms",
+    "dom_snapshot": "<button class='btn-submit_a8f9x2' data-testid='submit-order-btn' role='button' aria-label='Submit Order'>Submit Order</button>"
+  },
+  "expected_resolution": {
+    "healed_locator": "[data-testid='submit-order-btn']",
+    "fallback_locator": "button:has-text('Submit Order')",
+    "strategy": "AOM_ROLE_OR_TESTID"
+  },
+  "benchmark_targets": {
+    "max_heal_time_sec": 2.0,
+    "max_token_cost": 350,
+    "min_confidence_score": 0.85
+  }
+}

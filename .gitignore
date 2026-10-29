@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs and databases
+*.log
+*.tmp
+*.bak
+*.db
+*.sqlite
+*.sqlite3
+*.zip
+*.spec
+omni-qc.spec
+.sandbox_snapshots/
+tools/memory_cache.db
+tools/repo_map.txt
+tools/repo_map.json
+repo_map.txt
+repo_map.json
+
+# Test reports & artifacts
+reports/
+Reports/
+allure-results/
+allure-report/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE & Editors
+.vscode/
+.idea/
+*.swp
+*.swo

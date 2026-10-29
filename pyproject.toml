@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-qa"
+version = "2.0.0"
+description = "Enterprise AI Agent Quality Engineering & Test Automation Hub"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+    { name = "AI QA Engineering Swarm", email = "qa-swarm@enterprise.internal" }
+]
+keywords = ["qa", "testing", "ai-agents", "playwright", "clean-pom", "quality-gates"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Software Development :: Quality Assurance"
+]
+dependencies = []
+
+[project.scripts]
+agent-qa = "tools.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["tools*"]

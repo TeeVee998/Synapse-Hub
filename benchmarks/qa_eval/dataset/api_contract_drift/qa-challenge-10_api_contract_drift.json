@@ -1,0 +1,22 @@
+{
+  "id": "QA-CHALLENGE-10",
+  "name": "Authentication Header Prefix Upgrade",
+  "category": "api_contract_drift",
+  "difficulty": "EASY",
+  "description": "API gateway changed auth format from 'Authorization: Token <token>' to 'Bearer <token>'.",
+  "failure_vector": {
+    "type": "AUTH_HEADER_DRIFT",
+    "broken_code": "headers = {'Authorization': f'Token {auth_token}'}",
+    "error_log": "HTTP 401 Unauthorized: Invalid authorization scheme. Expected 'Bearer'.",
+    "api_payload": "{\"error\": \"Unauthorized\", \"code\": 401}"
+  },
+  "expected_resolution": {
+    "healed_code": "headers = {'Authorization': f'Bearer {auth_token}'}",
+    "strategy": "STANDARD_BEARER_TOKEN"
+  },
+  "benchmark_targets": {
+    "max_heal_time_sec": 1.5,
+    "max_token_cost": 250,
+    "min_confidence_score": 0.95
+  }
+}

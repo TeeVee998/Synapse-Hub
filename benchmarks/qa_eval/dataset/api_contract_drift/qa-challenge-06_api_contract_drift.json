@@ -1,0 +1,22 @@
+{
+  "id": "QA-CHALLENGE-06",
+  "name": "Numeric ID Serialized as String (Type Mutation)",
+  "category": "api_contract_drift",
+  "difficulty": "MEDIUM",
+  "description": "Backend response changed 'invoice_id: 10423' (int) to 'invoice_id: \"10423\"' (string).",
+  "failure_vector": {
+    "type": "TYPE_MUTATION",
+    "broken_assertion": "assert response.data.invoice_id == 10423",
+    "error_log": "AssertionError: Expected integer 10423 but received string '10423'",
+    "api_payload": "{\"status\": \"SUCCESS\", \"invoice_id\": \"10423\", \"amount\": 250.0}"
+  },
+  "expected_resolution": {
+    "healed_assertion": "assert str(response.data.invoice_id) == '10423'",
+    "strategy": "TYPE_COERCION_ASSERTION"
+  },
+  "benchmark_targets": {
+    "max_heal_time_sec": 2.0,
+    "max_token_cost": 280,
+    "min_confidence_score": 0.9
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "QA-CHALLENGE-13",
+  "name": "Debounced Search Input Autocomplete Race",
+  "category": "timing_and_race",
+  "difficulty": "MEDIUM",
+  "description": "Search input debounces 400ms before sending query; test clicked dropdown item before query fired.",
+  "failure_vector": {
+    "type": "DEBOUNCE_RACE",
+    "broken_code": "page.fill('#search-input', 'Invoice'); page.click('.dropdown-item:first-child')",
+    "error_log": "TimeoutException: Timed out waiting for '.dropdown-item' to appear in DOM",
+    "environment_condition": "Debounce Timer 400ms"
+  },
+  "expected_resolution": {
+    "healed_code": "page.fill('#search-input', 'Invoice'); page.waitForResponse(r => r.url().includes('/search') && r.status() == 200); page.click('.dropdown-item:first-child')",
+    "strategy": "CDP_RESPONSE_BARRIER"
+  },
+  "benchmark_targets": {
+    "max_heal_time_sec": 2.5,
+    "max_token_cost": 350,
+    "min_confidence_score": 0.88
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "QA-CHALLENGE-17",
+  "name": "Tab Switch Component Unmount Detach",
+  "category": "stale_and_mutation",
+  "difficulty": "MEDIUM",
+  "description": "Switching active tabs unmounts previous panel component entirely from virtual DOM.",
+  "failure_vector": {
+    "type": "COMPONENT_UNMOUNT",
+    "broken_code": "page.click('#tab-billing'); page.fill('#billing-tax-id', 'TAX-999');",
+    "error_log": "ElementNotInteractableException: Target element '#billing-tax-id' is hidden or unmounted",
+    "environment_condition": "Tab Component View Switching"
+  },
+  "expected_resolution": {
+    "healed_code": "page.click('#tab-billing'); page.waitForSelector('#billing-tab-content[aria-hidden=\"false\"]'); page.fill('#billing-tax-id', 'TAX-999');",
+    "strategy": "TAB_MOUNT_SYNCHRONIZATION"
+  },
+  "benchmark_targets": {
+    "max_heal_time_sec": 2.0,
+    "max_token_cost": 300,
+    "min_confidence_score": 0.91
+  }
+}

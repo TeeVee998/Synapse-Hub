@@ -1,0 +1,23 @@
+{
+  "id": "QA-CHALLENGE-04",
+  "name": "Legacy ID Removed in Favor of data-testid",
+  "category": "locator_drift",
+  "difficulty": "EASY",
+  "description": "Frontend framework removed legacy 'id=customer_name' during React refactor.",
+  "failure_vector": {
+    "type": "ID_REMOVAL",
+    "broken_locator": "#customer_name",
+    "error_log": "ElementNotFoundException: Cannot locate element '#customer_name'",
+    "dom_snapshot": "<input type='text' name='customerName' data-testid='customer-name-field' class='form-control'/>"
+  },
+  "expected_resolution": {
+    "healed_locator": "[data-testid='customer-name-field']",
+    "fallback_locator": "input[name='customerName']",
+    "strategy": "DATA_TESTID_UPGRADE"
+  },
+  "benchmark_targets": {
+    "max_heal_time_sec": 1.5,
+    "max_token_cost": 250,
+    "min_confidence_score": 0.92
+  }
+}

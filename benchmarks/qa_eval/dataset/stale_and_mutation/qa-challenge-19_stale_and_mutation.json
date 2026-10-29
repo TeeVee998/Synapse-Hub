@@ -1,0 +1,22 @@
+{
+  "id": "QA-CHALLENGE-19",
+  "name": "Reopened Modal Generates Fresh DOM Node",
+  "category": "stale_and_mutation",
+  "difficulty": "MEDIUM",
+  "description": "Closing and reopening dialog instantiates new DOM element with same CSS selector.",
+  "failure_vector": {
+    "type": "FRESH_INSTANCE_STALE",
+    "broken_code": "def modal = page.locator('#edit-dialog'); page.click('#close-btn'); page.click('#open-btn'); modal.fill('input', 'new');",
+    "error_log": "ElementNotVisibleException: Cached element reference points to detached/hidden dialog instance",
+    "environment_condition": "Modal Lifecycle Instantiation"
+  },
+  "expected_resolution": {
+    "healed_code": "page.click('#close-btn'); page.click('#open-btn'); page.locator('#edit-dialog:visible input').fill('new');",
+    "strategy": "VISIBLE_SELECTOR_REBIND"
+  },
+  "benchmark_targets": {
+    "max_heal_time_sec": 2.0,
+    "max_token_cost": 290,
+    "min_confidence_score": 0.94
+  }
+}

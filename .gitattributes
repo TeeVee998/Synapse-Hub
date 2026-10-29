@@ -1,0 +1,23 @@
+# Auto-detect text files and normalize line endings to LF
+* text=auto eol=lf
+
+# Shell and script files
+*.sh text eol=lf
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+
+# Source and documentation
+*.py text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.groovy text eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.db binary
+*.sqlite binary
+*.sqlite3 binary

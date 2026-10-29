@@ -1,0 +1,23 @@
+{
+  "id": "QA-CHALLENGE-05",
+  "name": "HTML Tag Evolution: Anchor to ARIA Button",
+  "category": "locator_drift",
+  "difficulty": "MEDIUM",
+  "description": "Navigation link <a href='#'> converted into accessible <button role='button'>.",
+  "failure_vector": {
+    "type": "TAG_MUTATION",
+    "broken_locator": "a.nav-export",
+    "error_log": "ElementNotInteractableException: Element <a class='nav-export'> is no longer attached or interactive",
+    "dom_snapshot": "<button role='button' class='btn-export' aria-label='Export Report' data-action='export'>Export Report</button>"
+  },
+  "expected_resolution": {
+    "healed_locator": "button[aria-label='Export Report']",
+    "fallback_locator": "button:has-text('Export Report')",
+    "strategy": "AOM_ROLE_MAPPING"
+  },
+  "benchmark_targets": {
+    "max_heal_time_sec": 2.0,
+    "max_token_cost": 300,
+    "min_confidence_score": 0.88
+  }
+}

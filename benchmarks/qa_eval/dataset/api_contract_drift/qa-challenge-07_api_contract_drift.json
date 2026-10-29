@@ -1,0 +1,22 @@
+{
+  "id": "QA-CHALLENGE-07",
+  "name": "Payload Response Field Rename",
+  "category": "api_contract_drift",
+  "difficulty": "EASY",
+  "description": "User profile endpoint renamed 'user_email' to 'email_address'.",
+  "failure_vector": {
+    "type": "FIELD_RENAME",
+    "broken_assertion": "assert response.json()['user_email'] == 'qa@example.com'",
+    "error_log": "KeyError: 'user_email' not found in response dictionary",
+    "api_payload": "{\"id\": 42, \"email_address\": \"qa@example.com\", \"role\": \"QA\"}"
+  },
+  "expected_resolution": {
+    "healed_assertion": "assert (response.json().get('email_address') or response.json().get('user_email')) == 'qa@example.com'",
+    "strategy": "RESILIENT_FIELD_LOOKUP"
+  },
+  "benchmark_targets": {
+    "max_heal_time_sec": 1.5,
+    "max_token_cost": 260,
+    "min_confidence_score": 0.95
+  }
+}

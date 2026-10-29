@@ -1,0 +1,21 @@
+{
+  "id": "QA-CHALLENGE-23",
+  "name": "Tautological assert true == true",
+  "category": "fake_pass_tautology",
+  "difficulty": "EASY",
+  "description": "Test asserts trivial identity 'assert true == true' instead of verifying business state.",
+  "failure_vector": {
+    "type": "TAUTOLOGY_ASSERTION",
+    "code_snippet": "def response = api.createInvoice(); assert true == true;",
+    "detection_rule": "TAUTOLOGY_PATTERN"
+  },
+  "expected_resolution": {
+    "healed_code": "def response = api.createInvoice(); assert response.status == 201 && response.id != null;",
+    "strategy": "MUTATION_TESTING_KILLS_TAUTOLOGY"
+  },
+  "benchmark_targets": {
+    "max_heal_time_sec": 1.0,
+    "max_token_cost": 220,
+    "min_confidence_score": 0.98
+  }
+}

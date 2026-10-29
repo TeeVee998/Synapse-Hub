@@ -1,0 +1,21 @@
+{
+  "id": "QA-CHALLENGE-21",
+  "name": "Swallowed HTTP 500 Error in Empty Catch Block",
+  "category": "fake_pass_tautology",
+  "difficulty": "EASY",
+  "description": "Test silently catches runtime exceptions in an empty catch, masking severe backend 500 crash.",
+  "failure_vector": {
+    "type": "SWALLOWED_EXCEPTION",
+    "code_snippet": "try { page.click('#submit-payment') } catch (Exception e) {} // Test passes even on 500",
+    "detection_rule": "EMPTY_CATCH_PATTERN"
+  },
+  "expected_resolution": {
+    "healed_code": "page.click('#submit-payment'); assert page.locator('.success-toast').isVisible();",
+    "strategy": "REMOVE_SWALLOWED_CATCH_AND_ASSERT"
+  },
+  "benchmark_targets": {
+    "max_heal_time_sec": 1.0,
+    "max_token_cost": 200,
+    "min_confidence_score": 0.99
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "QA-CHALLENGE-15",
+  "name": "Infinite Scroll Lazy Loaded Chunk Detach",
+  "category": "timing_and_race",
+  "difficulty": "MEDIUM",
+  "description": "Table rows 50-100 require viewport scroll to trigger network chunk download.",
+  "failure_vector": {
+    "type": "LAZY_LOAD_RACE",
+    "broken_code": "page.locator('tr[data-id=\"75\"]').click()",
+    "error_log": "TimeoutException: Timed out waiting for 'tr[data-id=\"75\"]' to be visible",
+    "environment_condition": "Virtual Scrolling Table"
+  },
+  "expected_resolution": {
+    "healed_code": "page.locator('tr[data-id=\"75\"]').scrollIntoViewIfNeeded(); page.locator('tr[data-id=\"75\"]').click()",
+    "strategy": "VIRTUAL_SCROLL_INTO_VIEW"
+  },
+  "benchmark_targets": {
+    "max_heal_time_sec": 2.0,
+    "max_token_cost": 300,
+    "min_confidence_score": 0.92
+  }
+}

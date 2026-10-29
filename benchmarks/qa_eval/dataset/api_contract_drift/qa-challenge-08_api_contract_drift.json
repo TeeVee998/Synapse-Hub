@@ -1,0 +1,22 @@
+{
+  "id": "QA-CHALLENGE-08",
+  "name": "Nested Response Object Flattened",
+  "category": "api_contract_drift",
+  "difficulty": "MEDIUM",
+  "description": "Backend flattened nested profile: 'data.profile.tier' changed to 'data.tier'.",
+  "failure_vector": {
+    "type": "STRUCTURE_FLATTEN",
+    "broken_assertion": "assert response.json()['profile']['tier'] == 'GOLD'",
+    "error_log": "TypeError: 'NoneType' or KeyError: 'profile'",
+    "api_payload": "{\"tier\": \"GOLD\", \"points\": 1200}"
+  },
+  "expected_resolution": {
+    "healed_assertion": "tier = response.json().get('tier') or response.json().get('profile', {}).get('tier'); assert tier == 'GOLD'",
+    "strategy": "SCHEMA_PATH_FALLBACK"
+  },
+  "benchmark_targets": {
+    "max_heal_time_sec": 2.0,
+    "max_token_cost": 320,
+    "min_confidence_score": 0.9
+  }
+}

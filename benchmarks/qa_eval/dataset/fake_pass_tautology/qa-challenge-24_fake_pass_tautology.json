@@ -1,0 +1,21 @@
+{
+  "id": "QA-CHALLENGE-24",
+  "name": "Unawaited Async Assertion (Silent Green Trap)",
+  "category": "fake_pass_tautology",
+  "difficulty": "MEDIUM",
+  "description": "Missing 'await' on expect(locator).toBeVisible(); Promise resolves ignored after test exit.",
+  "failure_vector": {
+    "type": "UNAWAITED_ASYNC_ASSERTION",
+    "code_snippet": "page.click('#save'); expect(page.locator('.alert')).toBeVisible(); // Missing await!",
+    "detection_rule": "UNAWAITED_ASYNC_EXPECT"
+  },
+  "expected_resolution": {
+    "healed_code": "page.click('#save'); await expect(page.locator('.alert')).toBeVisible();",
+    "strategy": "AST_ASYNC_AWAIT_ENFORCEMENT"
+  },
+  "benchmark_targets": {
+    "max_heal_time_sec": 1.5,
+    "max_token_cost": 250,
+    "min_confidence_score": 0.96
+  }
+}

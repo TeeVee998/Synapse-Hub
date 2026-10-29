@@ -1,0 +1,22 @@
+{
+  "id": "QA-CHALLENGE-12",
+  "name": "PrimeNG Modal Backdrop Fading Intercept",
+  "category": "timing_and_race",
+  "difficulty": "HARD",
+  "description": "Modal backdrop takes 450ms CSS transition to fade out; click immediately triggers intercept.",
+  "failure_vector": {
+    "type": "CLICK_INTERCEPTED",
+    "broken_code": "page.click('#confirm-btn')",
+    "error_log": "ElementClickInterceptedException: <div class='p-component-overlay p-component-overlay-enter'> intercepts pointer-events",
+    "environment_condition": "PrimeNG Modal Fade Transition"
+  },
+  "expected_resolution": {
+    "healed_code": "page.waitForSelector('.p-component-overlay', state: 'detached'); BasePage.clickJS('#confirm-btn')",
+    "strategy": "OVERLAY_SAFE_DISPATCH"
+  },
+  "benchmark_targets": {
+    "max_heal_time_sec": 3.0,
+    "max_token_cost": 380,
+    "min_confidence_score": 0.9
+  }
+}

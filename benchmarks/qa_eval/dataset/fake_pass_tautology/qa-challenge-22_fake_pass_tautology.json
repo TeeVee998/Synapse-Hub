@@ -1,0 +1,21 @@
+{
+  "id": "QA-CHALLENGE-22",
+  "name": "Zero-Assertion Smoke Test (Tautological Pass)",
+  "category": "fake_pass_tautology",
+  "difficulty": "EASY",
+  "description": "Test executes form inputs and clicks submit but contains exactly 0 assertion statements.",
+  "failure_vector": {
+    "type": "ZERO_ASSERTION_PASS",
+    "code_snippet": "page.fill('#username', 'admin'); page.fill('#password', 'secret'); page.click('#login-btn');",
+    "detection_rule": "FAKE_PASS_NO_ASSERTION"
+  },
+  "expected_resolution": {
+    "healed_code": "page.fill('#username', 'admin'); page.fill('#password', 'secret'); page.click('#login-btn'); expect(page.locator('#dashboard-header')).toBeVisible();",
+    "strategy": "INJECT_POST_CONDITION_ASSERTION"
+  },
+  "benchmark_targets": {
+    "max_heal_time_sec": 1.5,
+    "max_token_cost": 240,
+    "min_confidence_score": 0.97
+  }
+}

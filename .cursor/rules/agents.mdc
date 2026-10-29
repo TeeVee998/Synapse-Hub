@@ -1,0 +1,15 @@
+---
+description: Mandatory rules and coding standards for all AI Agents in Enterprise QA Automation
+globs: **/*
+alwaysApply: true
+---
+
+# AI Agent Mandatory Rule
+
+Before performing any action (reading, writing, modifying scripts, refactoring POM, running tests), you **MUST** read and strictly follow the guidelines defined in [AGENTS.md](../../AGENTS.md).
+
+Key requirements:
+1. Always open your first response with the 3-line confirmation block defined in Section 0 of `AGENTS.md`.
+2. Strictly enforce Clean Page Object Model: 100% locators and UI actions belong in Page Classes (e.g., `pages/` or `Keywords/pages/`). Never leave inline XPaths in test scripts.
+3. Never fake PASS: assertions must verify actual DOM state after action.
+4. Report your work using the 5-point report template in Section 6 of `AGENTS.md`.

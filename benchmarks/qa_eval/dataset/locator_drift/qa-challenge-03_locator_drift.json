@@ -1,0 +1,23 @@
+{
+  "id": "QA-CHALLENGE-03",
+  "name": "Semantic Text Label Evolution",
+  "category": "locator_drift",
+  "difficulty": "EASY",
+  "description": "CTA button label text changed from 'Submit Order' to 'Complete Purchase'.",
+  "failure_vector": {
+    "type": "LABEL_EVOLUTION",
+    "broken_locator": "//button[text()='Submit Order']",
+    "error_log": "TimeoutException: Timed out waiting for element with XPath //button[text()='Submit Order']",
+    "dom_snapshot": "<button type='submit' class='p-button-success' id='order-cta'>Complete Purchase</button>"
+  },
+  "expected_resolution": {
+    "healed_locator": "#order-cta",
+    "fallback_locator": "button[type='submit']",
+    "strategy": "ID_AND_SEMANTIC_INTENT"
+  },
+  "benchmark_targets": {
+    "max_heal_time_sec": 1.5,
+    "max_token_cost": 300,
+    "min_confidence_score": 0.9
+  }
+}

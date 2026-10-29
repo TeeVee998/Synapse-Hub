@@ -1,0 +1,22 @@
+{
+  "id": "QA-CHALLENGE-16",
+  "name": "WebSocket Table Auto-Refresh Stale Reference",
+  "category": "stale_and_mutation",
+  "difficulty": "HARD",
+  "description": "WebSocket pushes live quotes every 1.5s, wiping and recreating <tr> elements.",
+  "failure_vector": {
+    "type": "STALE_ELEMENT",
+    "broken_code": "def row = page.locator('#stocks tr').first(); page.waitForTimeout(1600); row.click();",
+    "error_log": "StaleElementReferenceException: Element is no longer attached to DOM",
+    "environment_condition": "WebSocket DOM Mutation"
+  },
+  "expected_resolution": {
+    "healed_code": "page.locator('#stocks tr').first().click(); // Re-queries locator at moment of dispatch",
+    "strategy": "DYNAMIC_LOCATOR_REQUERY"
+  },
+  "benchmark_targets": {
+    "max_heal_time_sec": 2.5,
+    "max_token_cost": 340,
+    "min_confidence_score": 0.9
+  }
+}

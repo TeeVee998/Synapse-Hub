@@ -1,0 +1,23 @@
+{
+  "id": "QA-CHALLENGE-20",
+  "name": "Locale Swap Invalidates Hardcoded Text Selectors",
+  "category": "stale_and_mutation",
+  "difficulty": "EASY",
+  "description": "Application language changed to French ('Enregistrer'); text selector 'Save' fails.",
+  "failure_vector": {
+    "type": "I18N_TEXT_MUTATION",
+    "broken_locator": "button:has-text('Save')",
+    "error_log": "TimeoutException: No element found matching text 'Save'",
+    "dom_snapshot": "<button type='submit' data-action='save' class='btn-primary' aria-label='save-record'>Enregistrer</button>"
+  },
+  "expected_resolution": {
+    "healed_locator": "button[data-action='save']",
+    "fallback_locator": "button[aria-label='save-record']",
+    "strategy": "LOCALE_AGNOSTIC_DATA_ATTRIBUTES"
+  },
+  "benchmark_targets": {
+    "max_heal_time_sec": 1.5,
+    "max_token_cost": 270,
+    "min_confidence_score": 0.95
+  }
+}

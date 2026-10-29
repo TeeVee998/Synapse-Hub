@@ -1,0 +1,55 @@
+{
+  "name": "agent-skills",
+  "version": "2.0.0",
+  "description": "Enterprise AI Agent Quality Engineering & Test Automation Hub",
+  "keywords": [
+    "qa",
+    "testing",
+    "ai-agents",
+    "playwright",
+    "clean-pom",
+    "quality-gates",
+    "antigravity",
+    "npx"
+  ],
+  "homepage": "https://github.com/TeeVee998/Agent-Skill#readme",
+  "bugs": {
+    "url": "https://github.com/TeeVee998/Agent-Skill/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TeeVee998/Agent-Skill.git"
+  },
+  "license": "MIT",
+  "author": "AI QA Engineering Swarm <qa-swarm@enterprise.internal>",
+  "main": "bin/agent-qa.js",
+  "bin": {
+    "agent-qa": "./bin/agent-qa.js",
+    "agent-skills": "./bin/agent-qa.js"
+  },
+  "files": [
+    ".agents",
+    "bin",
+    "tools",
+    "templates",
+    "README.md",
+    "AGENTS.md",
+    "skills_manifest.json",
+    "!**/__pycache__/**",
+    "!**/*.py[cod]",
+    "!**/*.db",
+    "!**/*.sqlite*"
+  ],
+  "scripts": {
+    "start": "node ./bin/agent-qa.js",
+    "version": "node ./bin/agent-qa.js version",
+    "verify": "node ./bin/agent-qa.js verify",
+    "setup": "node ./bin/agent-qa.js setup",
+    "analyze": "node ./bin/agent-qa.js analyze",
+    "lint": "node ./bin/agent-qa.js lint",
+    "test": "python3 -m unittest discover tests -p 'test_*.py'"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
