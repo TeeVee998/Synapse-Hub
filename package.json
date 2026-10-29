@@ -12,20 +12,21 @@
     "antigravity",
     "npx"
   ],
-  "homepage": "https://github.com/TeeVee998/Agent-Skill#readme",
+  "homepage": "https://github.com/TeeVee998/Agent-Cortex#readme",
   "bugs": {
-    "url": "https://github.com/TeeVee998/Agent-Skill/issues"
+    "url": "https://github.com/TeeVee998/Agent-Cortex/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TeeVee998/Agent-Skill.git"
+    "url": "git+https://github.com/TeeVee998/Agent-Cortex.git"
   },
   "license": "MIT",
   "author": "AI QA Engineering Swarm <qa-swarm@enterprise.internal>",
   "main": "bin/agent-qa.js",
   "bin": {
     "agent-qa": "./bin/agent-qa.js",
-    "agent-skills": "./bin/agent-qa.js"
+    "agent-skills": "./bin/agent-qa.js",
+    "agent-cortex": "./bin/agent-qa.js"
   },
   "files": [
     ".agents",
