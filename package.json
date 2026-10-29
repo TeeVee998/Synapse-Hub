@@ -1,9 +1,10 @@
 {
-  "name": "synapse-hub",
+  "name": "@teevee998/synapse-hub",
   "version": "2.1.0",
   "description": "Enterprise AI Agent Intelligence Hub & Autonomous Skill Network",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://npm.pkg.github.com"
   },
   "keywords": [
     "synapse",

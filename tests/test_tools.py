@@ -95,7 +95,7 @@ class TestToolsIntegrityAndBehavior(unittest.TestCase):
         with open(pkg_path, "r", encoding="utf-8") as f:
             pkg_data = json.load(f)
 
-        self.assertEqual(pkg_data.get("name"), "synapse-hub")
+        self.assertIn(pkg_data.get("name"), ["synapse-hub", "@teevee998/synapse-hub"])
         current_version = pkg_data.get("version")
         self.assertRegex(current_version, r"^\d+\.\d+\.\d+", "Version must follow semantic versioning")
         self.assertIn("synapse-hub", pkg_data.get("bin", {}))

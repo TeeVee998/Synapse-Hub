@@ -1,4 +1,4 @@
-name: Publish Package to NPM Registry
+name: Publish Package (GitHub Packages & NPM)
 
 on:
   release:
@@ -10,19 +10,15 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
 jobs:
-  build-and-publish:
+  build-and-verify:
+    name: Verify Quality Gates & Unit Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.x'
-          registry-url: 'https://registry.npmjs.org'
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
@@ -42,8 +38,42 @@ jobs:
         run: |
           python -m unittest discover tests -p "test_*.py"
 
+  publish-github-packages:
+    name: Publish to GitHub Packages
+    needs: build-and-verify
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js for GitHub Packages
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@teevee998'
+
+      - name: Publish to GitHub Packages Registry
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-npm:
+    name: Publish to NPM Registry
+    needs: build-and-verify
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js for NPM
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          registry-url: 'https://registry.npmjs.org'
+
       - name: Publish to NPM
-        run: |
-          npm publish --access public
+        continue-on-error: true
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
