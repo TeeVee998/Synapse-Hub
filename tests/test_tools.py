@@ -61,7 +61,7 @@ class TestToolsIntegrityAndBehavior(unittest.TestCase):
         with open(manifest_path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
-        self.assertEqual(data.get("version"), "2.0.0", "Manifest version must be 2.0.0")
+        self.assertEqual(data.get("version"), "2.0.1", "Manifest version must be 2.0.1")
         manifest_skills = [s["id"] for s in data.get("skills", [])]
         self.assertEqual(len(manifest_skills), 27, "Manifest must declare exactly 27 skills")
 
@@ -93,7 +93,7 @@ class TestToolsIntegrityAndBehavior(unittest.TestCase):
             pkg_data = json.load(f)
 
         self.assertEqual(pkg_data.get("name"), "synapse-hub")
-        self.assertEqual(pkg_data.get("version"), "2.0.0")
+        self.assertEqual(pkg_data.get("version"), "2.0.1")
         self.assertIn("synapse-hub", pkg_data.get("bin", {}))
         self.assertIn("synapse", pkg_data.get("bin", {}))
         self.assertIn("agent-qa", pkg_data.get("bin", {}))
@@ -101,7 +101,7 @@ class TestToolsIntegrityAndBehavior(unittest.TestCase):
         # Test node bin launcher execution
         res = subprocess.run(["node", bin_path, "version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd=REPO_ROOT)
         self.assertEqual(res.returncode, 0, f"Node bin launcher failed: {res.stderr}")
-        self.assertIn("Agent-QA Hub CLI v2.0.0", res.stdout)
+        self.assertIn("Agent-QA Hub CLI v2.0.1", res.stdout)
 
     def test_cache_resolver_cosine_similarity(self):
         """Validates compute_cosine_similarity calculation in cache_resolver."""
@@ -480,7 +480,7 @@ class TestToolsIntegrityAndBehavior(unittest.TestCase):
         try:
             cli.cmd_version(None)
             output = sys.stdout.getvalue()
-            self.assertIn("Agent-QA Hub CLI v2.0.0", output)
+            self.assertIn("Agent-QA Hub CLI v2.0.1", output)
             self.assertIn("27 Standardized Skills", output)
         finally:
             sys.stdout = old_stdout
