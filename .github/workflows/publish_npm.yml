@@ -53,6 +53,10 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
           scope: '@teevee998'
 
+      - name: Configure Scope for GitHub Packages
+        run: |
+          npm pkg set name=@teevee998/synapse-hub publishConfig.registry=https://npm.pkg.github.com
+
       - name: Publish to GitHub Packages Registry
         run: npm publish
         env:
