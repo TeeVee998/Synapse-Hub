@@ -1,4 +1,4 @@
-# 🧠 Agent Cortex — AI Agent Intelligence Core & Skill Hub
+# 🧠 Synapse Hub — AI Agent Intelligence Core & Skill Network
 
 > **The shared intelligence core and autonomous skill hub empowering AI coding assistants (Google Antigravity / Cursor / Windsurf / Claude Code) across automated testing suites.**  
 > **Tác giả / Author:** Thế Vị ([@TeeVee998](https://github.com/TeeVee998))  
@@ -8,11 +8,11 @@
 
 ## 🌟 1. Tổng quan & Mục đích Kiến trúc
 
-**Agent Cortex** là tầng trí tuệ đa tác tử tách rời (**Decoupled Shared Intelligence Core**), đóng vai trò như một **"Bộ não dùng chung"**, tách biệt hoàn toàn khỏi mã nguồn của từng dự án cụ thể. Dự án trang bị cho AI agents các vai trò bầy đàn chuyên biệt (Multi-Agent Swarm), quy trình tự chữa lành (Self-Healing), khả năng thấu hiểu mã nguồn cấp độ AST và các cổng chất lượng nghiêm ngặt (Quality Gates)—cho phép tự động hóa kiểm thử chuẩn xác tuyệt đối trên mọi codebase mà không làm bẩn repository mục tiêu.
+**Synapse Hub** là tầng trí tuệ đa tác tử tách rời (**Decoupled Shared Intelligence Core**), đóng vai trò như một **"Bộ não dùng chung"**, tách biệt hoàn toàn khỏi mã nguồn của từng dự án cụ thể. Dự án trang bị cho AI agents các vai trò bầy đàn chuyên biệt (Multi-Agent Swarm), quy trình tự chữa lành (Self-Healing), khả năng thấu hiểu mã nguồn cấp độ AST và các cổng chất lượng nghiêm ngặt (Quality Gates)—cho phép tự động hóa kiểm thử chuẩn xác tuyệt đối trên mọi codebase mà không làm bẩn repository mục tiêu.
 
 ```mermaid
 flowchart TD
-    subgraph Hub["🧠 Agent Cortex (Intelligence Core v2.0.0)"]
+    subgraph Hub["🧠 Synapse Hub (Intelligence Core v2.0.0)"]
         Skills[".agents/skills/ (27 Skills)"]
         Agents[".agents/agents/ (6 Specialized Roles)"]
         Rules[".agents/rules/ (7 Core Rules)"]
@@ -51,16 +51,16 @@ flowchart TD
 Tại thư mục bất kỳ của dự án đích, bạn có thể thực thi ngay mà không cần clone hay cài đặt trước:
 ```bash
 # 1-Click Bootstrap dự án (tự động sinh PROJECT_AI_GUIDE.md, cài pre-push hook, trích xuất AST map)
-npx agent-skills setup
+npx synapse-hub setup
 
 # Chạy kiểm tra 8 Quality Gates DoD
-npx agent-skills verify
+npx synapse-hub verify
 
 # Đánh giá sức khỏe dự án toàn diện (5-in-1 Project Health Report)
-npx agent-skills analyze
+npx synapse-hub analyze
 
 # Cài đặt cố định vào devDependencies của dự án mục tiêu
-npm install -D agent-skills
+npm install -D synapse-hub
 ```
 
 ### Cách B: Mở phiên làm việc đa thư mục (Multi-Root Workspace)
@@ -198,7 +198,7 @@ agent-qa lint
 
 # 🌐 English Edition
 
-# 🧠 Agent Cortex — AI Agent Intelligence Core & Skill Hub
+# 🧠 Synapse Hub — AI Agent Intelligence Core & Skill Network
 
 > **The shared intelligence core and autonomous skill hub empowering AI coding assistants (Google Antigravity / Cursor / Windsurf / Claude Code) across automated testing suites.**  
 > **Author:** Thế Vị ([@TeeVee998](https://github.com/TeeVee998))  
@@ -208,11 +208,11 @@ agent-qa lint
 
 ## 🌟 1. Overview & Architectural Purpose
 
-**Agent Cortex** serves as a **Decoupled Shared Intelligence Core**, acting as an external neural brain completely isolated from target projects' codebases. It equips AI agents with specialized swarm roles, self-healing execution protocols, AST-level code intelligence, and strict Quality Gates—enabling zero-leakage, truth-anchored test automation across any polyglot codebase without polluting target repositories.
+**Synapse Hub** serves as a **Decoupled Shared Intelligence Core**, acting as an external neural brain completely isolated from target projects' codebases. It equips AI agents with specialized swarm roles, self-healing execution protocols, AST-level code intelligence, and strict Quality Gates—enabling zero-leakage, truth-anchored test automation across any polyglot codebase without polluting target repositories.
 
 ```mermaid
 flowchart TD
-    subgraph Hub["🧠 Agent Cortex (Intelligence Core v2.0.0)"]
+    subgraph Hub["🧠 Synapse Hub (Intelligence Core v2.0.0)"]
         Skills[".agents/skills/ (27 Skills)"]
         Agents[".agents/agents/ (6 Specialized Roles)"]
         Rules[".agents/rules/ (7 Core Rules)"]
@@ -251,22 +251,22 @@ flowchart TD
 Run commands directly from any target project directory without cloning or prior installation:
 ```bash
 # 1-Click Project Bootstrap (generates PROJECT_AI_GUIDE.md, installs pre-push hook, extracts AST repo map)
-npx agent-skills setup
+npx synapse-hub setup
 
 # Run 8 Quality Gates DoD Verification
-npx agent-skills verify
+npx synapse-hub verify
 
 # Comprehensive 5-in-1 Project Health Audit
-npx agent-skills analyze
+npx synapse-hub analyze
 
 # Install permanently as a devDependency in target project
-npm install -D agent-skills
+npm install -D synapse-hub
 ```
 
 ### Method B: Multi-Root Workspace Mounting
 Within your AI IDE (Google Antigravity / VS Code / Cursor):
 1. Open your target project folder.
-2. Add the `Agent Cortex` directory to your workspace (`File` -> `Add Folder to Workspace...`).
+2. Add the `synapse-hub` directory to your workspace (`File` -> `Add Folder to Workspace...`).
 
 ### Step 2: Initialize Project AI Guide (`PROJECT_AI_GUIDE.md`)
 Copy `templates/PROJECT_AI_GUIDE_TEMPLATE.md` to target project root, rename to `PROJECT_AI_GUIDE.md`, and configure:
@@ -299,7 +299,7 @@ The bootstrap script automatically configures `.venv`, installs dependencies, li
 
 ## 👥 3. Multi-Agent Swarm System (6 Specialized Roles)
 
-Agent Cortex clearly partitions capabilities across 6 specialized AI roles, pre-configured with dedicated skills and tools:
+Synapse Hub clearly partitions capabilities across 6 specialized AI roles, pre-configured with dedicated skills and tools:
 
 | Agent Role | Core Responsibility | Assigned Skills | Included Tools |
 | :--- | :--- | :--- | :--- |

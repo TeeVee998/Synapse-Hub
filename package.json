@@ -1,14 +1,15 @@
 {
-  "name": "@teevee998/agent-cortex",
+  "name": "synapse-hub",
   "version": "2.0.0",
-  "description": "Enterprise AI Agent Quality Engineering & Test Automation Hub",
+  "description": "Enterprise AI Agent Intelligence Hub & Autonomous Skill Network",
   "publishConfig": {
     "access": "public"
   },
   "keywords": [
+    "synapse",
+    "ai-agents",
     "qa",
     "testing",
-    "ai-agents",
     "playwright",
     "clean-pom",
     "quality-gates",
@@ -27,9 +28,10 @@
   "author": "AI QA Engineering Swarm <qa-swarm@enterprise.internal>",
   "main": "bin/agent-qa.js",
   "bin": {
+    "synapse-hub": "./bin/agent-qa.js",
+    "synapse": "./bin/agent-qa.js",
     "agent-qa": "./bin/agent-qa.js",
-    "agent-skills": "./bin/agent-qa.js",
-    "agent-cortex": "./bin/agent-qa.js"
+    "agent-skills": "./bin/agent-qa.js"
   },
   "files": [
     ".agents",
