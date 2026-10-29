@@ -6,7 +6,7 @@ description: Standard Clean Git Push Protocol for target projects and agent-skil
 # CLEAN GIT PUSH PROTOCOL (TARGET PROJECTS & AGENT-SKILLS HUB)
 
 > **Context & Decoupled Architecture:**  
-> `agent-skills` is now an **independent, standalone repository** (`https://github.com/TeeVee998/Agent-Cortex.git`).  
+> `agent-skills` is now an **independent, standalone repository** (`https://github.com/TeeVee998/Synapse-Hub.git`).  
 > Target projects (Spokes) mount `agent-skills` (Hub) as an external multi-root workspace folder or secondary directory.  
 > **Legacy Discontinuation:** The previous "Dual-Remote / Smart Push" mechanism (`smart_push.ps1`, `scm-clean` branch switching, git commit-tree rewriting) is **OFFICIALLY DISCONTINUED**.
 

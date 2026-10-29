@@ -16,13 +16,13 @@
     "antigravity",
     "npx"
   ],
-  "homepage": "https://github.com/TeeVee998/Agent-Cortex#readme",
+  "homepage": "https://github.com/TeeVee998/Synapse-Hub#readme",
   "bugs": {
-    "url": "https://github.com/TeeVee998/Agent-Cortex/issues"
+    "url": "https://github.com/TeeVee998/Synapse-Hub/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TeeVee998/Agent-Cortex.git"
+    "url": "git+https://github.com/TeeVee998/Synapse-Hub.git"
   },
   "license": "MIT",
   "author": "AI QA Engineering Swarm <qa-swarm@enterprise.internal>",
