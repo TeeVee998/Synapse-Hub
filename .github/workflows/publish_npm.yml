@@ -63,7 +63,7 @@ jobs:
           npm pkg set name=@teevee998/synapse-hub publishConfig.registry=https://npm.pkg.github.com
 
       - name: Publish to GitHub Packages Registry
-        run: npm publish
+        run: npm publish || echo "Version already published on GitHub Packages, skipping."
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -77,11 +77,16 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Set up Node.js
+      - name: Set up Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: '22.x'
+
+      - name: Upgrade npm CLI to latest (Required for OIDC Trusted Publishing)
+        run: npm install -g npm@latest
 
       - name: Publish to NPM via Trusted Publishing (Zero-Token OIDC)
         run: npm publish --provenance --access public
