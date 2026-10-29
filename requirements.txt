@@ -1,4 +1,4 @@
 # Enterprise AI Agent Skills & Automation Hub
 # Core toolkit relies on Python Standard Library (Python >= 3.9).
 # Optional vision and canvas diffing dependencies:
-Pillow>=9.0.0
+Pillow>=13.0.0
