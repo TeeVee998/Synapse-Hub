@@ -228,6 +228,25 @@ agent-qa lint
 
 ---
 
+## 🤝 8. Nguồn Cảm Hứng & Lời Cảm Ơn (Acknowledgments & Inspirations)
+
+Dự án **Synapse Hub** được tổng hợp, kế thừa và phát triển dựa trên tinh thần mã nguồn mở và những ý tưởng đột phá từ các kho lưu trữ xuất sắc của cộng đồng kỹ nghệ phần mềm & AI:
+
+| Dự án & Tác giả | Nguồn cảm hứng & Đóng góp kiến trúc trong Synapse Hub |
+| :--- | :--- |
+| **[muratcankoylan/Agent-Skills-for-Context-Engineering](https://github.com/muratcankoylan/Agent-Skills-for-Context-Engineering)** | Nguyên lý Context Engineering, Observation Masking và kỹ thuật tối ưu hóa sự chú ý của LLM. |
+| **[alexgreensh/token-optimizer](https://github.com/alexgreensh/token-optimizer)** | Cơ chế cô đọng log CLI/Gradle (95% distillation) và tối ưu hóa KV-Cache. |
+| **[obra/superpowers](https://github.com/obra/superpowers)** *(Jesse Vincent)* | Kỷ luật gỡ lỗi dựa trên bằng chứng (Systematic Debugging), Cognitive Forcing và cơ chế Red-Team vs Blue-Team. |
+| **[Aider-AI/aider](https://github.com/Aider-AI/aider)** *(Paul Gauthier)* | Kỹ thuật trích xuất AST bản đồ mã nguồn thu gọn (`tools/repo_map.py`) dưới 600 tokens. |
+| **[lavague-ai/LaVague](https://github.com/lavague-ai/LaVague)** | Mô hình Large Action Model (LAM), tự động biên dịch User Story thành kịch bản kiểm thử Clean POM. |
+| **[facebook/infer](https://github.com/facebook/infer)** *(Meta Infer)* | Linter phân tích tĩnh AST (`tools/infer_linter.py`) phát hiện test giả lập (Fake-Pass) và try-catch nuốt lỗi. |
+| **[microsoft/playwright](https://github.com/microsoft/playwright)** | Tương tác live DOM/AOM sub-200ms, điều hướng headless và mô phỏng network resilience. |
+| **[dequelabs/axe-core](https://github.com/dequelabs/axe-core)** | Quy chuẩn kiểm toán tự động các tiêu chí khả năng tiếp cận WCAG 2.2 Level A/AA. |
+| **[bats-core/bats-core](https://github.com/bats-core/bats-core)** | Chuẩn kiểm thử tự động Bash Automated Testing System cho kịch bản shell/CLI. |
+| **[npryce/adr-tools](https://github.com/npryce/adr-tools)** | Quy chuẩn ghi nhận và lưu vết quyết định kiến trúc phần mềm (ADRs). |
+
+---
+
 # 🌐 English Edition
 
 # 🧠 Synapse Hub — AI Agent Intelligence Core & Skill Network
@@ -455,3 +474,23 @@ agent-qa --help
 agent-qa verify
 agent-qa lint
 ```
+
+---
+
+## 🤝 8. Acknowledgments & Upstream Inspirations
+
+**Synapse Hub** synthesizes, adapts, and builds upon groundbreaking methodologies and architectures from the global open-source and AI engineering community:
+
+| Project & Author | Architectural Inspiration in Synapse Hub |
+| :--- | :--- |
+| **[muratcankoylan/Agent-Skills-for-Context-Engineering](https://github.com/muratcankoylan/Agent-Skills-for-Context-Engineering)** | Context Engineering foundations, observation masking, and LLM attention budget optimization. |
+| **[alexgreensh/token-optimizer](https://github.com/alexgreensh/token-optimizer)** | Token-efficient reasoning, 95% log distillation, and KV-cache serialization protocols. |
+| **[obra/superpowers](https://github.com/obra/superpowers)** *(Jesse Vincent)* | Systematic evidence-based debugging, cognitive forcing functions, and Red-Team vs Blue-Team verification. |
+| **[Aider-AI/aider](https://github.com/Aider-AI/aider)** *(Paul Gauthier)* | Ultra-compact AST repository mapping algorithm (`tools/repo_map.py`) fitting 500+ signatures in < 600 tokens. |
+| **[lavague-ai/LaVague](https://github.com/lavague-ai/LaVague)** | Large Action Model (LAM) concept compiling natural language stories into deterministic Clean POM scripts. |
+| **[facebook/infer](https://github.com/facebook/infer)** *(Meta Infer)* | Static AST defect sentinel (`tools/infer_linter.py`) catching swallowed exceptions and 0-assertion fake passes. |
+| **[microsoft/playwright](https://github.com/microsoft/playwright)** | Sub-200ms headless live DOM/AOM probing, route stubbing, and anti-flake network shielding. |
+| **[dequelabs/axe-core](https://github.com/dequelabs/axe-core)** | Automated accessibility rule heuristics inspiring WCAG 2.2 Level A/AA AST auditing. |
+| **[bats-core/bats-core](https://github.com/bats-core/bats-core)** | Bash Automated Testing System patterns for CI/CD pipelines and cross-platform CLI verification. |
+| **[npryce/adr-tools](https://github.com/npryce/adr-tools)** | Architecture Decision Record (ADR) conventions and lifecycle workflows. |
+
