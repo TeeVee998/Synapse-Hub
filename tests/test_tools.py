@@ -86,10 +86,11 @@ class TestToolsIntegrityAndBehavior(unittest.TestCase):
         with open(pkg_path, "r", encoding="utf-8") as f:
             pkg_data = json.load(f)
 
-        self.assertEqual(pkg_data.get("name"), "agent-skills")
+        self.assertEqual(pkg_data.get("name"), "agent-cortex")
         self.assertEqual(pkg_data.get("version"), "2.0.0")
         self.assertIn("agent-qa", pkg_data.get("bin", {}))
         self.assertIn("agent-skills", pkg_data.get("bin", {}))
+        self.assertIn("agent-cortex", pkg_data.get("bin", {}))
 
         # Test node bin launcher execution
         res = subprocess.run(["node", bin_path, "version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd=REPO_ROOT)

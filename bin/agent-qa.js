@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * Enterprise Agent-Skills NPM Launcher
- * ====================================
+ * Enterprise Agent-Cortex NPM Launcher
+ * =====================================
  * Dispatches CLI subcommands to the underlying Python Standard Library engine (tools/cli.py).
- * Provides cross-platform zero-install execution via `npx agent-skills <command>`.
+ * Provides cross-platform zero-install execution via `npx agent-cortex <command>`.
  */
 
 const { spawn, execSync } = require('child_process');
@@ -51,7 +51,7 @@ function main() {
   const python = resolvePython();
 
   if (!python) {
-    console.error(`\n${BOLD}${RED}[ERROR] Python 3.9+ is required to execute agent-skills tools.${RESET}`);
+    console.error(`\n${BOLD}${RED}[ERROR] Python 3.9+ is required to execute agent-cortex tools.${RESET}`);
     console.error(`Neither ${CYAN}python3${RESET} nor ${CYAN}python${RESET} (>= 3.9) was found on your PATH.`);
     console.error(`👉 Please install Python from: ${BOLD}https://www.python.org/downloads/${RESET}\n`);
     process.exit(1);
@@ -71,7 +71,7 @@ function main() {
   });
 
   child.on('error', (err) => {
-    console.error(`\n${BOLD}${RED}[ERROR] Failed to start agent-skills CLI:${RESET}`, err.message);
+    console.error(`\n${BOLD}${RED}[ERROR] Failed to start agent-cortex CLI:${RESET}`, err.message);
     process.exit(1);
   });
 
