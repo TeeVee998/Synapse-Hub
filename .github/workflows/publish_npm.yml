@@ -43,6 +43,7 @@ jobs:
     name: Publish to GitHub Packages
     needs: build-and-verify
     runs-on: ubuntu-latest
+    continue-on-error: true
     permissions:
       contents: read
       packages: write
@@ -77,11 +78,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js for NPM
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20.x'
-          registry-url: 'https://registry.npmjs.org'
 
       - name: Publish to NPM via Trusted Publishing (Zero-Token OIDC)
         run: npm publish --provenance --access public
