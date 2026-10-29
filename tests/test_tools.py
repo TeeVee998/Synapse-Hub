@@ -61,7 +61,10 @@ class TestToolsIntegrityAndBehavior(unittest.TestCase):
         with open(manifest_path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
-        self.assertEqual(data.get("version"), "2.0.1", "Manifest version must be 2.0.1")
+        pkg_path = os.path.join(REPO_ROOT, "package.json")
+        with open(pkg_path, "r", encoding="utf-8") as pf:
+            expected_ver = json.load(pf).get("version")
+        self.assertEqual(data.get("version"), expected_ver, f"Manifest version must match package.json ({expected_ver})")
         manifest_skills = [s["id"] for s in data.get("skills", [])]
         self.assertEqual(len(manifest_skills), 27, "Manifest must declare exactly 27 skills")
 
@@ -93,7 +96,8 @@ class TestToolsIntegrityAndBehavior(unittest.TestCase):
             pkg_data = json.load(f)
 
         self.assertEqual(pkg_data.get("name"), "synapse-hub")
-        self.assertEqual(pkg_data.get("version"), "2.0.1")
+        current_version = pkg_data.get("version")
+        self.assertRegex(current_version, r"^\d+\.\d+\.\d+", "Version must follow semantic versioning")
         self.assertIn("synapse-hub", pkg_data.get("bin", {}))
         self.assertIn("synapse", pkg_data.get("bin", {}))
         self.assertIn("agent-qa", pkg_data.get("bin", {}))
@@ -101,7 +105,7 @@ class TestToolsIntegrityAndBehavior(unittest.TestCase):
         # Test node bin launcher execution
         res = subprocess.run(["node", bin_path, "version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd=REPO_ROOT)
         self.assertEqual(res.returncode, 0, f"Node bin launcher failed: {res.stderr}")
-        self.assertIn("Agent-QA Hub CLI v2.0.1", res.stdout)
+        self.assertIn(f"Agent-QA Hub CLI v{current_version}", res.stdout)
 
     def test_cache_resolver_cosine_similarity(self):
         """Validates compute_cosine_similarity calculation in cache_resolver."""
@@ -480,7 +484,10 @@ class TestToolsIntegrityAndBehavior(unittest.TestCase):
         try:
             cli.cmd_version(None)
             output = sys.stdout.getvalue()
-            self.assertIn("Agent-QA Hub CLI v2.0.1", output)
+            pkg_path = os.path.join(REPO_ROOT, "package.json")
+            with open(pkg_path, "r", encoding="utf-8") as pf:
+                cur_ver = json.load(pf).get("version")
+            self.assertIn(f"Agent-QA Hub CLI v{cur_ver}", output)
             self.assertIn("27 Standardized Skills", output)
         finally:
             sys.stdout = old_stdout
@@ -1209,6 +1216,21 @@ class TestToolsIntegrityAndBehavior(unittest.TestCase):
         self.assertTrue(any("Unicode BiDi RTL" in d for d in descriptions))
         self.assertTrue(any("Emoji Surrogate" in d for d in descriptions))
         self.assertTrue(any("10^4 Chars" in d for d in descriptions))
+
+    def test_bump_version_dry_run_and_calculation(self):
+        """Validates that bump_version parses semver correctly and dry-run exits 0."""
+        import bump_version
+        self.assertEqual(bump_version.calculate_next_version("2.0.1", "patch"), "2.0.2")
+        self.assertEqual(bump_version.calculate_next_version("2.0.1", "minor"), "2.1.0")
+        self.assertEqual(bump_version.calculate_next_version("2.0.1", "major"), "3.0.0")
+        self.assertEqual(bump_version.calculate_next_version("2.0.1", "2.5.0"), "2.5.0")
+
+        # Test dry-run CLI execution
+        res = subprocess.run([sys.executable, os.path.join(TOOLS_DIR, "bump_version.py"), "patch", "--dry-run"],
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd=REPO_ROOT)
+        self.assertEqual(res.returncode, 0)
+        self.assertIn("DRY RUN (Preview)", res.stdout)
+        self.assertIn("Would update package.json", res.stdout)
 
 
 if __name__ == "__main__":

@@ -53,7 +53,11 @@
     "setup": "node ./bin/agent-qa.js setup",
     "analyze": "node ./bin/agent-qa.js analyze",
     "lint": "node ./bin/agent-qa.js lint",
-    "test": "python3 -m unittest discover tests -p 'test_*.py'"
+    "test": "python3 -m unittest discover tests -p 'test_*.py'",
+    "bump": "python3 tools/bump_version.py",
+    "bump:minor": "python3 tools/bump_version.py minor",
+    "bump:major": "python3 tools/bump_version.py major",
+    "release": "python3 tools/bump_version.py patch --commit --push"
   },
   "engines": {
     "node": ">=16.0.0"
