@@ -43,6 +43,12 @@ import test_impact
 import trace_data_flow
 import analyze_project
 
+try:
+    from PIL import Image, ImageDraw, ImageFont
+    HAS_PIL = True
+except ImportError:
+    HAS_PIL = False
+
 
 class TestToolsIntegrityAndBehavior(unittest.TestCase):
     """Automated unit and functional tests for tools in tools/."""
@@ -554,6 +560,7 @@ class TestToolsIntegrityAndBehavior(unittest.TestCase):
         self.assertIsInstance(synced, int)
         self.assertGreaterEqual(synced, 0)
 
+    @unittest.skipUnless(HAS_PIL, "Pillow library is required for visual tests")
     def test_visual_diff_canvas_vectorized(self):
         """Regression test 5: compare_canvas_images runs fast using C-level histogram and accurate diff."""
         from PIL import Image
@@ -1064,6 +1071,7 @@ class TestToolsIntegrityAndBehavior(unittest.TestCase):
         self.assertIn("await request.post('https://app.test.local/api/pay'", code)
         self.assertIn("expect(resp2.status()).toBe(201)", code)
 
+    @unittest.skipUnless(HAS_PIL, "Pillow library is required for visual tests")
     def test_visual_som_helper_bounding_and_coordinate_grounding(self):
         """Validates that visual_som_helper overlays marks and resolves physical coordinates."""
         import visual_som_helper
@@ -1097,6 +1105,7 @@ class TestToolsIntegrityAndBehavior(unittest.TestCase):
             self.assertIn("GOAL: Click on Execute Trade", prompt)
             self.assertIn("CLICK_MARK:", prompt)
 
+    @unittest.skipUnless(HAS_PIL, "Pillow library is required for visual tests")
     def test_visual_som_helper_visual_caching(self):
         """Validates that visual_som_helper caches visual hashes and coordinates in SQLite."""
         import visual_som_helper

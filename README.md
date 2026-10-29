@@ -10,7 +10,7 @@
 
 ## 🌟 1. Tổng quan & Mục đích Kiến trúc
 
-**Synapse Hub** là tầng trí tuệ đa tác tử tách rời (**Decoupled Shared Intelligence Core**), đóng vai trò như một **"Bộ não dùng chung"**, tách biệt hoàn toàn khỏi mã nguồn của từng dự án cụ thể. Dự án trang bị cho AI agents các vai trò bầy đàn chuyên biệt (Multi-Agent Swarm), quy trình tự chữa lành (Self-Healing), khả năng thấu hiểu mã nguồn cấp độ AST và các cổng chất lượng nghiêm ngặt (Quality Gates)—cho phép tự động hóa kiểm thử chuẩn xác tuyệt đối trên mọi codebase mà không làm bẩn repository mục tiêu.
+**Synapse Hub** là tầng trí tuệ đa tác tử tách rời (**Decoupled Shared Intelligence Core**), đóng vai trò như một **"Bộ não dùng chung"**, tách biệt hoàn toàn khỏi mã nguồn của từng dự án cụ thể. Dự án trang bị cho AI agents đội ngũ Sub-Agent QC chuyên biệt (Multi-Agent Swarm), quy trình tự chữa lành (Self-Healing), khả năng thấu hiểu mã nguồn cấp độ AST và các cổng chất lượng nghiêm ngặt (Quality Gates)—cho phép tự động hóa kiểm thử chuẩn xác tuyệt đối trên mọi codebase mà không làm bẩn repository mục tiêu.
 
 ```mermaid
 flowchart TD

@@ -1,3 +1,4 @@
 # Enterprise AI Agent Skills & Automation Hub
-# The agent-qa toolkit relies 100% on the Python Standard Library (Python >= 3.9).
-# Zero external runtime dependencies required.
+# Core toolkit relies on Python Standard Library (Python >= 3.9).
+# Optional vision and canvas diffing dependencies:
+Pillow>=9.0.0
