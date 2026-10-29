@@ -49,26 +49,56 @@ flowchart TD
 
 ## 🚀 2. Cách Sử Dụng (NPM / npx & Workspace Mount)
 
-### Cách A: Sử dụng tức thì qua NPM / npx (Khuyên dùng cho Web, Node & Playwright)
-Tại thư mục bất kỳ của dự án đích, bạn có thể thực thi ngay mà không cần clone hay cài đặt trước:
+[![npm version](https://img.shields.io/npm/v/synapse-hub.svg?style=flat-square&color=blue)](https://www.npmjs.com/package/synapse-hub)
+[![npm downloads](https://img.shields.io/npm/dm/synapse-hub.svg?style=flat-square)](https://www.npmjs.com/package/synapse-hub)
+[![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](https://github.com/TeeVee998/Synapse-Hub/blob/main/package.json)
+
+### Cách A: Sử dụng tức thì qua NPM Registry (Khuyên dùng)
+Gói chính thức đã được phát hành toàn cầu tại **[npmjs.com/package/synapse-hub](https://www.npmjs.com/package/synapse-hub)**. Bạn có thể sử dụng ngay mà không cần clone mã nguồn:
+
+#### 1. Thực thi tức thì không cần cài đặt (`npx`):
+Tại thư mục gốc của bất kỳ dự án nào, thực thi trực tiếp:
 ```bash
-# 1-Click Bootstrap dự án (tự động sinh PROJECT_AI_GUIDE.md, cài pre-push hook, trích xuất AST map)
+# Khởi tạo tự động 1-Click (sinh PROJECT_AI_GUIDE.md, cài pre-push hook, trích xuất AST repo map)
 npx synapse-hub setup
 
-# Chạy kiểm tra 8 Quality Gates DoD
+# Chạy kiểm định 8 Cổng Chất Lượng (DoD Quality Gates)
 npx synapse-hub verify
 
-# Đánh giá sức khỏe dự án toàn diện (5-in-1 Project Health Report)
+# Đánh giá sức khỏe toàn diện dự án (5-in-1 Project Health Report)
 npx synapse-hub analyze
 
-# Cài đặt cố định vào devDependencies của dự án mục tiêu
+# Quét phát hiện mã giả, assertion rỗng (Fake-Pass AST Sentinel)
+npx synapse-hub lint
+```
+> 💡 **Mẹo:** Bạn cũng có thể dùng lệnh gọi rút gọn: `npx synapse setup` hoặc `npx synapse verify`.
+
+#### 2. Cài đặt cố định vào dự án (DevDependency):
+```bash
 npm install -D synapse-hub
+```
+Sau đó có thể khai báo vào `scripts` trong file `package.json` của dự án mục tiêu:
+```json
+"scripts": {
+  "qa:verify": "synapse-hub verify",
+  "qa:analyze": "synapse-hub analyze"
+}
+```
+
+#### 3. Cài đặt toàn cục (Global CLI):
+Để sử dụng công cụ ở bất cứ đâu trên máy tính:
+```bash
+npm install -g synapse-hub
+
+# Sử dụng trực tiếp:
+synapse-hub verify
+synapse setup
 ```
 
 ### Cách B: Mở phiên làm việc đa thư mục (Multi-Root Workspace)
 Trong IDE (Google Antigravity / VS Code / Cursor):
 1. Mở thư mục dự án mục tiêu của bạn.
-2. Thêm thư mục `agent-skills` vào Workspace (`File` -> `Add Folder to Workspace...`).
+2. Thêm thư mục `Synapse-Hub` vào Workspace (`File` -> `Add Folder to Workspace...`).
 
 ### Bước 2: Khởi tạo hướng dẫn dự án (`PROJECT_AI_GUIDE.md`)
 Copy file mẫu từ `templates/PROJECT_AI_GUIDE_TEMPLATE.md` vào thư mục gốc của dự án mục tiêu, đổi tên thành `PROJECT_AI_GUIDE.md` và điền thông tin cụ thể:
@@ -249,8 +279,15 @@ flowchart TD
 
 ## 🚀 2. Getting Started & Usage (NPM / npx & Workspace Mount)
 
-### Method A: Instant Execution via NPM / npx (Recommended for Web, Node & Playwright)
-Run commands directly from any target project directory without cloning or prior installation:
+[![npm version](https://img.shields.io/npm/v/synapse-hub.svg?style=flat-square&color=blue)](https://www.npmjs.com/package/synapse-hub)
+[![npm downloads](https://img.shields.io/npm/dm/synapse-hub.svg?style=flat-square)](https://www.npmjs.com/package/synapse-hub)
+[![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](https://github.com/TeeVee998/Synapse-Hub/blob/main/package.json)
+
+### Method A: Instant Execution via NPM Registry (Recommended)
+The package is officially published at **[npmjs.com/package/synapse-hub](https://www.npmjs.com/package/synapse-hub)**. Execute directly without cloning:
+
+#### 1. Zero-Install Execution (`npx`):
+Run from any target project directory:
 ```bash
 # 1-Click Project Bootstrap (generates PROJECT_AI_GUIDE.md, installs pre-push hook, extracts AST repo map)
 npx synapse-hub setup
@@ -261,14 +298,37 @@ npx synapse-hub verify
 # Comprehensive 5-in-1 Project Health Audit
 npx synapse-hub analyze
 
-# Install permanently as a devDependency in target project
+# Static Defect & Fake-Pass Sentinel scan
+npx synapse-hub lint
+```
+> 💡 **Tip:** You can also use the shorthand alias: `npx synapse setup` or `npx synapse verify`.
+
+#### 2. Project-Local Installation (DevDependency):
+```bash
 npm install -D synapse-hub
+```
+Configure custom lifecycle scripts in your target project's `package.json`:
+```json
+"scripts": {
+  "qa:verify": "synapse-hub verify",
+  "qa:analyze": "synapse-hub analyze"
+}
+```
+
+#### 3. Global CLI Installation:
+To use `synapse-hub` anywhere on your terminal:
+```bash
+npm install -g synapse-hub
+
+# Direct invocation:
+synapse-hub verify
+synapse setup
 ```
 
 ### Method B: Multi-Root Workspace Mounting
 Within your AI IDE (Google Antigravity / VS Code / Cursor):
 1. Open your target project folder.
-2. Add the `synapse-hub` directory to your workspace (`File` -> `Add Folder to Workspace...`).
+2. Add the `Synapse-Hub` directory to your workspace (`File` -> `Add Folder to Workspace...`).
 
 ### Step 2: Initialize Project AI Guide (`PROJECT_AI_GUIDE.md`)
 Copy `templates/PROJECT_AI_GUIDE_TEMPLATE.md` to target project root, rename to `PROJECT_AI_GUIDE.md`, and configure:
