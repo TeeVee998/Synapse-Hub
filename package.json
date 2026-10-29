@@ -1,7 +1,10 @@
 {
-  "name": "agent-cortex",
+  "name": "@teevee998/agent-cortex",
   "version": "2.0.0",
   "description": "Enterprise AI Agent Quality Engineering & Test Automation Hub",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [
     "qa",
     "testing",

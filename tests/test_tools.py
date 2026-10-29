@@ -86,7 +86,7 @@ class TestToolsIntegrityAndBehavior(unittest.TestCase):
         with open(pkg_path, "r", encoding="utf-8") as f:
             pkg_data = json.load(f)
 
-        self.assertEqual(pkg_data.get("name"), "agent-cortex")
+        self.assertEqual(pkg_data.get("name"), "@teevee998/agent-cortex")
         self.assertEqual(pkg_data.get("version"), "2.0.0")
         self.assertIn("agent-qa", pkg_data.get("bin", {}))
         self.assertIn("agent-skills", pkg_data.get("bin", {}))
