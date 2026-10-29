@@ -1,17 +1,18 @@
-# 🧠 AI Agent Skills & Intelligence Hub
+# 🧠 Agent Cortex — AI Agent Intelligence Core & Skill Hub
 
-> **Kho lưu trữ trung tâm các Kỹ năng (Skills), Quy tắc (Rules), Công cụ (Tools) và Quy trình tự động hóa (Workflows) cho Trợ lý AI (Google Antigravity / Cursor / Windsurf / Claude Code).**  
+> **The shared intelligence core and autonomous skill hub empowering AI coding assistants (Google Antigravity / Cursor / Windsurf / Claude Code) across automated testing suites.**  
+> **Tác giả / Author:** Thế Vị ([@TeeVee998](https://github.com/TeeVee998))  
 > **Phiên bản Hub:** `v2.0.0` (Semantic Versioning) | **Chỉ số toàn vẹn:** 27 Skills, 6 Agent Swarm Roles, 7 Core Rules, 20+ Python Tools.
 
 ---
 
 ## 🌟 1. Tổng quan & Mục đích Kiến trúc
 
-Repository này đóng vai trò là **"Bộ não dùng chung" (Shared Intelligence Core)**, tách biệt hoàn toàn khỏi mã nguồn của từng dự án cụ thể.
+**Agent Cortex** là tầng trí tuệ đa tác tử tách rời (**Decoupled Shared Intelligence Core**), đóng vai trò như một **"Bộ não dùng chung"**, tách biệt hoàn toàn khỏi mã nguồn của từng dự án cụ thể. Dự án trang bị cho AI agents các vai trò bầy đàn chuyên biệt (Multi-Agent Swarm), quy trình tự chữa lành (Self-Healing), khả năng thấu hiểu mã nguồn cấp độ AST và các cổng chất lượng nghiêm ngặt (Quality Gates)—cho phép tự động hóa kiểm thử chuẩn xác tuyệt đối trên mọi codebase mà không làm bẩn repository mục tiêu.
 
 ```mermaid
 flowchart TD
-    subgraph Hub["🧠 agent-skills (Intelligence Core v2.0.0)"]
+    subgraph Hub["🧠 Agent Cortex (Intelligence Core v2.0.0)"]
         Skills[".agents/skills/ (27 Skills)"]
         Agents[".agents/agents/ (6 Specialized Roles)"]
         Rules[".agents/rules/ (7 Core Rules)"]
@@ -186,6 +187,206 @@ Chi tiết đầy đủ xem tại [tools/TOOLS_RUNBOOK.md](tools/TOOLS_RUNBOOK.m
 3. **[docs/CLI_REFERENCE.md](docs/CLI_REFERENCE.md)**: Cẩm nang tra cứu toàn bộ tham số lệnh của công cụ dòng lệnh `agent-qa`.
 
 ### Cài đặt nhanh CLI Package:
+```bash
+pip install -e .
+agent-qa --help
+agent-qa verify
+agent-qa lint
+```
+
+---
+
+# 🌐 English Edition
+
+# 🧠 Agent Cortex — AI Agent Intelligence Core & Skill Hub
+
+> **The shared intelligence core and autonomous skill hub empowering AI coding assistants (Google Antigravity / Cursor / Windsurf / Claude Code) across automated testing suites.**  
+> **Author:** Thế Vị ([@TeeVee998](https://github.com/TeeVee998))  
+> **Hub Version:** `v2.0.0` (Semantic Versioning) | **Integrity Index:** 27 Skills, 6 Agent Swarm Roles, 7 Core Rules, 20+ Python Tools.
+
+---
+
+## 🌟 1. Overview & Architectural Purpose
+
+**Agent Cortex** serves as a **Decoupled Shared Intelligence Core**, acting as an external neural brain completely isolated from target projects' codebases. It equips AI agents with specialized swarm roles, self-healing execution protocols, AST-level code intelligence, and strict Quality Gates—enabling zero-leakage, truth-anchored test automation across any polyglot codebase without polluting target repositories.
+
+```mermaid
+flowchart TD
+    subgraph Hub["🧠 Agent Cortex (Intelligence Core v2.0.0)"]
+        Skills[".agents/skills/ (27 Skills)"]
+        Agents[".agents/agents/ (6 Specialized Roles)"]
+        Rules[".agents/rules/ (7 Core Rules)"]
+        Tools["tools/ (20+ Universal Python Tools)"]
+        Workflows[".agents/workflows/"]
+    end
+
+    subgraph ChatSession["💬 AI Agent Workspace / Chat Session"]
+        Hub -->|Mount/Add Workspace| ChatSession
+    end
+
+    subgraph Projects["📁 Target Projects"]
+        ProjectA["Project A<br/>(PROJECT_AI_GUIDE.md + Source Code)"]
+        ProjectB["Project B<br/>(PROJECT_AI_GUIDE.md + Test Code)"]
+        ProjectC["Project C<br/>(PROJECT_AI_GUIDE.md + App Code)"]
+        Other["Other Projects..."]
+    end
+
+    ProjectA -->|Mount Workspace| ChatSession
+    ProjectB -.->|Mount Workspace| ChatSession
+    ProjectC -.->|Mount Workspace| ChatSession
+    Other -.->|Mount Workspace| ChatSession
+```
+
+### Core Architectural Benefits:
+1. **Cross-Project Reusability:** Develop skills and tools once; reuse universally across any Web/API stack (React, Angular, Vue, Next.js, Java, Python).
+2. **Target Repository Privacy & Clean SCM:** Target project repos remain 100% clean—zero personal AI prompts or agent skills polluting production Git history.
+3. **Single Source of Truth:** Manage, upgrade, add new skills, and synchronize Global Memory Cache in one centralized hub.
+4. **Lean & Lightweight Integration:** Target projects require only **a single markdown guide** (`PROJECT_AI_GUIDE.md`).
+
+---
+
+## 🚀 2. Getting Started & Usage (NPM / npx & Workspace Mount)
+
+### Method A: Instant Execution via NPM / npx (Recommended for Web, Node & Playwright)
+Run commands directly from any target project directory without cloning or prior installation:
+```bash
+# 1-Click Project Bootstrap (generates PROJECT_AI_GUIDE.md, installs pre-push hook, extracts AST repo map)
+npx agent-skills setup
+
+# Run 8 Quality Gates DoD Verification
+npx agent-skills verify
+
+# Comprehensive 5-in-1 Project Health Audit
+npx agent-skills analyze
+
+# Install permanently as a devDependency in target project
+npm install -D agent-skills
+```
+
+### Method B: Multi-Root Workspace Mounting
+Within your AI IDE (Google Antigravity / VS Code / Cursor):
+1. Open your target project folder.
+2. Add the `Agent Cortex` directory to your workspace (`File` -> `Add Folder to Workspace...`).
+
+### Step 2: Initialize Project AI Guide (`PROJECT_AI_GUIDE.md`)
+Copy `templates/PROJECT_AI_GUIDE_TEMPLATE.md` to target project root, rename to `PROJECT_AI_GUIDE.md`, and configure:
+- Test/staging environment URLs.
+- Credentials and authentication strategies.
+- Source code directory structure.
+- Headless execution commands and technology stack.
+- **Fast-Lookup Registers:** Point `testcases.json` and `selectors.json` (or set `TC_DATA_FILE` / `XPATH_DATA_FILE` env vars) for instant zero-token query via `tools/lookup_tc.py` and `tools/lookup_xpath.py`.
+
+### Step 3: One-Click Environment Bootstrap
+Execute the automated bootstrap script:
+```powershell
+# Windows PowerShell
+./scripts/install.ps1
+
+# Linux / macOS
+./scripts/setup.sh
+```
+The bootstrap script automatically configures `.venv`, installs dependencies, lints skills, and seeds initial solutions into the Central SQLite Agent Memory (`~/.agent_memory/global_cache.db`).
+
+> 💡 **Initializing SQLite Memory on Clean CI/CD & Docker:**  
+> In fresh CI runners or Docker containers, initialize zero-token memory cache via:
+> ```bash
+> agent-qa heal init
+> # or run directly:
+> python tools/cache_resolver.py init
+> ```
+
+---
+
+## 👥 3. Multi-Agent Swarm System (6 Specialized Roles)
+
+Agent Cortex clearly partitions capabilities across 6 specialized AI roles, pre-configured with dedicated skills and tools:
+
+| Agent Role | Core Responsibility | Assigned Skills | Included Tools |
+| :--- | :--- | :--- | :--- |
+| **`orchestrator`** | Lead coordinator, project bootstrapping, health auditing, state anchoring. | `agent-orchestration-multi-agent-optimize`, `graphify-impact-analyzer`, `architecture-decision-records` | `tools/setup_project.py`, `tools/analyze_project.py`, `tools/project_state.py`, `tools/repo_map.py`, `tools/test_impact.py`, `tools/mcp_server.py` |
+| **`live-explorer`** | Live DOM/AOM probing via Playwright MCP, destructive click firewall. | `playwright-live-interaction`, `self-healing-locator`, `visual-regression-sentinel`, `auth-session-and-cookie-manager` | `tools/safety_firewall.py`, `tools/lookup_xpath.py`, `tools/visual_diff_canvas.py`, `tools/browser_helpers.js` |
+| **`pom-crafter`** | Clean POM engineer, API drift detection, User Story to test generation. | `clean-pom-crafter`, `lam-script-generator`, `synthetic-test-data-generator`, `api-spec-to-e2e-matrix`, `file-and-report-validator`, `db-state-verifier-and-seeder` | `tools/generate_tc_from_story.py`, `tools/generate_api_matrix.py`, `tools/api_drift_sentinel.py`, `tools/repo_map.py` |
+| **`test-runner`** | Headless CLI suite manager, CI parallel sharding and log distillation. | `katalon-cli-runner`, `e2e-testing-patterns`, `bats-testing-patterns`, `auth-session-and-cookie-manager`, `flaky-test-sentinel-and-quarantine` | `tools/matrix_sharder.py`, `tools/distill_log.py`, `tools/pinpoint_failure.py`, `tools/flaky_detector.py` |
+| **`failure-analyst`**| Automated closed-loop failure triage, MTTR scoring, self-healing PR drafting. | `failure-autopsy-and-healing`, `self-healing-locator`, `file-and-report-validator` | `tools/auto_heal.py`, `tools/heal_pr_automator.py`, `tools/pinpoint_failure.py`, `tools/cache_resolver.py` |
+| **`quality-gatekeeper`**| Enforces 8 Quality Gates DoD, scans fake passes, runs AST mutation testing. | `antigravity-test-sentinel`, `code-refactoring-refactor-clean`, `wcag-audit-patterns`, `web-vitals-and-performance-profiler`, `db-state-verifier-and-seeder`, `security-dast-sentinel` | `tools/verify_all.py`, `tools/infer_linter.py`, `tools/micro_mutator.py`, `tools/trace_data_flow.py`, `tools/wcag_audit.py`, `tools/lint_ai_docs.py` |
+
+---
+
+## 📦 4. Standardized 27 Skills Catalog (.agents/skills/)
+
+| # | Skill Name | Core Operational Scope |
+|:---:|---|---|
+| 1 | `agent-orchestration-multi-agent-optimize` | Multi-agent coordination profiling, workload distribution, and token cost budgeting. |
+| 2 | `antigravity-test-sentinel` | Verification-First sentinel, locking task completion until exit code 0 is proven. |
+| 3 | `api-network-mocking-interception` | HTTP/GraphQL request interception, route stubbing, and chaos network resilience testing. |
+| 4 | `api-spec-to-e2e-matrix` | Transforms OpenAPI/Swagger specifications into equivalence, boundary, and error test matrices. |
+| 5 | `architecture-decision-records` | Documents and maintains technical Architecture Decision Records (ADR). |
+| 6 | `auth-session-and-cookie-manager` | Manages sessions, JWT tokens, and storageState for zero-second authentications. |
+| 7 | `backend-load-and-stress-patterns` | Backend load/stress testing via k6 & Locust with P95/P99 SLA threshold assertions. |
+| 8 | `bats-testing-patterns` | Automated testing for Shell scripts, CI/CD pipelines, CLI mocks, and exit codes. |
+| 9 | `clean-pom-crafter` | Clean Page Object Model standards, Flat Architecture, and dynamic `uniqueCode` test data. |
+| 10 | `code-refactoring-refactor-clean` | Clean code refactoring, code smells elimination, technical debt remediation, and SOLID. |
+| 11 | `db-state-verifier-and-seeder` | Direct DB state assertions (PostgreSQL, MySQL, MongoDB, Redis) and isolated fixtures. |
+| 12 | `e2e-testing-patterns` | Multi-browser E2E testing architecture (Playwright/Cypress), Typed POM, parallel sharding. |
+| 13 | `failure-autopsy-and-healing` | Automated failure triage from JUnit XML, Allure reports, and visual error screenshots. |
+| 14 | `file-and-report-validator` | Verifies uploaded/downloaded files (Excel .xlsx, streaming CSV, PDF text/layout). |
+| 15 | `flaky-test-sentinel-and-quarantine` | Flaky test detection, flakiness index scoring, and quarantine isolation governance. |
+| 16 | `github-actions-templates` | Production-ready GitHub Actions CI/CD workflows and sharded testing matrix. |
+| 17 | `graphify-impact-analyzer` | AST Knowledge Graph navigation and zero-waste test impact analysis. |
+| 18 | `katalon-cli-runner` | Headless KRE CLI execution coordinator, licensing fallback, and zombie driver cleanup. |
+| 19 | `lam-script-generator` | Large Action Model generator compiling User Stories into 100% test scripts with zero replay. |
+| 20 | `playwright-live-interaction` | Real-time DOM/AOM probing via Playwright MCP with sub-200ms selector verification. |
+| 21 | `security-dast-sentinel` | Dynamic Application Security Testing (DAST), OWASP Top 10, Security Headers, BOLA/IDOR. |
+| 22 | `self-healing-locator` | Micro-locator self-healing via Accessibility Tree (AOM), Role > Label > TestId hierarchy. |
+| 23 | `synthetic-test-data-generator` | Robust synthetic boundary test data generation (BVT, anti-injection, multilingual, GIS). |
+| 24 | `token-and-context-optimizer` | Context engineering, 95% log distillation, anti-degradation, and disk scratchpads. |
+| 25 | `visual-regression-sentinel` | Pixel-level and SSIM visual regression testing with dynamic masking. |
+| 26 | `wcag-audit-patterns` | Automated WCAG 2.2 Level A/AA accessibility auditing via AST and `@axe-core`. |
+| 27 | `web-vitals-and-performance-profiler` | Core Web Vitals (LCP, CLS, TTFB) profiling and slow API endpoint detection via CDP. |
+
+---
+
+## 📜 5. 7 Core Rules Catalog (.agents/rules/)
+
+1. **`context-engineering.md`**: Observation masking, lazy progressive disclosure, and KV-cache optimization.
+2. **`git-push-protocol.md`**: Clean git push protocol (decoupled architecture guarantees zero AI leakage).
+3. **`graphify.md`**: Navigating the AST knowledge graph over reading entire large source files.
+4. **`lessons-learned.md`**: Episodic anti-pattern blacklist (strictly capped under 40 lines).
+5. **`mandatory-playwright-live.md`**: Mandatory headless Full HD 1920x1080 and live DOM probing before codifying.
+6. **`skill-precedence.md`**: Tier-1 local skill precedence resolving external plugin collisions.
+7. **`systematic-debugging.md`**: Evidence-first debugging discipline; zero guessing; 8 Quality Gates DoD.
+
+---
+
+## 🛠️ 6. Automated Tools Runbook (tools/ & scripts/)
+
+For full details, refer to [tools/TOOLS_RUNBOOK.md](tools/TOOLS_RUNBOOK.md):
+
+- `tools/verify_all.py`: 8 Quality Gates DoD verification (UTF-8, No XPaths, UniqueCode, Clean POM).
+- `tools/infer_linter.py`: Static AST analysis detecting fake passes (zero asserts) and empty catch blocks.
+- `tools/test_impact.py`: Scopes affected test cases based on git diffs.
+- `tools/cache_resolver.py`: Manages the central SQLite error memory cache (`~/.agent_memory/global_cache.db`).
+- `tools/distill_log.py`: Filters 95% noise from CLI/Gradle/KRE logs, preserving stacktraces and pointers.
+- `tools/agent_canary.py`: Injects 8 failure vectors to benchmark MTTR and autonomous recovery rate.
+- `tools/repo_map.py`: Extracts a compressed method and Page Class map (~500 tokens).
+- `tools/visual_diff_canvas.py`: Pixel/SSIM comparison for canvas/GIS interfaces lacking standard DOM.
+- `tools/wcag_audit.py`: Automated scanning for WCAG 2.2 Level A/AA criteria.
+- `tools/generate_api_matrix.py`: Generates positive, boundary, and negative test matrices from Swagger/OpenAPI.
+- `tools/generate_tc_from_story.py`: Large Action Model parser generating Clean POM skeletons from stories.
+- `tools/trace_data_flow.py`: Taint analysis tracking test data flow and preventing database orphan junk.
+- `scripts/install.ps1` & `scripts/setup.sh`: 1-click bootstrap scripts setting up the hub environment.
+- `scripts/lint_skills.ps1`: Linter verifying skill integrity and metadata manifest.
+- `pyproject.toml` & `tools/cli.py`: PEP 621 packaging for the global `agent-qa` CLI.
+
+---
+
+## 📚 7. Extended Technical Documentation & CLI Package (docs/)
+
+1. **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**: Hub/Spoke architecture, 4-tier skill model, and 6-agent swarm coordination.
+2. **[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)**: Contribution standards, new skill authoring principles, and verification pipelines.
+3. **[docs/CLI_REFERENCE.md](docs/CLI_REFERENCE.md)**: Comprehensive command-line reference for the `agent-qa` CLI.
+
+### Quick CLI Installation:
 ```bash
 pip install -e .
 agent-qa --help
