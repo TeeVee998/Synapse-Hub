@@ -110,6 +110,119 @@ class NetworkMockShield:
         return f"cy.intercept('{method}', '{url_pattern}', {{ statusCode: {status}, body: {body_json}{delay_opt} }}).as('mock_{url_pattern.split('/')[-1]}');"
 
     @classmethod
+    def generate_playwright_har_harness(cls, har_path: str, mode: str = "replay", url_glob: str = "**/*", lang: str = "ts") -> str:
+        """
+        Generates Playwright Native Zero-Latency HAR Record & Replay harness.
+        - record: Dumps real network traffic to HAR file.
+        - replay: Intercepts all matching requests and returns responses from HAR with 0ms delay.
+        """
+        if mode == "record":
+            if lang == "python":
+                return "\n".join([
+                    f"# --- ZERO-LATENCY HAR RECORDING HARNESS (Playwright Python) ---",
+                    f"# Dumps live network traffic to '{har_path}'",
+                    f"context = browser.new_context(",
+                    f"    record_har_path='{har_path}',",
+                    f"    record_har_mode='minimal',",
+                    f"    record_har_url_filter='{url_glob}'",
+                    f")",
+                    f"page = context.new_page()",
+                    f"# Note: Run 'python tools/network_mock_shield.py --har-sanitize {har_path}' before committing to git!"
+                ])
+            else:
+                return "\n".join([
+                    f"// --- ZERO-LATENCY HAR RECORDING HARNESS (Playwright TS) ---",
+                    f"// Dumps live network traffic to '{har_path}'",
+                    f"const context = await browser.newContext({{",
+                    f"  recordHar: {{",
+                    f"    path: '{har_path}',",
+                    f"    mode: 'minimal',",
+                    f"    urlFilter: '{url_glob}'",
+                    f"  }}",
+                    f"}});",
+                    f"const page = await context.newPage();",
+                    f"// Note: Run 'python tools/network_mock_shield.py --har-sanitize {har_path}' before committing to git!"
+                ])
+        else:
+            # Replay Mode
+            if lang == "python":
+                return "\n".join([
+                    f"# --- ZERO-LATENCY HAR REPLAY HARNESS (Playwright Python) ---",
+                    f"# Replays 100% network responses from local HAR with 0ms delay (Immune to backend downtime)",
+                    f"page.route_from_har(",
+                    f"    har_id='{har_path}',",
+                    f"    url='{url_glob}',",
+                    f"    not_found='fallback',",
+                    f"    update=False",
+                    f")"
+                ])
+            else:
+                return "\n".join([
+                    f"// --- ZERO-LATENCY HAR REPLAY HARNESS (Playwright TS) ---",
+                    f"// Replays 100% network responses from local HAR with 0ms delay (Immune to backend downtime)",
+                    f"await page.routeFromHAR('{har_path}', {{",
+                    f"  url: '{url_glob}',",
+                    f"  notFound: 'fallback',",
+                    f"  update: false",
+                    f"}});"
+                ])
+
+    @classmethod
+    def sanitize_har_file(cls, input_har_path: str, output_har_path: Optional[str] = None) -> int:
+        """
+        Parses a recorded HAR file and redacts sensitive PII & credentials:
+        Bearer tokens, Authorization headers, Cookie headers, passwords, API keys.
+        Returns the count of redacted entries.
+        """
+        import re
+        if not os.path.exists(input_har_path):
+            raise FileNotFoundError(f"HAR file not found: {input_har_path}")
+
+        with open(input_har_path, "r", encoding="utf-8", errors="replace") as fp:
+            data = json.load(fp)
+
+        entries = data.get("log", {}).get("entries", [])
+        redacted_count = 0
+
+        pii_patterns = [
+            (re.compile(r'"(password|pass|secret|token|api_?key|access_?token)"\s*:\s*"[^"]+"', re.IGNORECASE), r'"\1": "REDACTED_SECRET"'),
+            (re.compile(r'"(credit_?card|card_?number|pan)"\s*:\s*"[^"]+"', re.IGNORECASE), r'"\1": "411111******1111"'),
+            (re.compile(r'"(cvv|cvc)"\s*:\s*"[^"]+"', re.IGNORECASE), r'"\1": "999"'),
+            (re.compile(r'"(email)"\s*:\s*"[^"]+"', re.IGNORECASE), r'"\1": "auto_user@enterprise.local"')
+        ]
+
+        for entry in entries:
+            req = entry.get("request", {})
+            # 1. Scrub Request Headers
+            for header in req.get("headers", []):
+                h_name = header.get("name", "").lower()
+                if h_name in ("authorization", "cookie", "x-api-key", "token", "proxy-authorization"):
+                    header["value"] = "Bearer REDACTED_TOKEN" if "bearer" in header.get("value", "").lower() else "REDACTED"
+                    redacted_count += 1
+
+            # 2. Scrub Request Post Data
+            post_data = req.get("postData", {})
+            if "text" in post_data:
+                txt = post_data["text"]
+                for pat, rep in pii_patterns:
+                    txt = pat.sub(rep, txt)
+                post_data["text"] = txt
+
+            # 3. Scrub Response Headers (Set-Cookie)
+            resp = entry.get("response", {})
+            for header in resp.get("headers", []):
+                h_name = header.get("name", "").lower()
+                if h_name in ("set-cookie", "authorization"):
+                    header["value"] = "REDACTED_COOKIE"
+                    redacted_count += 1
+
+        out_path = output_har_path or input_har_path
+        with open(out_path, "w", encoding="utf-8") as fp:
+            json.dump(data, fp, indent=2)
+
+        return redacted_count
+
+    @classmethod
     def get_preset(cls, preset_name: str) -> Dict[str, Any]:
         """Returns preset details or raises ValueError."""
         if preset_name not in cls.PRESETS:
@@ -127,7 +240,35 @@ def main():
     parser.add_argument("--lang", choices=["ts", "python", "cypress"], default="ts", help="Target script language")
     parser.add_argument("--list-presets", action="store_true", help="List all available presets")
 
+    # HAR Record & Replay options
+    parser.add_argument("--har-mode", choices=["record", "replay"], default=None, help="Generate Playwright HAR record or replay harness")
+    parser.add_argument("--har-path", default="fixtures/network_trace.har", help="Path to HAR archive file")
+    parser.add_argument("--har-sanitize", default=None, help="Sanitize PII, tokens, and cookies from recorded HAR file")
+    parser.add_argument("--har-out", default=None, help="Optional output path for sanitized HAR")
+
     args = parser.parse_args()
+
+    # Handle HAR Sanitization
+    if args.har_sanitize:
+        redacted = NetworkMockShield.sanitize_har_file(args.har_sanitize, output_har_path=args.har_out)
+        target = args.har_out or args.har_sanitize
+        print(f"✅ [HAR SANITIZED] Scrubbed {redacted} sensitive headers/tokens in: {target}")
+        return
+
+    # Handle HAR Harness Generation
+    if args.har_mode:
+        code = NetworkMockShield.generate_playwright_har_harness(
+            har_path=args.har_path,
+            mode=args.har_mode,
+            url_glob=args.url,
+            lang=args.lang
+        )
+        print("======================================================================")
+        print(f"  PLAYWRIGHT ZERO-LATENCY HAR {args.har_mode.upper()} HARNESS ({args.lang.upper()})")
+        print("======================================================================")
+        print(code)
+        print("======================================================================")
+        return
 
     if args.list_presets:
         print("======================================================================")

@@ -46,6 +46,9 @@ reports/
 Reports/
 allure-results/
 allure-report/
+tmp/
+.portman/
+graphify-out/
 
 # OS
 .DS_Store

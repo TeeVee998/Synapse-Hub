@@ -13,6 +13,7 @@
 | **Comprehensive Health & AST Analysis ("analyze project")** | `tools/analyze_project.py` | `python tools/analyze_project.py [target]` (or `agent-qa analyze`).<br/>*Post-Audit:* Stages, commits, and pushes `PROJECT_HEALTH_REPORT.md` & `repo_map.txt` to project Git. |
 | **Action Safety Firewall (Environment Protection)** | `tools/safety_firewall.py` | `python tools/safety_firewall.py --text "Delete" --action click` (or `agent-qa safety-check`) |
 | **API Contract Drift (Breaking Change Detection)** | `tools/api_drift_sentinel.py` | `python tools/api_drift_sentinel.py --old base.json --new curr.json` (or `agent-qa contract-drift`) |
+| **Autonomous API Fuzzing & Chaos Breaker** | `tools/api_fuzzer.py` | `agent-qa fuzz-api --base-url <url> --spec <swagger.json>` (Catches 500, DB leaks, SLA breach) |
 | **FastMCP JSON-RPC Server (Cursor/Claude/Antigravity)** | `tools/mcp_server.py` | `python tools/mcp_server.py` (or `agent-qa mcp-serve`) |
 | **AST Micro-Mutation (Assertion Quality Verification)** | `tools/micro_mutator.py` | `python tools/micro_mutator.py [target]` (or `agent-qa mutate`) |
 | **Self-Healing PR Automator (Trace & Visual Diff Proof)** | `tools/heal_pr_automator.py` | `python tools/heal_pr_automator.py --page P.groovy --old "//a" --new "//b" --trace-zip trace.zip` (or `agent-qa heal-pr`) |
@@ -33,6 +34,8 @@
 | **After healing a test failure** | `tools/cache_resolver.py` | `python tools/cache_resolver.py record-lesson --context "<page>" --error "<sig>" --lesson "<summary>"` |
 | **Generating test scripts from Natural Language Story** | `tools/generate_tc_from_story.py`| `python tools/generate_tc_from_story.py "<story>"` |
 | **Generating E2E matrix from OpenAPI/Swagger** | `tools/generate_api_matrix.py` | `python tools/generate_api_matrix.py --spec <swagger.json>` |
+| **Exporting API tests to Postman Collection v2.1** | `tools/export_postman_collection.py` | `agent-qa export-postman --spec <swagger.json> -o col.json` |
+| **Generating JMeter Performance Test Plan (.jmx)** | `tools/generate_jmx_plan.py` | `agent-qa generate-jmx --spec <swagger.json> --vus 100 -o plan.jmx` |
 | **Auditing Web Accessibility (WCAG 2.2)** | `tools/wcag_audit.py` | `python tools/wcag_audit.py <path_to_html_or_url>` |
 | **0-Token Polyglot Test Transpilation** | `tools/omni_transpiler.py` | `agent-qa transpile <file> --to <target>` (Playwright TS, Python, Java, Katalon, Cypress) |
 | **0-Token Repository Polyglot AST Scan** | `tools/omni_transpiler.py` | `agent-qa omni-scan [path]` (Instant inventory of Pages, Locators, Tests across languages) |
@@ -233,14 +236,30 @@
 ---
 
 ### 15. `tools/visual_som_helper.py`
-- **Purpose:** Multimodal Vision Grounding and Set-of-Marks (SoM) fallback engine. When standard DOM locators fail on HTML5 Canvas, WebGL, or deeply nested Shadow DOM, it overlays numbered bounding box badges on screenshots, resolves target coordinates `(x, y)`, and dispatches physical Playwright mouse clicks (`await page.mouse.click(x, y)`).
+- **Purpose:** Multimodal Vision Grounding and Set-of-Marks (SoM) fallback engine. When standard DOM locators fail on HTML5 Canvas, GIS maps, WebGL charts, or deeply nested Shadow DOM, it autonomously detects interactive visual contours using PIL edge clustering, overlays numbered bounding box badges on screenshots, resolves target coordinates `(x, y)`, caches coordinates via 64-bit dHash in SQLite, and dispatches physical Playwright mouse clicks (`await page.mouse.click(x, y)`).
 - **CLI Syntax:**
   ```bash
+  # Autonomous Canvas contour detection without DOM
+  python tools/visual_som_helper.py --image canvas_map.png --detect-only
+
   # Generate Set-of-Marks overlay and resolve target coordinates
   python tools/visual_som_helper.py --image screenshot.png --label "Execute Trade"
 
-  # Resolve specific Mark ID
-  python tools/visual_som_helper.py --image screenshot.png --mark-id 3 --json
+  # Zero-Token Visual Cache lookup (Similarity > 98%)
+  python tools/visual_som_helper.py --image screenshot.png --component "TradeButton" --cache-lookup
+  ```
+
+---
+
+### 16. `tools/api_fuzzer.py`
+- **Purpose:** Autonomous runtime API fuzzer and chaos breaker. Ingests OpenAPI 3.x / Swagger 2.0 schemas, generates dynamic boundary, type-inverted, and adversarial fuzzing payloads from `tools/fuzz_payloads.py`, executes live HTTP/S requests against staging/test APIs, and evaluates three-alarm defect Oracle: HTTP 500 crashes, database stacktrace leaks, and SLA latency timeouts (> 3000ms).
+- **CLI Syntax:**
+  ```bash
+  # Execute active fuzzing against staging API
+  agent-qa fuzz-api --base-url "https://staging.api.enterprise.com" --spec swagger.json --token "JWT_SECRET"
+
+  # Air-gapped / deterministic dry-run mode for CI/CD
+  agent-qa fuzz-api --dry-run
   ```
 
 ---
@@ -295,4 +314,36 @@
 - **CLI Syntax:**
   ```bash
   agent-qa ci-hook --file LoginPage.ts --old-loc "//button[@id='old']" --new-loc "//button[@id='new']"
+  ```
+
+---
+
+### 21. `tools/export_postman_collection.py`
+- **Purpose:** Enterprise OpenAPI/Swagger & HAR to Postman Collection v2.1.0 Exporter. Generates fully structured Postman collections with dynamic pre-request scripts, SLA latency tests, response code assertions, and autonomous bearer token / created entity ID extraction for Newman and CI/CD pipelines.
+- **CLI Syntax:**
+  ```bash
+  # Ingest OpenAPI spec and export Postman collection + companion environment
+  agent-qa export-postman --spec swagger.json -o collection.json --env-output env.json
+
+  # Replay production HAR traffic as Postman requests
+  agent-qa export-postman --har session.har -o har_collection.json
+
+  # Generate sample collection from built-in enterprise schema
+  agent-qa export-postman --sample -o sample_collection.json
+  ```
+
+---
+
+### 22. `tools/generate_jmx_plan.py`
+- **Purpose:** Apache JMeter 5.x Performance Test Plan XML (.jmx) Generator. Ingests OpenAPI specifications, Postman Collections, or HAR recordings to output production-ready JMeter load, stress, and spike test plans with configurable VUs, ramp-up schedules, SLA assertions (< 500ms), and dynamic session token propagation.
+- **CLI Syntax:**
+  ```bash
+  # Generate JMeter plan from OpenAPI with 100 Virtual Users for 10 minutes
+  agent-qa generate-jmx --spec swagger.json -o load_plan.jmx --vus 100 --duration 600
+
+  # Convert existing Postman collection into JMeter performance test plan
+  agent-qa generate-jmx --postman collection.json -o perf_plan.jmx --vus 50 --ramp-up 20
+
+  # Run headless JMeter CLI
+  jmeter -n -t load_plan.jmx -l results.jtl -e -o ./html_report
   ```

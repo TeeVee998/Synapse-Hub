@@ -16,6 +16,7 @@ description: Critical anti-patterns, past mistakes, and strict avoidance rules (
 | **4** | **Context window blowout** | Read 4,368-line `DataMiningPage.groovy` directly. | **Never read large files whole.** Query `tools/repo_map.txt` or read 20-50 line ranges. |
 | **5** | **Flaky timing on CI/CD** | `Thread.sleep` failed under variable network lag. | Replace 100% with Smart Wait: Angular `isStable()` and CDP `Network Idle 0`. |
 | **6** | **DB polluted with test junk** | Created entities without executing deletion. | Every data creation test case **must** execute idempotent teardown cleanup. |
+| **7** | **Graphify/CLI ran on Skill Hub instead of target project** | Defaulted to `CWD = Agent Skill` without checking Active Workspaces. | **Agent Skill folder = read-only hub, NEVER a CLI target.** Always identify the real target project from `Active Workspaces` (the non-hub workspace). If multiple project workspaces exist, ask the user. All outputs (graphify-out/, reports) must land inside the target project folder. |
 
 ### Memory Management & Consolidation Protocol:
 - **Max capacity:** 8 active rules in prompt hot memory.

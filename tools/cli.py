@@ -257,6 +257,30 @@ def cmd_decouple_config(args):
     sys.exit(decouple_main())
 
 
+def cmd_fuzz_api(args):
+    from api_fuzzer import main as fuzz_main
+    sys.argv = [sys.argv[0]] + (sys.argv[2:] if len(sys.argv) > 2 else [])
+    sys.exit(fuzz_main())
+
+
+def cmd_som(args):
+    from visual_som_helper import main as som_main
+    sys.argv = [sys.argv[0]] + (sys.argv[2:] if len(sys.argv) > 2 else [])
+    sys.exit(som_main())
+
+
+def cmd_export_postman(args):
+    from export_postman_collection import main as postman_main
+    sys.argv = [sys.argv[0]] + (sys.argv[2:] if len(sys.argv) > 2 else [])
+    sys.exit(postman_main())
+
+
+def cmd_generate_jmx(args):
+    from generate_jmx_plan import main as jmx_main
+    sys.argv = [sys.argv[0]] + (sys.argv[2:] if len(sys.argv) > 2 else [])
+    sys.exit(jmx_main())
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog="agent-qa",
@@ -384,6 +408,22 @@ def main():
     p_decouple.add_argument("--fix", action="store_true", help="Apply environment variable replacements in-place")
     p_decouple.add_argument("--out-dir", default=None, help="Output directory for config profiles")
     p_decouple.set_defaults(func=cmd_decouple_config)
+
+    # fuzz-api
+    p_fuzz = subparsers.add_parser("fuzz-api", help="Autonomous API Fuzzing & Chaos Breaker (bắn mutation payloads, bắt 500, DB leak, SLA breach)")
+    p_fuzz.set_defaults(func=cmd_fuzz_api)
+
+    # som (Visual Grounding for Canvas / GIS)
+    p_som = subparsers.add_parser("som", help="Multimodal Vision Grounding & Set-of-Marks (SoM) for Canvas/GIS without DOM")
+    p_som.set_defaults(func=cmd_som)
+
+    # export-postman
+    p_postman = subparsers.add_parser("export-postman", help="Export OpenAPI / Swagger / HAR to Postman Collection v2.1.0 with auto-asserts")
+    p_postman.set_defaults(func=cmd_export_postman)
+
+    # generate-jmx
+    p_jmx = subparsers.add_parser("generate-jmx", help="Generate Apache JMeter 5.x Test Plan XML (.jmx) from OpenAPI / Postman / HAR")
+    p_jmx.set_defaults(func=cmd_generate_jmx)
 
     args, unknown = parser.parse_known_args()
     if getattr(args, "offline", False):

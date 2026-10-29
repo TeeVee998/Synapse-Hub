@@ -27,12 +27,13 @@ import sqlite3
 import argparse
 from typing import Dict, Any, List, Optional, Tuple, Union
 try:
-    from PIL import Image, ImageDraw, ImageFont
+    from PIL import Image, ImageDraw, ImageFont, ImageFilter
     HAS_PIL = True
 except ImportError:
     Image = None
     ImageDraw = None
     ImageFont = None
+    ImageFilter = None
     HAS_PIL = False
 
 # Enforce UTF-8 stdout encoding for Windows console compatibility
@@ -229,6 +230,89 @@ class VisualSoMHelper:
 
         return visual_hash
 
+    def detect_canvas_interactive_regions(
+        self,
+        image_path: str,
+        stride: int = 16,
+        edge_threshold: int = 28,
+        min_pixels_per_cell: int = 6,
+        min_w: int = 16,
+        min_h: int = 16,
+        max_ratio: float = 0.88
+    ) -> List[Dict[str, Any]]:
+        """
+        Standalone Computer Vision Contour / Active Blob Detector for Canvas/GIS.
+        Detects interactive visual components (buttons, polygon nodes, markers, sliders, chart icons)
+        without requiring DOM elements or accessibility nodes.
+        Uses pure PIL edge filtering and connected-grid component clustering (Zero-Dependency).
+        """
+        if not os.path.exists(image_path) or not HAS_PIL:
+            return []
+
+        img = Image.open(image_path).convert("L")
+        w, h = img.size
+        max_allowed_w = int(w * max_ratio)
+        max_allowed_h = int(h * max_ratio)
+
+        # Detect high-contrast edges & contours
+        edges = img.filter(ImageFilter.FIND_EDGES)
+        edges = edges.point(lambda p: 255 if p > edge_threshold else 0)
+        pixels = edges.load()
+
+        # Identify active cells with high edge density
+        active_cells = set()
+        for y in range(0, h, stride):
+            for x in range(0, w, stride):
+                count = 0
+                for cy in range(y, min(h, y + stride)):
+                    for cx in range(x, min(w, x + stride)):
+                        if pixels[cx, cy] > 0:
+                            count += 1
+                if count >= min_pixels_per_cell:
+                    active_cells.add((x // stride, y // stride))
+
+        # 8-direction BFS clustering to group connected components
+        visited = set()
+        detected_elements = []
+        cluster_id = 1
+
+        for cell in sorted(active_cells):
+            if cell in visited:
+                continue
+            queue = [cell]
+            visited.add(cell)
+            cluster = [cell]
+
+            while queue:
+                curr = queue.pop(0)
+                cx, cy = curr
+                for dx in (-1, 0, 1):
+                    for dy in (-1, 0, 1):
+                        nb = (cx + dx, cy + dy)
+                        if nb in active_cells and nb not in visited:
+                            visited.add(nb)
+                            queue.append(nb)
+                            cluster.append(nb)
+
+            min_x = max(0, min(c[0] for c in cluster) * stride - 4)
+            min_y = max(0, min(c[1] for c in cluster) * stride - 4)
+            box_w = min(w - min_x, (max(c[0] for c in cluster) + 1) * stride - min_x + 8)
+            box_h = min(h - min_y, (max(c[1] for c in cluster) + 1) * stride - min_y + 8)
+
+            # Filter out whole-canvas background borders or tiny noise
+            if box_w >= min_w and box_h >= min_h and (box_w < max_allowed_w or box_h < max_allowed_h):
+                detected_elements.append({
+                    "x": min_x,
+                    "y": min_y,
+                    "width": box_w,
+                    "height": box_h,
+                    "label": f"Canvas_Target_{cluster_id}",
+                    "tag": "canvas_interactive_node"
+                })
+                cluster_id += 1
+
+        return detected_elements
+
     def generate_som_overlay(
         self,
         image_path: str,
@@ -237,21 +321,26 @@ class VisualSoMHelper:
     ) -> Tuple[str, Dict[int, Dict[str, Any]]]:
         """
         Draws high-contrast numbered badges (Set-of-Marks) over each element bounding box.
+        If elements is omitted, autonomously runs detect_canvas_interactive_regions.
         Returns (marked_image_path, marks_map).
         """
+        if not os.path.exists(image_path):
+            img = Image.new("RGB", (self.viewport_width, self.viewport_height), color="#1E1E2E")
+            draw = ImageDraw.Draw(img)
+            draw.text((50, 50), "Mock Financial Dashboard (HTML5 Canvas)", fill="#FFFFFF")
+            draw.rectangle([100, 150, 220, 190], outline="#00CCFF", width=2)
+            draw.rectangle([240, 150, 360, 190], outline="#FF0055", width=2)
+            draw.rectangle([500, 300, 700, 350], outline="#00FF66", width=2)
+            img.save(image_path)
+
         if not elements:
-            elements = [
+            detected = self.detect_canvas_interactive_regions(image_path)
+            elements = detected if detected else [
                 {"x": 100, "y": 150, "width": 120, "height": 40, "label": "TradingView Zoom In", "tag": "canvas_control"},
                 {"x": 240, "y": 150, "width": 120, "height": 40, "label": "TradingView Zoom Out", "tag": "canvas_control"},
                 {"x": 500, "y": 300, "width": 200, "height": 50, "label": "Execute Trade Order", "tag": "shadow_button"},
                 {"x": 720, "y": 300, "width": 150, "height": 50, "label": "Cancel Order", "tag": "shadow_button"}
             ]
-
-        if not os.path.exists(image_path):
-            img = Image.new("RGB", (self.viewport_width, self.viewport_height), color="#1E1E2E")
-            draw = ImageDraw.Draw(img)
-            draw.text((50, 50), "Mock Financial Dashboard (HTML5 Canvas)", fill="#FFFFFF")
-            img.save(image_path)
 
         img = Image.open(image_path).convert("RGBA")
         overlay = Image.new("RGBA", img.size, (255, 255, 255, 0))
@@ -342,6 +431,7 @@ def main():
     parser.add_argument("--cache-lookup", action="store_true", help="Attempt zero-token visual cache resolution first")
     parser.add_argument("--cache-save", action="store_true", help="Save resolved coordinates to visual cache")
     parser.add_argument("--threshold", type=float, default=0.98, help="Visual similarity threshold for cache hit (default: 0.98)")
+    parser.add_argument("--detect-only", action="store_true", help="Run pure contour/blob detector and print detected bounding boxes")
     parser.add_argument("--json", action="store_true", help="Output results in JSON format")
     args = parser.parse_args()
 
@@ -364,6 +454,27 @@ def main():
                 print(f"   Action      : {cached_result['playwright_action']}\n")
             return 0
 
+    # Auto-generate mock canvas if image doesn't exist
+    if not os.path.exists(args.image):
+        img = Image.new("RGB", (helper.viewport_width, helper.viewport_height), color="#1E1E2E")
+        draw = ImageDraw.Draw(img)
+        draw.text((50, 50), "Mock GIS & Financial Dashboard (HTML5 Canvas)", fill="#FFFFFF")
+        draw.rectangle([100, 150, 220, 190], fill="#00CCFF", outline="#FFFFFF", width=2)
+        draw.rectangle([240, 150, 360, 190], fill="#FF0055", outline="#FFFFFF", width=2)
+        draw.rectangle([500, 300, 700, 350], fill="#00FF66", outline="#FFFFFF", width=2)
+        img.save(args.image)
+
+    # Detect Only
+    if args.detect_only:
+        blobs = helper.detect_canvas_interactive_regions(args.image)
+        if args.json:
+            print(json.dumps(blobs, indent=2))
+        else:
+            print(f"\n🔍 [CANVAS CONTOURS DETECTED] Found {len(blobs)} interactive regions:")
+            for b in blobs:
+                print(f"   • {b['label']}: Bounds {b['x']},{b['y']} ({b['width']}x{b['height']} px)")
+        return 0
+
     # Load elements
     elements = []
     if args.elements_json:
@@ -377,7 +488,8 @@ def main():
                 pass
 
     if not elements:
-        elements = [
+        detected = helper.detect_canvas_interactive_regions(args.image)
+        elements = detected if detected else [
             {"x": 100, "y": 150, "width": 120, "height": 40, "label": "TradingView Zoom In", "tag": "canvas_control"},
             {"x": 240, "y": 150, "width": 120, "height": 40, "label": "TradingView Zoom Out", "tag": "canvas_control"},
             {"x": 500, "y": 300, "width": 200, "height": 50, "label": "Execute Trade Order", "tag": "shadow_button"},

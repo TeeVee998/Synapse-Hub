@@ -48,7 +48,18 @@ MUTATION_RULES = [
     (r"\bor\b", "and", "Logical Inversion (or -> and)"),
     (r"\s&&\s", " || ", "Logical AND Inversion (&& -> ||)"),
     (r"\s\|\|\s", " && ", "Logical OR Inversion (|| -> &&)"),
+    (r"\s\+\s", " - ", "Arithmetic Inversion (+ -> -)"),
+    (r"\s-\s", " + ", "Arithmetic Inversion (- -> +)"),
+    (r"\breturn\s+true\b", "return false", "Return Value Inversion (return true -> return false)"),
+    (r"\breturn\s+false\b", "return true", "Return Value Inversion (return false -> return true)"),
+    (r"\breturn\s+0\b", "return -1", "Return Value Shift (return 0 -> return -1)"),
 ]
+
+# Action statement pattern for Statement Deletion Mutants
+ACTION_STATEMENT_PATTERN = re.compile(
+    r'\.(click|submit|save|update|delete|send|fill|press|type|execute|write)\s*\(',
+    re.IGNORECASE
+)
 
 # Assertion and verification patterns
 ASSERTION_PATTERN = re.compile(
@@ -65,6 +76,27 @@ EMPTY_CATCH_PATTERN = re.compile(
     r'catch\s*\([^\)]*\)\s*\{\s*\}',
     re.MULTILINE
 )
+
+
+def is_inside_quotes(line: str, pos: int) -> bool:
+    """Determines whether a character position in a line is enclosed within string quotes."""
+    in_single = False
+    in_double = False
+    escaped = False
+    for i, ch in enumerate(line):
+        if i == pos:
+            return in_single or in_double
+        if escaped:
+            escaped = False
+            continue
+        if ch == '\\':
+            escaped = True
+            continue
+        if ch == "'" and not in_double:
+            in_single = not in_single
+        elif ch == '"' and not in_single:
+            in_double = not in_double
+    return in_single or in_double
 
 
 def generate_mutants_for_code(code: str, file_path: str = "") -> List[Dict[str, Any]]:
@@ -95,10 +127,34 @@ def generate_mutants_for_code(code: str, file_path: str = "") -> List[Dict[str, 
         if stripped.startswith(("//", "#", "/*", "*", "import", "package", "from")):
             continue
 
+        # Statement Deletion Mutant (Simulates omitted UI action or bypassed step)
+        if ACTION_STATEMENT_PATTERN.search(stripped) and not ASSERTION_PATTERN.search(stripped):
+            indent = line[:len(line) - len(line.lstrip())]
+            mutated_line = f"{indent}// MUTANT_DELETED: {stripped}\n"
+            mutated_lines = list(lines)
+            mutated_lines[line_idx] = mutated_line
+            mutants.append({
+                "id": f"MUT-{mutant_id:04d}",
+                "file": file_path,
+                "line": line_idx + 1,
+                "original_snippet": line.strip(),
+                "mutated_snippet": mutated_line.strip(),
+                "description": "Statement Deletion (Omit critical action/mutation call)",
+                "mutated_code": "".join(mutated_lines),
+                "status": "SURVIVED"
+            })
+            mutant_id += 1
+            if len(mutants) >= 20:
+                return mutants
+
         for pattern, replacement, desc in MUTATION_RULES:
             matches = list(re.finditer(pattern, line))
             for m in matches:
                 start, end = m.span()
+                # Skip mutations occurring inside string literals
+                if is_inside_quotes(line, start):
+                    continue
+
                 mutated_line = line[:start] + replacement + line[end:]
                 mutated_lines = list(lines)
                 mutated_lines[line_idx] = mutated_line

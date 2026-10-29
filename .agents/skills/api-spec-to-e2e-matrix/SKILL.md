@@ -59,12 +59,15 @@ Every negative test case must assert two distinct layers:
 
 ## 5. Automated Execution via Tooling
 
-Agent can automatically invoke 	ools/generate_api_matrix.py to produce matrices from Swagger files:
+Agent can automatically invoke `tools/generate_api_matrix.py` and `tools/export_postman_collection.py`:
 
-``bash
-# Generate Markdown matrix
+```bash
+# 1. Generate Markdown matrix
 python tools/generate_api_matrix.py --spec path/to/openapi.json --format md -o docs/api_matrix.md
 
-# Generate JSON matrix for programmatic ingestion
+# 2. Generate JSON matrix for programmatic ingestion
 python tools/generate_api_matrix.py --spec path/to/openapi.json --format json -o tools/api_matrix.json
-``
+
+# 3. Export directly to Postman Collection v2.1.0 with auto-assertions
+python tools/export_postman_collection.py --spec path/to/openapi.json -o postman_collection.json --env-output postman_env.json
+```

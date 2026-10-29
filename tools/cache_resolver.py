@@ -225,6 +225,22 @@ def init_db(seed=True, target_db=None):
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
+
+        # 4. Flaky Test Historical Telemetry & Quarantine Matrix
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS test_telemetry (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                test_id TEXT NOT NULL,
+                run_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                status TEXT NOT NULL,
+                is_retry INTEGER DEFAULT 0,
+                duration_ms REAL DEFAULT 0.0,
+                error_signature TEXT DEFAULT '',
+                context TEXT DEFAULT ''
+            )
+        """)
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_telemetry_test_id ON test_telemetry (test_id)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_telemetry_timestamp ON test_telemetry (run_timestamp)")
         conn.commit()
 
         # Migrate existing solutions from local DB if initializing global DB for the first time
@@ -667,6 +683,72 @@ def query_lessons(context_or_keyword, limit=2):
         return top_results
 
 
+@retry_on_locked()
+def record_test_telemetry(test_id, status, is_retry=0, duration_ms=0.0, error_signature="", context="", target_db=None):
+    """
+    Records an individual test execution into persistent SQLite telemetry.
+    Used for computing 30-day historical flakiness index and auto-quarantine decisions.
+    """
+    init_db(seed=True, target_db=target_db)
+    current_db = target_db or DB_FILE
+    with get_db(current_db) as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO test_telemetry (test_id, status, is_retry, duration_ms, error_signature, context)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (test_id, status.upper(), int(is_retry), float(duration_ms), error_signature, context))
+        conn.commit()
+        return True
+
+
+def get_flaky_telemetry(days=30, min_runs=2, threshold=0.15, target_db=None):
+    """
+    Queries historical test telemetry and calculates the Flaky Ratio across the given window.
+    Flaky Ratio = (retry_pass_count + fail_then_pass_transitions) / total_runs.
+    """
+    init_db(seed=True, target_db=target_db)
+    current_db = target_db or DB_FILE
+    with get_db(current_db) as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT 
+                test_id,
+                COUNT(*) as total_runs,
+                SUM(CASE WHEN status = 'PASS' THEN 1 ELSE 0 END) as pass_count,
+                SUM(CASE WHEN status = 'FAIL' THEN 1 ELSE 0 END) as fail_count,
+                SUM(CASE WHEN status = 'PASS' AND is_retry = 1 THEN 1 ELSE 0 END) as retry_pass_count,
+                AVG(duration_ms) as avg_duration_ms
+            FROM test_telemetry
+            WHERE run_timestamp >= datetime('now', '-' || ? || ' days')
+            GROUP BY test_id
+            HAVING total_runs >= ?
+        """, (days, min_runs))
+        rows = cursor.fetchall()
+        candidates = []
+        for r in rows:
+            total = r["total_runs"]
+            retry_passes = r["retry_pass_count"] or 0
+            fails = r["fail_count"] or 0
+            passes = r["pass_count"] or 0
+            # If test both passes and fails across runs, or passes on retry
+            flaky_events = retry_passes + (1 if fails > 0 and passes > 0 else 0)
+            flaky_ratio = round(min(1.0, flaky_events / max(1, total)), 3)
+            quarantine = flaky_ratio >= threshold and passes > 0
+
+            candidates.append({
+                "test_id": r["test_id"],
+                "total_runs": total,
+                "pass_count": passes,
+                "fail_count": fails,
+                "retry_pass_count": retry_passes,
+                "flaky_ratio": flaky_ratio,
+                "avg_duration_ms": round(r["avg_duration_ms"] or 0.0, 1),
+                "quarantine_recommended": quarantine
+            })
+        candidates.sort(key=lambda x: x["flaky_ratio"], reverse=True)
+        return candidates
+
+
 def get_stats():
     init_db(seed=True)
     with get_db() as conn:
@@ -683,6 +765,9 @@ def get_stats():
         cursor.execute("SELECT COUNT(*) as total_lessons FROM lessons_learned")
         total_lessons = cursor.fetchone()["total_lessons"] or 0
 
+        cursor.execute("SELECT COUNT(*) as total_telemetry FROM test_telemetry")
+        total_telemetry = cursor.fetchone()["total_telemetry"] or 0
+
         cursor.execute("SELECT error_signature, module_name, hit_count FROM healing_cache ORDER BY hit_count DESC")
         top_solutions = [dict(r) for r in cursor.fetchall()]
 
@@ -691,6 +776,7 @@ def get_stats():
             "total_hits": total_hits,
             "total_failed_fixes": total_failed,
             "total_lessons_learned": total_lessons,
+            "total_telemetry_records": total_telemetry,
             "estimated_tokens_saved": saved_tokens,
             "solutions": top_solutions
         }
@@ -735,6 +821,21 @@ def main():
     lesson_get_parser = subparsers.add_parser("get-lessons", help="Retrieve top 2 historical lessons learned for context")
     lesson_get_parser.add_argument("--context", required=True, help="Page, flow, or error keyword to match")
     lesson_get_parser.add_argument("--limit", type=int, default=2, help="Number of lessons to retrieve (default: 2)")
+
+    # Record-Telemetry command (Historical Telemetry)
+    telem_record_parser = subparsers.add_parser("record-telemetry", help="Record individual test run outcome into telemetry")
+    telem_record_parser.add_argument("--test-id", required=True, help="Test case identifier or class#method")
+    telem_record_parser.add_argument("--status", required=True, choices=["PASS", "FAIL"], help="Execution status")
+    telem_record_parser.add_argument("--retry", type=int, default=0, help="Whether this run was an automated retry (1 or 0)")
+    telem_record_parser.add_argument("--duration", type=float, default=0.0, help="Run duration in ms")
+    telem_record_parser.add_argument("--error", default="", help="Error signature if failed")
+    telem_record_parser.add_argument("--context", default="", help="Environment or workflow context")
+
+    # Get-Flaky command (Historical Flakiness Query)
+    flaky_get_parser = subparsers.add_parser("get-flaky", help="Query historical flaky test candidates from telemetry")
+    flaky_get_parser.add_argument("--days", type=int, default=30, help="Lookback window in days (default: 30)")
+    flaky_get_parser.add_argument("--min-runs", type=int, default=2, help="Minimum runs required (default: 2)")
+    flaky_get_parser.add_argument("--threshold", type=float, default=0.15, help="Flaky ratio threshold for quarantine (default: 0.15)")
 
     # Stats command
     subparsers.add_parser("stats", help="View memory cache statistics (Positive & Negative)")
@@ -815,6 +916,33 @@ def main():
                 if l.get("failed_attempt") or l.get("successful_fix"):
                     print(f"   ⚠️ Anti-Pattern: {l.get('failed_attempt') or 'N/A'}")
                     print(f"   ✅ Proven Fix  : {l.get('successful_fix') or 'N/A'}")
+        print("==================================================")
+
+    elif args.command == "record-telemetry":
+        ok = record_test_telemetry(
+            args.test_id,
+            args.status,
+            is_retry=args.retry,
+            duration_ms=args.duration,
+            error_signature=args.error,
+            context=args.context
+        )
+        if ok:
+            print(f"📊 [TELEMETRY RECORDED] {args.test_id} -> {args.status} (Retry={args.retry}, {args.duration}ms)")
+
+    elif args.command == "get-flaky":
+        flaky_list = get_flaky_telemetry(days=args.days, min_runs=args.min_runs, threshold=args.threshold)
+        print("==================================================")
+        print(f"📈 [HISTORICAL FLAKINESS TELEMETRY ({args.days} Days)]")
+        print("==================================================")
+        if not flaky_list:
+            print("  (Zero flaky tests detected above threshold. Suite is stable.)")
+        else:
+            for item in flaky_list:
+                status_icon = "🚨 [QUARANTINE]" if item["quarantine_recommended"] else "ℹ️ [OBSERVE]"
+                print(f"{status_icon} {item['test_id']}")
+                print(f"   Runs: {item['total_runs']} | Passes: {item['pass_count']} | Fails: {item['fail_count']} | Retry Passes: {item['retry_pass_count']}")
+                print(f"   Flaky Ratio: {item['flaky_ratio']*100:.1f}% | Avg Duration: {item['avg_duration_ms']}ms")
         print("==================================================")
 
     elif args.command == "stats":

@@ -204,6 +204,19 @@ locust -f tests/load/locustfile.py --headless -u 100 -r 10 --run-time 5m \
        --exit-code-on-error 1
 ```
 
+### Autonomous Apache JMeter Plan Generation & Execution
+Hub provides `tools/generate_jmx_plan.py` to auto-generate JMeter 5.x test plans (.jmx) directly from OpenAPI specs or Postman collections:
+```bash
+# 1. Generate JMeter Test Plan (100 VUs, 10 min, SLA < 500ms)
+python tools/generate_jmx_plan.py --spec swagger.json -o perf_plan.jmx --vus 100 --duration 600
+
+# 2. Convert existing Postman collection to JMeter Plan
+python tools/generate_jmx_plan.py --postman postman_collection.json -o perf_plan.jmx --vus 50
+
+# 3. Execute headless JMeter in CI/CD pipeline
+jmeter -n -t perf_plan.jmx -l results.jtl -e -o ./html_report
+```
+
 ---
 
 ## 6. Performance Engineering Checklist
