@@ -81,8 +81,8 @@ Transform functional tests into input sanitization and robustness validation by 
 
 ```bash
 # Query CLI catalog for specific field vectors
-python tools/fuzz_payloads.py --field username --type string
-python tools/fuzz_payloads.py --category sqli --json
+python3 ~/.zcode/synapse-hub/tools/fuzz_payloads.py --field username --type string
+python3 ~/.zcode/synapse-hub/tools/fuzz_payloads.py --category sqli --json
 ```
 
 ### Recipe D: Harmless SQLi Polyglot Sanity

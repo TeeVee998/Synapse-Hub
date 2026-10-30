@@ -41,7 +41,7 @@ flowchart TD
 1. **Step 1: Execute Runner Command:**
    - Run the targeted test case or test suite via headless CLI runner or verification gate:
      ```bash
-     python3 tools/verify_all.py
+     synapse verify
      ```
 2. **Step 2: Inspect Exit Code:**
    - If the process terminates with exit code != 0, the task is **LOCKED**.
@@ -50,7 +50,7 @@ flowchart TD
    - The Agent must parse the exact error exception and stack trace from the failure output.
    - Apply targeted in-place healing and re-execute.
 4. **Step 4: Definition of Done Verification:**
-   - Run `python3 tools/verify_all.py` to confirm all 6 quality gates pass.
+   - Run `synapse verify` to confirm all 6 quality gates pass.
 
 ---
 

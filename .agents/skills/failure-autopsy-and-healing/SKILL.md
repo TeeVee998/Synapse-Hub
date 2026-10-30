@@ -21,7 +21,7 @@ flowchart LR
 
 1. **Zero-Token Triage:** Pinpoint failed line and cause instantly (<50 tokens):
    ```bash
-   python3 tools/pinpoint_failure.py
+   python3 ~/.zcode/synapse-hub/tools/pinpoint_failure.py
    # or bash .agents/skills/failure-autopsy-and-healing/scripts/triage_failures.sh
    ```
 2. **Visual Autopsy:** Inspect the latest error screenshot to immediately detect: disabled buttons, missing required fields, UI overlaps, or obscuring modal backdrops.
@@ -49,4 +49,4 @@ flowchart LR
 
 - [**Diagnostic & Healing Matrix (`healing_matrix.md`)**](references/healing_matrix.md): Concrete code prescriptions for disabled buttons, boundary overlaps, `ElementClickInterceptedException`, `StaleElementReferenceException`, and 4 flaky test root causes.
 - [**Fast-Fix Triad & Runtime Helper (`tools/browser_helpers.js`)**](tools/browser_helpers.js): In-browser diagnosis engine via `window.__qa` (`audit`, `heal`, `clickSafe`, `hud`).
-- **Automated Triage Script:** `python3 tools/pinpoint_failure.py` and `scripts/triage_failures.sh`.
+- **Automated Triage Script:** `python3 ~/.zcode/synapse-hub/tools/pinpoint_failure.py` and `scripts/triage_failures.sh`.

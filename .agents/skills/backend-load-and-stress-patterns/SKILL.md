@@ -27,13 +27,13 @@ description: "Orchestrate k6, Locust, and JMeter backend load, stress, and SLA e
 ### Option A: Apache JMeter (Headless CLI + JTL Analyzer)
 ```bash
 # 1. Generate XML test plan from OpenAPI / Postman
-python tools/generate_jmx_plan.py --spec api.json -o load_plan.jmx --vus 50 --duration 180 --sla-p95 500
+synapse generate-jmx --spec api.json -o load_plan.jmx --vus 50 --duration 180 --sla-p95 500
 
 # 2. Run headless benchmark
 jmeter -n -t load_plan.jmx -l results.jtl -e -o ./html_report
 
 # 3. Automated CI/CD Quality Gatekeeper
-python tools/jtl_analyzer.py results.jtl --sla-p95 500 --max-error-rate 1.0
+synapse analyze-jtl results.jtl --sla-p95 500 --max-error-rate 1.0
 ```
 
 ### Option B: k6 Production Load Testing (with Kill-Switch & Arrival Rate)

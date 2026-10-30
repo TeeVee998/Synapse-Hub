@@ -48,7 +48,7 @@ The user needs actionable code refactoring and technical debt remediation. Focus
 - Never alter business logic without explicit confirmation.
 - Keep diffs minimal, reviewable, and run verification gates:
   ```bash
-  python3 tools/verify_all.py
+  synapse verify
   ```
 
 ## Output Format

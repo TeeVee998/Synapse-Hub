@@ -47,11 +47,11 @@ To prevent false alarms in educational documentation (e.g. *"Never run sudo"*):
 
 ```bash
 # Scan a specific candidate skill or file
-python tools/skillspector.py path/to/SKILL.md
+synapse skillspector path/to/SKILL.md
 
 # Scan entire skills directory
-python tools/skillspector.py --scan-skills
+synapse skillspector --scan-skills
 
 # Fail CI pipeline if high or critical risks are detected
-python tools/skillspector.py --scan-skills --strict
+synapse skillspector --scan-skills --strict
 ```

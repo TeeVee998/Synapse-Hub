@@ -62,13 +62,13 @@ Agent can automatically invoke `tools/generate_api_matrix.py` and `tools/export_
 
 ```bash
 # 1. Generate Markdown matrix
-python tools/generate_api_matrix.py --spec path/to/openapi.json --format md -o docs/api_matrix.md
+python3 ~/.zcode/synapse-hub/tools/generate_api_matrix.py --spec path/to/openapi.json --format md -o docs/api_matrix.md
 
 # 2. Generate JSON matrix for programmatic ingestion
-python tools/generate_api_matrix.py --spec path/to/openapi.json --format json -o tools/api_matrix.json
+python3 ~/.zcode/synapse-hub/tools/generate_api_matrix.py --spec path/to/openapi.json --format json -o tools/api_matrix.json
 
 # 3. Export directly to Postman Collection v2.1.0 with AJV JSON Schema & DDT
-python tools/export_postman_collection.py --spec path/to/openapi.json -o postman_collection.json --env-output postman_env.json --ddt-output test_data.csv
+synapse export-postman --spec path/to/openapi.json -o postman_collection.json --env-output postman_env.json --ddt-output test_data.csv
 
 # 4. Zero-Input Autonomous Synthesis (No input file provided!)
 agent-qa export-postman --domain banking -o banking_col.json --env-output env.json --ddt-output ddt.csv

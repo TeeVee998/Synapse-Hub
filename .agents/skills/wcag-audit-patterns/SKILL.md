@@ -70,8 +70,8 @@ Agent can automatically audit accessibility for any HTML file or live page URL v
 
 ```bash
 # Audit a local HTML snapshot
-python tools/wcag_audit.py path/to/page.html -o docs/wcag_audit_report.md
+python3 ~/.zcode/synapse-hub/tools/wcag_audit.py path/to/page.html -o docs/wcag_audit_report.md
 
 # Audit a live application URL directly
-python tools/wcag_audit.py https://staging.example.com --url -o docs/wcag_audit_report.md
+python3 ~/.zcode/synapse-hub/tools/wcag_audit.py https://staging.example.com --url -o docs/wcag_audit_report.md
 ```

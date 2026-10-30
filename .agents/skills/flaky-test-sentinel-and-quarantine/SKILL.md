@@ -73,10 +73,10 @@ This repository provides an automated flakiness analyzer in `tools/flaky_detecto
 ### Running 5-Iteration Flakiness Benchmark
 ```bash
 # Run a specific test script 5 consecutive times to benchmark stability
-python tools/flaky_detector.py --repeat 5 --cmd "npm test -- tests/e2e/TC-104.spec.ts"
+synapse flaky --repeat 5 --cmd "npm test -- tests/e2e/TC-104.spec.ts"
 
 # Or parse existing test execution history
-python tools/flaky_detector.py --reports "reports/**/junit*.xml"
+synapse flaky --reports "reports/**/junit*.xml"
 ```
 
 Output Report (`reports/quarantine_board.json`):

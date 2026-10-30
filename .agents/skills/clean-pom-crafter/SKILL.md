@@ -22,7 +22,7 @@ Specialized skill for creating, refactoring, and standardizing test automation s
    - All `.groovy`, `.java`, `.ts`, `.tc` files must NEVER contain UTF-8 BOM bytes (`0xEF, 0xBB, 0xBF`).
 5. **Context Window Protection (Zero-Token Economy):**
    - 🚫 **NEVER read entire monolithic Page Class files (> 100KB) into LLM context.**
-   - Always use `python3 tools/lookup_xpath.py <keyword>` or line-range targeted reads (`read_file` with `StartLine`/`EndLine`) to find selectors and methods on demand.
+   - Always use `python3 ~/.zcode/synapse-hub/tools/lookup_xpath.py <keyword>` or line-range targeted reads (`read_file` with `StartLine`/`EndLine`) to find selectors and methods on demand.
 
 ---
 
@@ -68,5 +68,5 @@ All Page Classes **MUST** follow this strict locator hierarchy:
 
 - [**Standard Clean POM Methods (`pom_patterns.groovy`)**](references/pom_patterns.groovy): Full implementation of `searchRecord`, `editRecord`, `deleteRecord`, `setCalendarDate`, `selectMultiOptions`, `verifyRecordExists`, `verifyRecordNotExists`, `jsSetInput`.
 - [**Standard Test Script Template (`standard_test_case.groovy`)**](examples/standard_test_case.groovy): 7-step complete script template from Login -> Create -> Search -> Edit -> Delete.
-- [**Zero-Token XPath Lookup (`tools/lookup_xpath.py`)**](tools/lookup_xpath.py): Command `python3 tools/lookup_xpath.py <PageClass>` returns exact locators in <200 tokens without parsing full files.
+- [**Zero-Token XPath Lookup (`~/.zcode/synapse-hub/tools/lookup_xpath.py`)**](~/.zcode/synapse-hub/tools/lookup_xpath.py): Command `python3 ~/.zcode/synapse-hub/tools/lookup_xpath.py <PageClass>` returns exact locators in <200 tokens without parsing full files.
 - [**Browser Runtime Helper (`tools/browser_helpers.js`)**](tools/browser_helpers.js): In-browser validation engine for form audits, safe clicks, and batch verification.

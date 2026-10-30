@@ -30,7 +30,7 @@ Run impact analysis before dispatching test suites:
 
 ### 2.1. Check Impact of Modified Page Class
 ```bash
-python3 tools/test_impact.py -f Keywords/pages/CategoryPage.groovy
+synapse impact -f Keywords/pages/CategoryPage.groovy
 ```
 *Output:*
 - Target File: `Keywords/pages/CategoryPage.groovy`
@@ -40,12 +40,12 @@ python3 tools/test_impact.py -f Keywords/pages/CategoryPage.groovy
 
 ### 2.2. Automatically Analyze Git Changes
 ```bash
-python3 tools/test_impact.py --git-diff
+synapse impact --git-diff
 ```
 
 ### 2.3. Output Machine-Readable JSON (For CI/CD Pipelines)
 ```bash
-python3 tools/test_impact.py --git-diff --json
+synapse impact --git-diff --json
 ```
 
 ---
@@ -71,6 +71,6 @@ python3 tools/test_impact.py --git-diff --json
 
 ## 5. Agent Operational Guardrails
 
-1. **Before modifying any Page Class:** Run `python3 tools/test_impact.py -f <path>` to identify dependent Test Cases.
+1. **Before modifying any Page Class:** Run `synapse impact -f <path>` to identify dependent Test Cases.
 2. **After modifying code:** Run `graphify update .` to keep the knowledge graph synchronized.
-3. **DoD Compliance:** Always verify that all changes pass `python3 tools/verify_all.py`.
+3. **DoD Compliance:** Always verify that all changes pass `synapse verify`.

@@ -102,22 +102,22 @@ To eliminate cascading flakiness and orphan test junk in parallel CI runs, agent
 ### 1. Transaction Savepoint Rollback Context
 Wrap E2E test data creation inside transactional savepoints:
 ```bash
-python tools/db_sandbox.py rollback-test --db-path "path/to/db.sqlite"
+python3 ~/.zcode/synapse-hub/tools/db_sandbox.py rollback-test --db-path "path/to/db.sqlite"
 ```
 *Guarantees zero leftover records: state is automatically rolled back to pristine baseline upon test completion.*
 
 ### 2. Ephemeral Snapshot & Instant Restore (< 0.5s)
 ```bash
 # Before test suite runs: capture pristine database baseline
-python tools/db_sandbox.py snapshot --id pristine_baseline
+python3 ~/.zcode/synapse-hub/tools/db_sandbox.py snapshot --id pristine_baseline
 
 # After suite execution: instantly restore clean database
-python tools/db_sandbox.py restore --id pristine_baseline
+python3 ~/.zcode/synapse-hub/tools/db_sandbox.py restore --id pristine_baseline
 ```
 
 ### 3. Taint Pollution Audit & Cascading Purge
 Scan all tables for orphan records carrying test prefixes (`AUTO_`, `TEST_`) and purge them cleanly:
 ```bash
-python tools/db_sandbox.py audit
+python3 ~/.zcode/synapse-hub/tools/db_sandbox.py audit
 ```
 

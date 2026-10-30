@@ -72,5 +72,5 @@ katalonc -noSplash -runMode=console \
 3. **Compile Allure Report:** `allure generate ./allure-results -o ./Reports/allure-report --clean`.
 4. If failures occur, immediately dispatch failure autopsy:
    ```bash
-   python3 tools/pinpoint_failure.py
+   python3 ~/.zcode/synapse-hub/tools/pinpoint_failure.py
    ```

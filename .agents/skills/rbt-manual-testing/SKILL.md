@@ -137,7 +137,7 @@ Export Markdown test cases directly into styled Excel workbooks via the CLI tool
 
 ```bash
 # Convert Markdown table into styled Excel
-python3 tools/md_to_xlsx.py path/to/test_cases.md -o output.xlsx --sheet-name "Regression Suite"
+synapse export-excel path/to/test_cases.md -o output.xlsx --sheet-name "Regression Suite"
 
 # Or via unified CLI dispatcher:
 agent-qa export-excel path/to/test_cases.md
