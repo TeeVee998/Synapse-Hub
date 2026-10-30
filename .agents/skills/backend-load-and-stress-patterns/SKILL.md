@@ -204,17 +204,33 @@ locust -f tests/load/locustfile.py --headless -u 100 -r 10 --run-time 5m \
        --exit-code-on-error 1
 ```
 
-### Autonomous Apache JMeter Plan Generation & Execution
-Hub provides `tools/generate_jmx_plan.py` to auto-generate JMeter 5.x test plans (.jmx) directly from OpenAPI specs or Postman collections:
+### Autonomous Apache JMeter 360° Suite (Generation, Distributed Cluster & CI/CD Gate)
+Hub provides complete enterprise lifecycle automation for Apache JMeter 5.x via `generate_jmx_plan.py` and `jtl_analyzer.py`:
+
 ```bash
-# 1. Generate JMeter Test Plan (100 VUs, 10 min, SLA < 500ms)
-python tools/generate_jmx_plan.py --spec swagger.json -o perf_plan.jmx --vus 100 --duration 600
+# 1. Generate Full Enterprise Plan (Spike/Soak profile, CSV parameters, Transaction Controllers, JSR223 HMAC)
+agent-qa generate-jmx --spec swagger.json -o perf_plan.jmx \
+  --workload spike --vus 200 --duration 600 \
+  --csv-data users.csv --group-transactions --jsr223-hmac
 
-# 2. Convert existing Postman collection to JMeter Plan
-python tools/generate_jmx_plan.py --postman postman_collection.json -o perf_plan.jmx --vus 50
+# 2. Generate Plan with InfluxDB / Grafana Live Streaming
+agent-qa generate-jmx --spec swagger.json -o perf_plan.jmx \
+  --influxdb-url http://influxdb:8086/write?db=jmeter
 
-# 3. Execute headless JMeter in CI/CD pipeline
+# 3. Generate Database JDBC Benchmark Plan
+agent-qa generate-jmx --jdbc-sample -o jdbc_plan.jmx
+
+# 4. Execute Headless JMeter in CLI / CI Pipeline
 jmeter -n -t perf_plan.jmx -l results.jtl -e -o ./html_report
+
+# 5. Distributed Testing across Cluster (Master + 3 Slaves)
+# Templates located at: tools/templates/jmeter-distributed/
+docker-compose -f tools/templates/jmeter-distributed/docker-compose.yml up -d
+jmeter -n -t perf_plan.jmx -R slave1,slave2,slave3 -l results.jtl
+
+# 6. CI/CD SLA Quality Gate Enforcement (Exit code 0 on Pass, 1 on Breach)
+agent-qa analyze-jtl results.jtl --sla-p95 500 --max-error-rate 1.0 \
+  --markdown pr_perf_report.md --json metrics.json
 ```
 
 ---
