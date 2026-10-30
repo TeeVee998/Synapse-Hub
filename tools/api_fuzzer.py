@@ -88,6 +88,21 @@ class ApiFuzzer:
         self.sla_ms = sla_ms
         self.verify_ssl = verify_ssl
 
+        # Environment Allowlist Guard (F2 Safety Discipline)
+        # Prevents accidental fuzzing or stress bombardment against production environments
+        parsed = urllib.parse.urlparse(self.base_url)
+        host = (parsed.hostname or "").lower()
+        is_safe_env = any(
+            token in host for token in [
+                "localhost", "127.0.0.1", "::1", "staging", "dev", "test", "qa", "sandbox", "local", "internal"
+            ]
+        )
+        if host and not is_safe_env and not os.environ.get("SYNAPSE_ALLOW_PROD_FUZZ"):
+            raise PermissionError(
+                f"[SAFETY FIREWALL - REJECTED] Target host '{host}' is not in the allowed non-production environment allowlist "
+                "(localhost, staging, dev, test, qa, sandbox). Set SYNAPSE_ALLOW_PROD_FUZZ=1 only if authorized."
+            )
+
         # Prepare SSL context (support self-signed staging certificates)
         self.ssl_context = ssl.create_default_context()
         if not verify_ssl:

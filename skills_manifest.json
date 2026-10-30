@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "name": "Enterprise Agent Skills Hub",
-  "version": "2.1.1",
+  "version": "2.3.0",
   "description": "Unified Catalog of 28 Specialized Skills for Autonomous AI Agents in Enterprise Software Quality Engineering, Performance, and Architecture.",
   "totalSkills": 28,
   "categories": {
@@ -30,6 +30,7 @@
       "file-and-report-validator",
       "db-state-verifier-and-seeder",
       "security-dast-sentinel",
+      "skillspector-security-guard",
       "flaky-test-sentinel-and-quarantine"
     ],
     "architecture_and_analysis": [
@@ -41,6 +42,119 @@
       "github-actions-templates",
       "web-vitals-and-performance-profiler"
     ]
+  },
+  "profiles": {
+    "core": {
+      "name": "Core Essential QA",
+      "description": "Lightweight core profile containing essential skills for prompt optimization, clean POM, live probing, self-healing, and quality gate enforcement.",
+      "skills": [
+        "token-and-context-optimizer",
+        "clean-pom-crafter",
+        "playwright-live-interaction",
+        "self-healing-locator",
+        "failure-autopsy-and-healing",
+        "antigravity-test-sentinel",
+        "synthetic-test-data-generator",
+        "flaky-test-sentinel-and-quarantine"
+      ]
+    },
+    "web-e2e": {
+      "name": "Web E2E & Visual Testing",
+      "description": "Full-stack E2E web automation with multi-role auth, visual regression, and WCAG accessibility audits.",
+      "skills": [
+        "clean-pom-crafter",
+        "e2e-testing-patterns",
+        "playwright-live-interaction",
+        "self-healing-locator",
+        "auth-session-and-cookie-manager",
+        "visual-regression-sentinel",
+        "wcag-audit-patterns",
+        "web-vitals-and-performance-profiler",
+        "antigravity-test-sentinel"
+      ]
+    },
+    "api-perf": {
+      "name": "API & Performance Testing",
+      "description": "Specialized profile for REST/GraphQL APIs, network mocking, contract drift, load testing (k6/JMeter), and fuzzing.",
+      "skills": [
+        "api-spec-to-e2e-matrix",
+        "api-network-mocking-interception",
+        "backend-load-and-stress-patterns",
+        "db-state-verifier-and-seeder",
+        "security-dast-sentinel",
+        "file-and-report-validator"
+      ]
+    },
+    "full": {
+      "name": "Complete Enterprise Hub",
+      "description": "All 28 skills enabled across context optimization, multi-agent swarms, performance, and architecture.",
+      "skills": "all"
+    },
+    "playwright": {
+      "name": "Playwright Framework Profile",
+      "description": "Optimized for Playwright TypeScript/JavaScript E2E test suites with live exploration, POM crafter, and visual sentinel.",
+      "skills": [
+        "token-and-context-optimizer",
+        "clean-pom-crafter",
+        "playwright-live-interaction",
+        "self-healing-locator",
+        "failure-autopsy-and-healing",
+        "antigravity-test-sentinel",
+        "e2e-testing-patterns",
+        "visual-regression-sentinel",
+        "auth-session-and-cookie-manager",
+        "api-network-mocking-interception",
+        "synthetic-test-data-generator",
+        "flaky-test-sentinel-and-quarantine",
+        "web-vitals-and-performance-profiler"
+      ]
+    },
+    "pytest": {
+      "name": "Pytest Framework Profile",
+      "description": "Optimized for Python test suites (Pytest/Playwright-Python/Requests) with API matrix and DB state seeding.",
+      "skills": [
+        "token-and-context-optimizer",
+        "clean-pom-crafter",
+        "self-healing-locator",
+        "failure-autopsy-and-healing",
+        "antigravity-test-sentinel",
+        "synthetic-test-data-generator",
+        "api-spec-to-e2e-matrix",
+        "api-network-mocking-interception",
+        "db-state-verifier-and-seeder",
+        "flaky-test-sentinel-and-quarantine"
+      ]
+    },
+    "cypress": {
+      "name": "Cypress Framework Profile",
+      "description": "Optimized for Cypress E2E suites with Clean POM and network stubbing.",
+      "skills": [
+        "token-and-context-optimizer",
+        "clean-pom-crafter",
+        "e2e-testing-patterns",
+        "self-healing-locator",
+        "failure-autopsy-and-healing",
+        "antigravity-test-sentinel",
+        "synthetic-test-data-generator",
+        "api-network-mocking-interception",
+        "visual-regression-sentinel"
+      ]
+    },
+    "katalon": {
+      "name": "Katalon Studio Profile",
+      "description": "Optimized for Katalon Studio Groovy suites with Katalon CLI runner, Clean POM, and failure autopsy.",
+      "skills": [
+        "token-and-context-optimizer",
+        "clean-pom-crafter",
+        "katalon-cli-runner",
+        "lam-script-generator",
+        "self-healing-locator",
+        "failure-autopsy-and-healing",
+        "antigravity-test-sentinel",
+        "synthetic-test-data-generator",
+        "flaky-test-sentinel-and-quarantine"
+      ]
+    }
   },
   "skills": [
     {
@@ -221,6 +335,15 @@
       "path": ".agents/skills/security-dast-sentinel/SKILL.md",
       "version": "1.0.0",
       "summary": "Run dynamic security audits: OWASP Top 10, security headers, IDOR, and token leakage."
+    },
+    {
+      "id": "skillspector-security-guard",
+      "name": "SkillSpector Security Guard",
+      "description": "Autonomous security scanner for AI Agent skills, prompt instructions, and MCP tool configs. Detects 71 vulnerability vectors across 17 categories (Prompt Injection, Data Exfiltration, Privilege Escalation, Agent Snooping, Tool Poisoning, Behavioral AST). Powered by NVIDIA SkillSpector heuristics with Prohibition Context Guard.",
+      "category": "verification_and_resilience",
+      "path": ".agents/skills/skillspector-security-guard/SKILL.md",
+      "version": "1.0.0",
+      "summary": "Audit and verify AI agent skills, prompts, and MCP configurations against 71 vulnerability vectors inspired by NVIDIA SkillSpector."
     },
     {
       "id": "self-healing-locator",

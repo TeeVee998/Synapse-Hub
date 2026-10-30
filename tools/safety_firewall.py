@@ -41,6 +41,13 @@ DANGEROUS_ACTION_KEYWORDS = [
     r"\breset\b",
     r"\btransfer\b",
     r"\bformat\b",
+    # Multilingual & Vietnamese destructive keywords
+    r"x[oóòỏõọ][aáàảãạ]",
+    r"x[oóòỏõọ]a\s+t[aáàảãạ]t\s+c[aảáàãạ]",
+    r"h[uủúùũụ]y",
+    r"thanh\s+to[aáàảãạ]n",
+    r"r[uúùủũụ]t\s+ti[eềéèẻẽẹ]n",
+    r"n[aạáàảã]p\s+ti[eềéèẻẽẹ]n",
 ]
 
 DANGEROUS_SELECTOR_PATTERNS = [
@@ -50,6 +57,8 @@ DANGEROUS_SELECTOR_PATTERNS = [
     r"\.p-button-danger\b",
     r"\[aria-label\*=['\"]?delete['\"]?\]",
     r"button[#\.\-_a-zA-Z0-9]*[_\-]*(?:del|delete|purge|remove|wipe|drop)",
+    r":(?:has-text|text)\s*\(\s*['\"][^'\"]*(?:delete|remove|wipe|purge|pay|x[oóòỏõọ][aáàảãạ]|h[uủúùũụ]y|thanh\s*to[aáàảãạ]n)[^'\"]*['\"]\s*\)",
+    r"text=['\"][^'\"]*(?:delete|remove|wipe|purge|pay|x[oóòỏõọ][aáàảãạ]|h[uủúùũụ]y|thanh\s*to[aáàảãạ]n)",
 ]
 
 COMPILED_TEXT_REGEX = re.compile("|".join(DANGEROUS_ACTION_KEYWORDS), re.IGNORECASE)
@@ -84,8 +93,12 @@ def is_action_dangerous(action_type: str, text: str = "", selector: str = "") ->
         return True, f"Element text contains dangerous keyword: '{match}'"
 
     # Check selector
-    if sel_clean and COMPILED_SEL_REGEX.search(sel_clean):
-        return True, f"Element selector matches destructive pattern: '{sel_clean}'"
+    if sel_clean:
+        if COMPILED_SEL_REGEX.search(sel_clean):
+            return True, f"Element selector matches destructive pattern: '{sel_clean}'"
+        if COMPILED_TEXT_REGEX.search(sel_clean):
+            match = COMPILED_TEXT_REGEX.search(sel_clean).group(0)
+            return True, f"Element selector contains dangerous keyword: '{match}' in '{sel_clean}'"
 
     # Specific dangerous action types
     if action_type.lower() in ("drop_database", "wipe_environment", "execute_payment"):

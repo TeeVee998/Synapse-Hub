@@ -1,0 +1,3 @@
+[RAW CLI LOG: 3,200 lines truncated by distill_log.py]
+FAILED tests/checkout.spec.ts:42:15 -> TimeoutError: Waiting for selector `button.order-confirm`
+Status: 1 failed, 12 passed in 14.2s

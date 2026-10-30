@@ -20,6 +20,7 @@ import sys
 import glob
 import json
 import time
+import shlex
 import argparse
 import subprocess
 import xml.etree.ElementTree as ET
@@ -56,12 +57,12 @@ RESET = "\033[0m"
 
 
 def run_command(cmd: str, timeout: int = 300) -> Tuple[int, str, str, float]:
-    """Executes a shell command and returns (returncode, stdout, stderr, elapsed_ms)."""
+    """Executes a command safely without shell=True and returns (returncode, stdout, stderr, elapsed_ms)."""
     start = time.time()
     try:
+        args = shlex.split(cmd, posix=sys.platform != "win32")
         res = subprocess.run(
-            cmd,
-            shell=True,
+            args,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,

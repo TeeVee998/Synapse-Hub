@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+// SPDX-FileCopyrightText: Copyright (c) 2026 Thế Vị (@TeeVee998). All rights reserved.
+// SPDX-License-Identifier: MIT
+// Project: Synapse-Hub (https://github.com/TeeVee998/Synapse-Hub)
+
 /**
  * Enterprise Synapse-Hub NPM Launcher
  * ====================================

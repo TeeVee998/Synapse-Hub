@@ -1,0 +1,9 @@
+{
+  "route": "**/api/v1/checkout",
+  "method": "POST",
+  "status": 200,
+  "response": {
+    "orderId": "ORD-AUTO-998822",
+    "status": "CONFIRMED"
+  }
+}

@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: Copyright (c) 2026 Thế Vị (@TeeVee998). All rights reserved.
+# SPDX-License-Identifier: MIT
+# Project: Synapse-Hub (https://github.com/TeeVee998/Synapse-Hub)
+
 """
 Enterprise Agent-QA CLI Entrypoint
 ----------------------------------
@@ -25,7 +29,7 @@ sys.path.insert(0, SCRIPT_DIR)
 
 def cmd_version(args):
     manifest_path = os.path.join(REPO_ROOT, "skills_manifest.json")
-    version = "2.1.1"
+    version = "2.3.0"
     if os.path.exists(manifest_path):
         try:
             import json
@@ -35,15 +39,27 @@ def cmd_version(args):
         except Exception:
             pass
     print(f"Agent-QA Hub CLI v{version}")
-    manifest_skills = 27
+    manifest_skills = 28
     if os.path.exists(manifest_path):
         try:
             import json
             with open(manifest_path, "r", encoding="utf-8") as f:
-                manifest_skills = json.load(f).get("totalSkills", 27)
+                manifest_skills = json.load(f).get("totalSkills", 28)
         except Exception:
             pass
     print(f"Catalog: {manifest_skills} Standardized Skills | 6 Subagent Swarm Profiles")
+    print("Created by: Thế Vị (@TeeVee998) <https://github.com/TeeVee998/Synapse-Hub>")
+    print("License   : MIT (Attribution Required)")
+
+
+def cmd_verify_author(args):
+    from author_integrity import verify_author_attribution, get_canonical_watermark, enforce_author_attribution
+    valid, violations = verify_author_attribution()
+    if valid:
+        print(f"✅ Author attribution & provenance verified: {get_canonical_watermark()}")
+        sys.exit(0)
+    else:
+        enforce_author_attribution(strict=True)
 
 
 def cmd_verify(args):
@@ -281,6 +297,12 @@ def cmd_generate_jmx(args):
     sys.exit(jmx_main())
 
 
+def cmd_skillspector(args):
+    from skillspector import main as skillspector_main
+    sys.argv = [sys.argv[0]] + (sys.argv[2:] if len(sys.argv) > 2 else [])
+    sys.exit(skillspector_main())
+
+
 def cmd_analyze_jtl(args):
     from jtl_analyzer import main as jtl_main
     sys.argv = [sys.argv[0]] + (sys.argv[2:] if len(sys.argv) > 2 else [])
@@ -291,6 +313,18 @@ def cmd_export_excel(args):
     from md_to_xlsx import main as excel_main
     sys.argv = [sys.argv[0]] + (sys.argv[2:] if len(sys.argv) > 2 else [])
     sys.exit(excel_main())
+
+
+def cmd_correlate_telemetry(args):
+    from telemetry_correlator import main as telem_main
+    sys.argv = [sys.argv[0]] + (sys.argv[2:] if len(sys.argv) > 2 else [])
+    sys.exit(telem_main())
+
+
+def cmd_analyze_newman(args):
+    from newman_analyzer import main as newman_main
+    sys.argv = [sys.argv[0]] + (sys.argv[2:] if len(sys.argv) > 2 else [])
+    sys.exit(newman_main())
 
 
 def cmd_update(args):
@@ -463,10 +497,30 @@ def main():
     p_excel.add_argument("--sheet-name", default="Test Cases", help="Worksheet title (default: Test Cases)")
     p_excel.set_defaults(func=cmd_export_excel)
 
+    # correlate-telemetry
+    p_telemetry = subparsers.add_parser("correlate-telemetry", help="Correlate Client-Side JMeter latency with Server-Side APM CPU/RAM/DB telemetry")
+    p_telemetry.set_defaults(func=cmd_correlate_telemetry)
+
+    # analyze-newman
+    p_newman = subparsers.add_parser("analyze-newman", help="Analyze Postman / Newman test results, triage failed assertions, and enforce CI/CD Quality Gate")
+    p_newman.set_defaults(func=cmd_analyze_newman)
+
     # update
     p_update = subparsers.add_parser("update", help="1-Click update Synapse-Hub to latest version from GitHub/NPM")
     p_update.add_argument("--check", action="store_true", help="Check for available updates without applying")
     p_update.set_defaults(func=cmd_update)
+
+    # skillspector (AI Agent Skill & MCP Security Scanner)
+    p_skillspector = subparsers.add_parser("skillspector", help="AI Agent Skill & MCP Security Sentinel (71 vectors, NVIDIA SkillSpector spec)")
+    p_skillspector.add_argument("path", nargs="?", default=".", help="Skill directory or file to scan (default: current directory)")
+    p_skillspector.add_argument("--format", choices=["terminal", "json", "markdown", "sarif"], default="terminal", help="Output format")
+    p_skillspector.add_argument("--output", "-o", help="Write report to output file")
+    p_skillspector.add_argument("--strict", action="store_true", help="Fail with non-zero exit code on HIGH/CRITICAL finding")
+    p_skillspector.set_defaults(func=cmd_skillspector)
+
+    # verify-author (Author Provenance & Anti-Tamper Integrity Guard)
+    p_author = subparsers.add_parser("verify-author", help="Verify author attribution, provenance, and anti-tamper integrity")
+    p_author.set_defaults(func=cmd_verify_author)
 
     args, unknown = parser.parse_known_args()
     if getattr(args, "offline", False):
@@ -476,6 +530,10 @@ def main():
     if not args.subcommand:
         parser.print_help()
         sys.exit(0)
+
+    # Enforce cryptographic author attribution and anti-tamper provenance
+    from author_integrity import assert_integrity_or_raise
+    assert_integrity_or_raise()
 
     # Non-intrusive cached update notification (24h cache)
     if args.subcommand not in ("update", "mcp-serve", "version"):

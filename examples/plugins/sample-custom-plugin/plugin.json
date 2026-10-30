@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "sample-custom-plugin",
+  "version": "1.0.0",
+  "description": "Demonstration 3rd-party plugin extending Synapse Hub with custom HTTP security headers audit capabilities.",
+  "author": "Synapse Community Contributor",
+  "license": "MIT",
+  "repository": "https://github.com/TeeVee998/Synapse-Hub",
+  "skills": [
+    "custom-security-headers-audit"
+  ],
+  "tools": [
+    "tools/custom_security_headers.py"
+  ],
+  "minHubVersion": "2.2.0"
+}

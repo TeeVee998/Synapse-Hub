@@ -1,0 +1,14 @@
+{
+  "expectedHeaders": [
+    "Order ID",
+    "Customer Name",
+    "Amount",
+    "Date",
+    "Status"
+  ],
+  "rowCountRange": [
+    1,
+    5000
+  ],
+  "dateFormat": "YYYY-MM-DD"
+}

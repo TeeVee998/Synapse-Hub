@@ -35,8 +35,10 @@
 | **Generating test scripts from Natural Language Story** | `tools/generate_tc_from_story.py`| `python tools/generate_tc_from_story.py "<story>"` |
 | **Generating E2E matrix from OpenAPI/Swagger** | `tools/generate_api_matrix.py` | `python tools/generate_api_matrix.py --spec <swagger.json>` |
 | **Exporting API tests to Postman Collection v2.1** | `tools/export_postman_collection.py` | `agent-qa export-postman --spec <swagger.json> -o col.json` |
+| **Analyzing Newman Results & CI/CD Gatekeeper** | `tools/newman_analyzer.py` | `agent-qa analyze-newman report.json --max-failures 0` |
 | **Generating JMeter Performance Test Plan (.jmx)** | `tools/generate_jmx_plan.py` | `agent-qa generate-jmx --spec <swagger.json> --vus 100 -o plan.jmx` |
 | **Analyzing JMeter JTL & Enforcing CI/CD SLA Gate** | `tools/jtl_analyzer.py` | `agent-qa analyze-jtl results.jtl --sla-p95 500 --max-error-rate 1.0` |
+| **Full-Stack APM & Server Telemetry RCA Correlator** | `tools/telemetry_correlator.py` | `agent-qa correlate-telemetry --jtl results.jtl --server-metrics srv.csv` |
 | **Auditing Web Accessibility (WCAG 2.2)** | `tools/wcag_audit.py` | `python tools/wcag_audit.py <path_to_html_or_url>` |
 | **0-Token Polyglot Test Transpilation** | `tools/omni_transpiler.py` | `agent-qa transpile <file> --to <target>` (Playwright TS, Python, Java, Katalon, Cypress) |
 | **0-Token Repository Polyglot AST Scan** | `tools/omni_transpiler.py` | `agent-qa omni-scan [path]` (Instant inventory of Pages, Locators, Tests across languages) |
@@ -53,6 +55,8 @@
 | **Lookup XPath Locator in cached memory** | `tools/lookup_xpath.py` | `python tools/lookup_xpath.py "<keyword>"` |
 | **Lookup Test Case metadata** | `tools/lookup_tc.py` | `python tools/lookup_tc.py "<keyword_or_id>"` |
 | **Linting Markdown documentation quality** | `tools/lint_ai_docs.py` | `python tools/lint_ai_docs.py` |
+| **Auditing AI Agent Skills & MCP Security** | `tools/skillspector.py` | `python tools/skillspector.py [path]` (or `agent-qa skillspector [path]` / `npx synapse-hub skillspector`) |
+| **Author Provenance & Anti-Tamper Integrity Guard** | `tools/author_integrity.py` | `python tools/author_integrity.py` (or `agent-qa verify-author` / `verify_all Gate 0`) |
 | **Upstream Version Check & 1-Click Self-Update** | `tools/update_sentinel.py` | `python tools/update_sentinel.py --check / --update` (or `agent-qa update` / `npx synapse-hub update`) |
 
 ---
@@ -336,36 +340,40 @@ agent-qa update
 ---
 
 ### 21. `tools/export_postman_collection.py`
-- **Purpose:** Enterprise OpenAPI/Swagger & HAR to Postman Collection v2.1.0 Exporter. Generates fully structured Postman collections with dynamic pre-request scripts, SLA latency tests, response code assertions, and autonomous bearer token / created entity ID extraction for Newman and CI/CD pipelines.
+- **Purpose:** Enterprise OpenAPI/Swagger, HAR & Zero-Input Domain Postman Collection v2.1.0 Exporter (Postman Pinnacle Suite). Generates fully structured Postman collections with dynamic pre-request scripts, SLA latency tests, response code assertions, autonomous token/entity chaining, native **AJV JSON Schema Validation**, companion **Data-Driven Testing (DDT) CSV matrix**, and **Autonomous Zero-Input Domain Synthesis** (`--domain [ecommerce|banking|saas]`).
 - **CLI Syntax:**
   ```bash
-  # Ingest OpenAPI spec and export Postman collection + companion environment
+  # 1. Ingest OpenAPI spec and export Postman collection + environment + AJV Schema asserts
   agent-qa export-postman --spec swagger.json -o collection.json --env-output env.json
 
-  # Replay production HAR traffic as Postman requests
-  agent-qa export-postman --har session.har -o har_collection.json
+  # 2. Autonomous Zero-Input Synthesis (No file provided! Synthesizes complete Banking/Ecom suite)
+  agent-qa export-postman --domain banking -o banking_col.json --env-output env.json --ddt-output ddt_data.csv
+  agent-qa export-postman --domain ecommerce -o ecom_col.json --ddt-output ecom_data.csv
 
-  # Generate sample collection from built-in enterprise schema
-  agent-qa export-postman --sample -o sample_collection.json
+  # 3. Replay production HAR traffic as Postman requests
+  agent-qa export-postman --har session.har -o har_collection.json
   ```
 
 ---
 
 ### 22. `tools/generate_jmx_plan.py`
-- **Purpose:** Apache JMeter 5.x Performance Test Plan XML (.jmx) Generator (JMeter 360° Suite). Ingests OpenAPI specifications, Postman Collections, or HAR recordings to output production-ready JMeter load, stress, spike, and soak test plans with HTTP Cookie & Cache Managers, CSV Data Set Config, Transaction Controllers, JSR223 Groovy HMAC payload signers, InfluxDB live APM telemetry, and SLA assertions.
+- **Purpose:** Apache JMeter 5.x Performance Test Plan XML (.jmx) Generator (JMeter 360° Pinnacle Suite). Ingests OpenAPI specifications, Postman Collections, or HAR recordings to output production-ready JMeter load, stress, spike, and soak test plans with HTTP Cookie & Cache Managers, CSV Data Set Config, Transaction Controllers, Pareto Traffic Shaping (`--weighted-mix`), Deep Data Correlation (CSRF regex & random dynamic selectors), JSR223 Groovy HMAC payload signers, InfluxDB live APM telemetry, PerfMon server agent monitoring, and Multi-Protocol support (HTTP, JDBC, WebSocket, gRPC, Kafka).
 - **CLI Syntax:**
   ```bash
-  # 1. Generate JMeter plan from OpenAPI with 100 Virtual Users for 10 minutes
-  agent-qa generate-jmx --spec swagger.json -o load_plan.jmx --vus 100 --duration 600
+  # 1. Generate JMeter plan with Pareto traffic shaping (70% Browse, 20% Cart, 10% Checkout)
+  agent-qa generate-jmx --spec swagger.json -o load_plan.jmx --weighted-mix "70:Browse,20:Cart,10:Checkout"
 
-  # 2. Convert existing Postman collection with CSV data parameterization & Transaction Controllers
-  agent-qa generate-jmx --postman collection.json -o perf_plan.jmx --csv-data users.csv --group-transactions
+  # 2. Convert existing Postman collection with CSV data & Deep Correlation (CSRF + random items)
+  agent-qa generate-jmx --postman collection.json -o perf_plan.jmx --csv-data users.csv --deep-correlation
 
-  # 3. Generate Spike or Step-Up workload profile with JSR223 HMAC payload signer
-  agent-qa generate-jmx --spec swagger.json -o spike_plan.jmx --workload spike --jsr223-hmac
+  # 3. Generate multi-protocol test plans (WebSocket, gRPC, Kafka, JDBC)
+  agent-qa generate-jmx --ws-sample -o websocket_plan.jmx
+  agent-qa generate-jmx --grpc-sample -o grpc_plan.jmx
+  agent-qa generate-jmx --kafka-sample -o kafka_plan.jmx
+  agent-qa generate-jmx --jdbc-sample -o jdbc_plan.jmx
 
-  # 4. Generate with live InfluxDB / Grafana streaming
-  agent-qa generate-jmx --spec swagger.json -o perf_plan.jmx --influxdb-url http://influxdb:8086/write?db=jmeter
+  # 4. Generate with live InfluxDB streaming & PerfMon Server Agent
+  agent-qa generate-jmx --spec swagger.json -o perf_plan.jmx --influxdb-url http://influxdb:8086/write?db=jmeter --perfmon-server 192.168.1.50:4444
 
   # 5. Run headless JMeter CLI
   jmeter -n -t load_plan.jmx -l results.jtl -e -o ./html_report
@@ -374,14 +382,14 @@ agent-qa update
 ---
 
 ### 23. `tools/jtl_analyzer.py`
-- **Purpose:** Apache JMeter JTL Results Analyzer & CI/CD SLA Quality Gatekeeper. Parses `.jtl` (CSV or XML), computes statistical percentiles ($P_{50}, P_{90}, P_{95}, P_{99}$, Throughput, Error Rate), evaluates user SLA thresholds, and returns deterministic exit code `0` (Pass) or `1` (Fail) to enforce quality gates in automated pipelines.
+- **Purpose:** Apache JMeter JTL Results Analyzer & CI/CD SLA Quality Gatekeeper. Parses `.jtl` (CSV or XML), computes statistical percentiles ($P_{50}, P_{90}, P_{95}, P_{99}$, Throughput, Error Rate), evaluates user SLA thresholds, supports server telemetry correlation (`--telemetry`), and returns deterministic exit code `0` (Pass) or `1` (Fail) to enforce quality gates in automated pipelines.
 - **CLI Syntax:**
   ```bash
   # 1. Enforce CI/CD Quality Gate with P95 Latency SLA (< 500ms) and max error rate (< 1%)
   agent-qa analyze-jtl results.jtl --sla-p95 500 --max-error-rate 1.0
 
-  # 2. Export GitHub / GitLab Pull Request Markdown report & JSON metrics
-  agent-qa analyze-jtl results.jtl --markdown pr_report.md --json metrics.json
+  # 2. Correlate with Server-Side APM Telemetry directly in Quality Gate
+  agent-qa analyze-jtl results.jtl --sla-p95 500 --telemetry server_metrics.csv --markdown pr_report.md
 
   # 3. Dry-run sample benchmark verification
   agent-qa analyze-jtl --sample --sla-p95 500
@@ -389,8 +397,26 @@ agent-qa update
 
 ---
 
-### 24. `tools/md_to_xlsx.py`
-- **Purpose:** Enterprise Markdown-to-Excel Converter. Parses Markdown Test Case tables and converts them into professional, styled Excel workbooks (`.xlsx`) with Navy Blue headers, frozen header panes (`A2`), auto-filters, color-coded badges for Risk Level (High/Med/Low) and Priority (Critical/High/Med/Low), and multi-line wrapping.
+### 36. `tools/author_integrity.py` (Author Provenance & Anti-Tamper Integrity Guard)
+- **Purpose:** Cryptographic and textual provenance validator enforcing the mandatory author attribution condition of the MIT License:
+  *"The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software."*
+  Protects original creator **Thế Vị (@TeeVee998)** against unauthorized author stripping or copyright tampering across `LICENSE`, `package.json`, `README.md`, and `pyproject.toml`.
+- **Trigger Condition:** Runs autonomously as **Gate 0** in `tools/verify_all.py`, pre-dispatch in `agent-qa` CLI, or on-demand via `agent-qa verify-author`.
+- **CLI Syntax:**
+  ```bash
+  # 1. Verify author attribution and provenance
+  python tools/author_integrity.py
+  agent-qa verify-author
+
+  # 2. Enforced autonomously during Quality Gate verification
+  python tools/verify_all.py
+  agent-qa verify
+  ```
+
+---
+
+### 37. `tools/md_to_xlsx.py` (Enterprise Markdown-to-Excel Converter)
+- **Purpose:** Parses Markdown Test Case tables and converts them into professional, styled Excel workbooks (`.xlsx`) with Navy Blue headers, frozen header panes (`A2`), auto-filters, color-coded badges for Risk Level (High/Med/Low) and Priority (Critical/High/Med/Low), and multi-line wrapping.
 - **CLI Syntax:**
   ```bash
   # 1. Convert markdown test cases to styled Excel (.xlsx)
@@ -402,4 +428,3 @@ agent-qa update
   # 3. Direct python execution
   python3 tools/md_to_xlsx.py path/to/cases.md -o export.xlsx
   ```
-

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "playwright-live": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-playwright"
+      ],
+      "sandboxPolicy": "HEADLESS_VIRTUAL_DISPLAY"
+    }
+  }
+}

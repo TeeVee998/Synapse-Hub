@@ -16,7 +16,7 @@ agent-qa <command> [options]
 
 | Command | Subsystem | Description | Example |
 | :--- | :--- | :--- | :--- |
-| `verify` | Quality Sentinel | Executes all 7 Quality Gates DoD validation | `agent-qa verify` |
+| `verify` | Quality Sentinel | Executes all 9 Quality Gates DoD validation | `agent-qa verify` |
 | `lint` | Static Analysis | AST-level fake-pass and zero-assertion scanner | `agent-qa lint` |
 | `heal` | Self-Healing | Queries zero-token semantic error memory cache | `agent-qa heal query "StaleElement"` |
 | `distill` | Token Optimizer | Filters verbose CLI/Gradle logs by 95% | `agent-qa distill build.log` |
@@ -30,7 +30,7 @@ agent-qa <command> [options]
 
 If running without global package installation, tools can be executed directly via Python:
 
-### 2.1. Verify 7 Quality Gates
+### 2.1. Verify 9 Quality Gates (Gate 0 - Gate 8)
 ```bash
 # Auto-detect mode (default: detects Hub vs Target Test Project)
 python tools/verify_all.py
@@ -40,8 +40,9 @@ python tools/verify_all.py --mode hub      # QA Hub integrity validation
 python tools/verify_all.py --mode target   # Target automation suite validation
 ```
 - **Operational Modes:**
-  - `--mode hub`: Validates QA Hub assets, skills, tools integrity, zero BOM, path portability, and universal credential security across repository files without requiring target Katalon scripts.
-  - `--mode target`: Enforces target automation suite standards including Clean POM across `Scripts/*.groovy` and `Profiles/default.glbl` password encryption.
+  - `--mode hub`: Validates QA Hub assets, skills, tools integrity, zero BOM, path portability, and universal credential security across repository files without requiring target test scripts.
+  - `--mode target`: Enforces target automation suite standards including Clean POM across test scripts and credential encryption.
+- **Gate 0:** Author Attribution & Provenance Guard (preserves MIT author notice).
 - **Gate 1:** 100% UTF-8 No BOM check across all scripts, markdown, and config files.
 - **Gate 2:** Path Portability (zero absolute host/machine directory paths).
 - **Gate 3:** Clean POM & Flat Architecture (zero raw XPaths/CSS in test scripts).
@@ -49,6 +50,7 @@ python tools/verify_all.py --mode target   # Target automation suite validation
 - **Gate 5:** Temporary file and properties artifact cleanup.
 - **Gate 6:** Credential Security & Secret Scanner (zero hardcoded plaintext passwords or API tokens).
 - **Gate 7:** Static Defect & AST Fake-Pass Sentinel.
+- **Gate 8:** AST Micro-Mutation Sentinel (Requires Mutation Score >= 80%).
 
 ### 2.2. AST Fake-Pass Sentinel
 ```bash

@@ -30,7 +30,7 @@ When executing tasks within automated testing repositories, Agent must strictly 
 | **Test Script & POM Generation** | `clean-pom-crafter`<br/>`lam-script-generator` | `QA Automation Engineer` | Enforces Flat Architecture, zero XPaths in scripts, dynamic `uniqueCode`, and 2-phase search. Generic plugin templates violate Clean POM standards. |
 | **Locator Healing & DOM Diffing** | `self-healing-locator`<br/>`failure-autopsy-and-healing` | `Locator Healer Agent` | Uses token-efficient AOM diffing (Role > Label > TestId) and reads local JUnit XML/Screenshots. |
 | **Flaky Test Triage & Root Cause** | `failure-autopsy-and-healing` | `Flaky Test Analyzer` | Triage occurs via 0-token JUnit XML parsing, `Screenshots/FAILED_*.png` autopsy, and SQLite cosine cache (`memory_cache.db`). |
-| **Live Web & Locator Probing** | `playwright-live-interaction` | `Smart Locator Agent` | Direct CDP network idle 0, PrimeNG overlay bypass, and in-browser helper integration. |
+| **Live Web & Locator Probing** | `playwright-live-interaction` | `Smart Locator Agent` | Direct CDP network idle 0, dynamic overlay bypass, and in-browser helper integration. |
 | **Code Refactoring & Tech Debt** | `code-refactoring-refactor-clean` | *(Consolidated)* | Single unified skill covering SOLID refactoring, code smells, and technical debt remediation. |
 | **Accessibility (A11y) Testing** | `wcag-audit-patterns`<br/>*(Guideline)* | `a11y-debugging`<br/>*(Tooling Only)* | `wcag-audit-patterns` governs WCAG 2.2 rules; `a11y-debugging` is used solely for low-level Chrome DevTools inspection. |
 

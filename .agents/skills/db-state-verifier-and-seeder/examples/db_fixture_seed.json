@@ -1,0 +1,12 @@
+{
+  "table": "tenants",
+  "operation": "INSERT",
+  "records": [
+    {
+      "tenant_id": "AUTO_TENANT_01",
+      "status": "ACTIVE",
+      "plan": "ENTERPRISE"
+    }
+  ],
+  "teardown": "DELETE FROM tenants WHERE tenant_id = :tenant_id"
+}

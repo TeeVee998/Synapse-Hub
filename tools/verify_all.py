@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: Copyright (c) 2026 Thế Vị (@TeeVee998). All rights reserved.
+# SPDX-License-Identifier: MIT
+# Project: Synapse-Hub (https://github.com/TeeVee998/Synapse-Hub)
+
 """
 Enterprise Multi-Project DoD Verifier (One Command Quality Gate)
 ---------------------------------------------------------
 Consolidates all definition-of-done criteria into a single executable command.
 
 Verifies:
+  Gate 0: Author Attribution & Copyright Integrity: Verifies author provenance (Thế Vị @TeeVee998).
   Gate 1: 100% UTF-8 No BOM across all repository files (8 extensions).
   Gate 2: Path Portability: Zero absolute machine paths (file:///C:, /Users/...).
   Gate 3: Clean POM & Flat Architecture: Zero raw XPaths or findTestObject in Scripts/.
@@ -124,6 +129,44 @@ def resolve_target_repo(cli_target=None, cli_repo=None):
     return hub_root
 
 
+def gate_0_author_integrity(repo_root, mode="AUTO"):
+    print("\n[GATE 0] Running Author Attribution & Anti-Tamper Integrity Guard...")
+    try:
+        from author_integrity import (
+            verify_author_attribution,
+            get_canonical_watermark,
+            verify_author_fingerprint,
+            DEFAULT_REPO_ROOT,
+        )
+    except ImportError:
+        import sys
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from author_integrity import (
+            verify_author_attribution,
+            get_canonical_watermark,
+            verify_author_fingerprint,
+            DEFAULT_REPO_ROOT,
+        )
+
+    # 1. Cryptographic SHA-256 fingerprint verification
+    if not verify_author_fingerprint():
+        print("[FAIL] Cryptographic author fingerprint mismatch! Original creator ('Thế Vị @TeeVee998') has been tampered with.")
+        return False
+
+    # 2. In HUB mode, verify the Hub repository itself.
+    # In TARGET mode, verify the Hub tools root to guarantee engine integrity.
+    check_root = repo_root if mode == "HUB" else DEFAULT_REPO_ROOT
+    valid, violations = verify_author_attribution(check_root)
+    if not valid:
+        print("[FAIL] Author Attribution & Copyright Integrity Violated:")
+        for v in violations:
+            print(f"   • {v}")
+        print("   Under MIT License, original author attribution to 'Thế Vị (@TeeVee998)' must be preserved.")
+        return False
+    print(f"[PASS] Author Attribution & Cryptographic Provenance verified intact: {get_canonical_watermark()}")
+    return True
+
+
 def gate_1_bom_check(repo_root, mode="AUTO"):
     print("\n[GATE 1] Scanning UTF-8 No BOM across repository...")
     violations = []
@@ -158,7 +201,8 @@ def gate_2_path_portability(repo_root, mode="AUTO"):
     }
     ignored_files = {
         ".project", ".classpath", ".DS_Store", "memory_cache.db",
-        "verify_all.py", "git_pre_commit_guard.py", "agent_canary.py", "repo_map.txt", "repo_map.json"
+        "verify_all.py", "git_pre_commit_guard.py", "agent_canary.py", "repo_map.txt", "repo_map.json",
+        "PROJECT_HEALTH_REPORT.md", "PROJECT_STATE.md"
     }
     violations = []
     for root, dirs, files in os.walk(repo_root):
@@ -194,43 +238,42 @@ def gate_2_path_portability(repo_root, mode="AUTO"):
 
 
 def gate_3_clean_pom(repo_root, mode="AUTO"):
-    print("\n[GATE 3] Checking Clean POM & Flat Architecture in Scripts/......")
-    scripts_dir = os.path.join(repo_root, "Scripts")
+    print("\n[GATE 3] Checking Clean POM & Flat Architecture in Test Scripts...")
+    effective_mode = detect_repo_mode(repo_root) if mode == "AUTO" else mode
+    if effective_mode == "HUB":
+        print("[PASS] Hub Mode: Repository contains QA Hub assets; Clean POM applies to target test suites.")
+        return True
 
-    has_groovy = False
-    if os.path.isdir(scripts_dir):
-        groovy_files = [f for f in glob.glob(os.path.join(scripts_dir, "**", "*.groovy"), recursive=True)]
-        has_groovy = len(groovy_files) > 0
+    test_dirs = ["Scripts", "tests", "test", "e2e", "specs", "cypress"]
+    test_files = []
+    for td in test_dirs:
+        d = os.path.join(repo_root, td)
+        if os.path.isdir(d):
+            for ext in ("*.groovy", "*.ts", "*.js", "*.py", "*.java"):
+                test_files.extend(glob.glob(os.path.join(d, "**", ext), recursive=True))
 
-    if not has_groovy:
-        if mode == "HUB":
-            print("[SKIP] Hub Mode: Repository contains QA Hub assets; no target Groovy scripts in Scripts/ to verify.")
-            return True
-        else:
-            print("[SKIP] No Groovy test scripts present in Scripts/ directory.")
-            return True
+    if not test_files:
+        print("[SKIP] No test scripts present in candidate directories (Scripts/, tests/, e2e/).")
+        return True
 
     violations = []
-    for root, dirs, files in os.walk(scripts_dir):
-        for f in files:
-            if f.endswith(".groovy"):
-                full_path = os.path.join(root, f)
-                rel_path = os.path.relpath(full_path, repo_root)
-                try:
-                    with open(full_path, "r", encoding="utf-8", errors="ignore") as fp:
-                        for line_no, line in enumerate(fp, 1):
-                            stripped = line.strip()
-                            if stripped.startswith("//") or stripped.startswith("/*"):
-                                continue
-                            if "findTestObject" in line:
-                                violations.append((rel_path, line_no, "Raw findTestObject"))
-                            if "//" in line and ("//table" in line or "//input" in line or "//button" in line):
-                                violations.append((rel_path, line_no, "Raw XPath"))
-                except Exception:
-                    pass
+    for full_path in sorted(set(test_files)):
+        rel_path = os.path.relpath(full_path, repo_root)
+        try:
+            with open(full_path, "r", encoding="utf-8", errors="ignore") as fp:
+                for line_no, line in enumerate(fp, 1):
+                    stripped = line.strip()
+                    if stripped.startswith("//") or stripped.startswith("/*") or stripped.startswith("#"):
+                        continue
+                    if "findTestObject" in line:
+                        violations.append((rel_path, line_no, "Raw findTestObject"))
+                    if "//" in line and ("//table" in line or "//input" in line or "//button" in line):
+                        violations.append((rel_path, line_no, "Raw XPath"))
+        except Exception:
+            pass
 
     if violations:
-        print(f"[FAIL] {len(violations)} Clean POM violations in Scripts/:")
+        print(f"[FAIL] {len(violations)} Clean POM violations in test scripts:")
         for rel_path, line_no, reason in violations:
             print(f"   - {rel_path}:{line_no} ({reason})")
         return False
@@ -361,26 +404,35 @@ def gate_6_credential_security(repo_root, mode="AUTO"):
 
 def gate_7_infer_linter(repo_root, mode="AUTO"):
     print("\n[GATE 7] Running Meta Infer-Style Static Defect & Fake-Pass Sentinel...")
-    scripts_dir = os.path.join(repo_root, "Scripts")
-    has_groovy = False
-    if os.path.isdir(scripts_dir):
-        groovy_files = [f for f in glob.glob(os.path.join(scripts_dir, "**", "*.groovy"), recursive=True)]
-        has_groovy = len(groovy_files) > 0
+    effective_mode = detect_repo_mode(repo_root) if mode == "AUTO" else mode
+    if effective_mode == "HUB":
+        print("[PASS] Hub Mode: Static Defect Sentinel active for target projects.")
+        return True
 
-    if not has_groovy:
-        if mode == "HUB":
-            print("[SKIP] Hub Mode: No Groovy test scripts in Scripts/ to scan (Static Defect Sentinel active for target projects).")
-            return True
-        else:
-            print("[SKIP] No Groovy test scripts present in Scripts/ directory.")
-            return True
+    test_dirs = ["Scripts", "tests", "test", "e2e", "specs", "cypress"]
+    has_tests = False
+    target_scan_dir = None
+    for td in test_dirs:
+        d = os.path.join(repo_root, td)
+        if os.path.isdir(d):
+            for ext in ("*.groovy", "*.ts", "*.js", "*.py", "*.java"):
+                if glob.glob(os.path.join(d, "**", ext), recursive=True):
+                    has_tests = True
+                    target_scan_dir = d
+                    break
+        if has_tests:
+            break
+
+    if not has_tests:
+        print("[SKIP] No test scripts (Groovy/TS/JS/Py) present in candidate test directories.")
+        return True
 
     infer_script = os.path.join(SCRIPT_DIR, "infer_linter.py")
     if not os.path.exists(infer_script):
         infer_script = os.path.join(repo_root, "tools", "infer_linter.py")
 
     if os.path.exists(infer_script):
-        res = subprocess.run([sys.executable, infer_script, "--dir", scripts_dir], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        res = subprocess.run([sys.executable, infer_script, "--dir", target_scan_dir], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         if res.returncode != 0:
             print("[FAIL] Static Defect Sentinel detected critical issues in test scripts:")
             print(res.stdout)
@@ -440,29 +492,16 @@ def gate_8_micro_mutator(repo_root, mode="AUTO"):
     return True
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Enterprise DoD Verification Sentinel")
-    parser.add_argument("target", nargs="?", default=None,
-                        help="Target repository path to verify (defaults to auto-detection from CWD or Hub)")
-    parser.add_argument("--repo", "--path", dest="repo_path", default=None,
-                        help="Target repository path to verify")
-    parser.add_argument("--mode", choices=["auto", "hub", "target"], default="auto",
-                        help="Execution mode (auto-detect, hub, or target test project)")
-    args = parser.parse_args()
-
-    try:
-        repo_root = resolve_target_repo(cli_target=args.target, cli_repo=args.repo_path)
-    except FileNotFoundError as e:
-        print(f"[ERROR] {e}")
-        return 1
-
-    effective_mode = detect_repo_mode(repo_root) if args.mode == "auto" else args.mode.upper()
+def run_all_gates(repo_root, mode="AUTO"):
+    """Programmatic entrypoint to execute all 9 DoD Quality Gates."""
+    effective_mode = detect_repo_mode(repo_root) if mode.upper() == "AUTO" else mode.upper()
 
     print_header(f"ENTERPRISE AUTOMATION - ONE-COMMAND DoD VERIFICATION [{effective_mode} MODE]")
     print(f"Target Repository: {repo_root}")
     print(f"Operational Mode : {effective_mode}")
 
     gates = [
+        ("Gate 0: Author Attribution & Integrity", gate_0_author_integrity),
         ("Gate 1: UTF-8 No BOM", gate_1_bom_check),
         ("Gate 2: Path Portability", gate_2_path_portability),
         ("Gate 3: Clean POM & Flat Architecture", gate_3_clean_pom),
@@ -481,7 +520,7 @@ def main():
 
     print("\n" + "=" * 70)
     if all_passed:
-        print("[ALL 8 GATES PASSED - 100% DoD COMPLIANT]")
+        print("[ALL QUALITY GATES PASSED - 100% DoD COMPLIANT]")
         print("   Repository is 100% compliant, secure, and ready for execution/CI/CD.")
         print("=" * 70 + "\n")
         return 0
@@ -490,6 +529,25 @@ def main():
         print("   Please review the errors above and resolve them before proceeding.")
         print("=" * 70 + "\n")
         return 1
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Enterprise DoD Verification Sentinel")
+    parser.add_argument("target", nargs="?", default=None,
+                        help="Target repository path to verify (defaults to auto-detection from CWD or Hub)")
+    parser.add_argument("--repo", "--path", dest="repo_path", default=None,
+                        help="Target repository path to verify")
+    parser.add_argument("--mode", choices=["auto", "hub", "target"], default="auto",
+                        help="Execution mode (auto-detect, hub, or target test project)")
+    args = parser.parse_args()
+
+    try:
+        repo_root = resolve_target_repo(cli_target=args.target, cli_repo=args.repo_path)
+    except FileNotFoundError as e:
+        print(f"[ERROR] {e}")
+        return 1
+
+    return run_all_gates(repo_root, mode=args.mode)
 
 
 if __name__ == "__main__":

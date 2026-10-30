@@ -26,8 +26,10 @@ def distill(log_text, max_lines=40):
     # Noise filters
     noise_patterns = [
         re.compile(r'^\s*$'),
-        re.compile(r'\[INFO\b'),
-        re.compile(r'\[DEBUG\b'),
+        re.compile(r'\[INFO\b|\bINFO:|\bINFO\s+', re.IGNORECASE),
+        re.compile(r'\[DEBUG\b|\bDEBUG:|\bDEBUG\s+', re.IGNORECASE),
+        re.compile(r'\[TRACE\b|\bTRACE:|\bTRACE\s+', re.IGNORECASE),
+        re.compile(r'^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}.*\b(?:INFO|DEBUG|TRACE)\b', re.IGNORECASE),
         re.compile(r'\bPASSED\b', re.IGNORECASE),
         re.compile(r'> Task :'),
         re.compile(r'SLF4J:'),
@@ -47,10 +49,11 @@ def distill(log_text, max_lines=40):
         re.compile(r'Caused by:'),
         re.compile(r'at (?:Enterprise\.|Script\d+|com\.kms)'),
         re.compile(r'TC-\d+.*FAILED'),
+        re.compile(r'FAIL\s+.*(?:\.spec|\.test)'),
     ]
 
-    tc_pattern = re.compile(r'(TC-\d+)')
-    line_num_pattern = re.compile(r'((?:Script\d+|\w+Page)\.groovy:(\d+))')
+    tc_pattern = re.compile(r'(TC-\d+|test_[A-Za-z0-9_]+|[A-Za-z0-9_-]+\.(?:spec|test)\.[jt]sx?)')
+    line_num_pattern = re.compile(r'((?:Script\d+|\w+Page|\w+\.(?:groovy|ts|js|py)):(\d+))|File "([^"]+)", line (\d+)')
     exception_pattern = re.compile(r'([A-Za-z0-9_.]*(?:Exception|Error)):?\s*(.*)')
 
     captured_failures = []
@@ -63,7 +66,7 @@ def distill(log_text, max_lines=40):
     for line in lines:
         # Check if line indicates failure
         is_fail_line = any(p.search(line) for p in failure_indicators)
-        is_noise = any(p.search(line) for p in noise_patterns)
+        is_noise = any(p.search(line) for p in noise_patterns) and not is_fail_line
 
         # Detect TC identifier
         m_tc = tc_pattern.search(line)
@@ -73,7 +76,7 @@ def distill(log_text, max_lines=40):
         # Detect script line number
         m_loc = line_num_pattern.search(line)
         if m_loc:
-            failing_locs.append(m_loc.group(1))
+            failing_locs.append(m_loc.group(1) or f"{m_loc.group(3)}:{m_loc.group(4)}")
 
         if is_fail_line:
             in_failure_block = True
@@ -102,9 +105,12 @@ def distill(log_text, max_lines=40):
         output.append("======================================================================")
         return "\n".join(output)
 
-    output.append(f"❌ FAILURES DETECTED: {len(failing_tcs)} Test Case(s) marked FAILED.")
     if failing_tcs:
+        output.append(f"❌ FAILURES DETECTED: {len(failing_tcs)} Test Case(s) marked FAILED.")
         output.append(f"   Targeted TCs: {', '.join(sorted(failing_tcs))}")
+    else:
+        output.append(f"❌ FAILURES / ERRORS DETECTED: {len(captured_failures)} failure block(s) isolated.")
+        
     if failing_locs:
         unique_locs = sorted(set(failing_locs))
         output.append(f"   Failing Script Location(s): {', '.join(unique_locs[:5])}")
@@ -116,10 +122,13 @@ def distill(log_text, max_lines=40):
     output.append("======================================================================")
     return "\n".join(output)
 
+# Public alias for MCP server compatibility
+distill_log_content = distill
+
 def main():
     parser = argparse.ArgumentParser(description="Distill terminal execution logs into high-signal failure blocks.")
     parser.add_argument("--file", "-f", help="Path to raw log file (reads from stdin if omitted).")
-    parser.add_argument("--save-raw", "-s", default="Reports/raw_execution.log", help="Path to preserve raw log.")
+    parser.add_argument("--save-raw", "-s", default=None, help="Path to preserve raw log (omitted by default to prevent hub pollution).")
     args = parser.parse_args()
 
     if args.file:
@@ -134,13 +143,13 @@ def main():
             sys.exit(0)
         log_text = sys.stdin.read()
 
-    # Preserve raw log on disk
+    # Preserve raw log on disk if explicitly requested
     if args.save_raw:
         try:
             os.makedirs(os.path.dirname(os.path.abspath(args.save_raw)), exist_ok=True)
             with open(args.save_raw, "w", encoding="utf-8") as fp:
                 fp.write(log_text)
-        except Exception as e:
+        except Exception:
             pass
 
     summary = distill(log_text)

@@ -95,7 +95,7 @@ def detect_tech_stack(target_dir):
             "language": "Groovy",
             "page_dir": "Keywords/pages",
             "test_dir": "Scripts",
-            "run_cmd": "./tools/run_headless_kre.sh (or katalonc CLI)"
+            "run_cmd": "katalonc -noSplash -runMode=console"
         }
 
     # 2. Playwright check
@@ -143,7 +143,7 @@ def detect_tech_stack(target_dir):
     }
 
 
-def ensure_project_ai_guide(target_dir, stack_info):
+def ensure_project_ai_guide(target_dir, stack_info, profile="full"):
     """Generates PROJECT_AI_GUIDE.md tailored to the target project if missing."""
     guide_path = os.path.join(target_dir, "PROJECT_AI_GUIDE.md")
     if os.path.exists(guide_path):
@@ -167,6 +167,14 @@ def ensure_project_ai_guide(target_dir, stack_info):
     content = content.replace("tests/e2e/... or Scripts/...", stack_info["test_dir"])
     content = content.replace("[e.g., npx playwright test --project=chromium --reporter=html,junit:results.xml]", stack_info["run_cmd"])
 
+    profile_line = f"- **Active Skills Profile:** `{profile.upper()}`"
+    if profile_line not in content:
+        lang_target = f"- **Script Language:** `{stack_info['language']}`"
+        if lang_target in content:
+            content = content.replace(lang_target, f"{lang_target}\n{profile_line}")
+        else:
+            content = content.replace("## 1. General System Under Test", f"## 1. General System Under Test\n{profile_line}")
+
     with open(guide_path, "w", encoding="utf-8") as f:
         f.write(content)
 
@@ -175,7 +183,10 @@ def ensure_project_ai_guide(target_dir, stack_info):
 
 
 def install_git_pre_push_hook(target_dir):
-    """Installs an automated pre-push hook into target project's .git repository."""
+    """
+    Installs or appends an automated pre-push hook into target project's .git repository.
+    Safely backs up any existing pre-push hook (e.g. Husky, Lefthook) to prevent side-effects.
+    """
     git_dir = os.path.join(target_dir, ".git")
     if not os.path.isdir(git_dir):
         print("  [SKIP] Not a Git repository root (.git folder not found). Skipped Git Hook installation.")
@@ -185,37 +196,69 @@ def install_git_pre_push_hook(target_dir):
     os.makedirs(hooks_dir, exist_ok=True)
     hook_file = os.path.join(hooks_dir, "pre-push")
 
+    # Resolve pinned package version
+    manifest_file = os.path.join(HUB_ROOT, "skills_manifest.json")
+    pkg_ver = "2.2.2"
+    if os.path.exists(manifest_file):
+        try:
+            with open(manifest_file, "r", encoding="utf-8") as f:
+                pkg_ver = json.load(f).get("version", pkg_ver)
+        except Exception:
+            pass
+
     verify_all_script = os.path.join(SCRIPT_DIR, "verify_all.py").replace("\\", "/")
     analyze_script = os.path.join(SCRIPT_DIR, "analyze_project.py").replace("\\", "/")
 
-    hook_content = f"""#!/bin/sh
-# Automated Zero-Leakage Pre-Push Hook (Installed by Synapse-Hub)
-# Enforces 8 Quality Gates DoD and syncs project intelligence before pushing.
-
-echo "\\n[AI-GUARD] Running Pre-Push Verification (8 Quality Gates DoD)..."
-if command -v npx >/dev/null 2>&1; then
-    npx synapse-hub verify
-elif [ -f "{verify_all_script}" ]; then
+    hook_snippet = f"""
+# --- Synapse-Hub Pre-Push Quality Gate (v{pkg_ver}) ---
+echo "\\n[AI-GUARD] Running Pre-Push Verification (Quality Gates DoD)..."
+# Prioritize local tool execution to run offline without network latency or registry dependency
+if [ -f "{verify_all_script}" ]; then
     python3 "{verify_all_script}" || python "{verify_all_script}"
+elif command -v agent-qa >/dev/null 2>&1; then
+    agent-qa verify
+elif command -v npx >/dev/null 2>&1; then
+    npx --no-install synapse-hub verify 2>/dev/null || npx synapse-hub@{pkg_ver} verify
 fi
 if [ $? -ne 0 ]; then
     echo "\\n[AI-GUARD - REJECTED] Git Push aborted: Quality Gates verification failed!"
-    echo "Please fix defects or run 'npx synapse-hub verify' locally before pushing.\\n"
+    echo "Please fix defects or run 'python tools/verify_all.py' locally before pushing.\\n"
     exit 1
 fi
 
-echo "[AI-GUARD - PASSED] 8 Quality Gates satisfied. Syncing project health report..."
-if command -v npx >/dev/null 2>&1; then
-    npx synapse-hub analyze
-elif [ -f "{analyze_script}" ]; then
+echo "[AI-GUARD - PASSED] Quality Gates satisfied. Syncing project health report..."
+if [ -f "{analyze_script}" ]; then
     python3 "{analyze_script}" || python "{analyze_script}"
+elif command -v agent-qa >/dev/null 2>&1; then
+    agent-qa analyze
+elif command -v npx >/dev/null 2>&1; then
+    npx --no-install synapse-hub analyze 2>/dev/null || npx synapse-hub@{pkg_ver} analyze
 fi
 echo "[AI-GUARD - READY] Pushing to remote...\\n"
-exit 0
+# --- End Synapse-Hub Quality Gate ---
 """
+
     try:
+        if os.path.exists(hook_file):
+            with open(hook_file, "r", encoding="utf-8", errors="ignore") as f:
+                existing_content = f.read()
+
+            if "Synapse-Hub" in existing_content or "synapse-hub" in existing_content:
+                print(f"  {CYAN}[SKIP] Pre-Push Git Hook already present:{RESET} {hook_file}")
+                return True
+
+            # Safely backup existing hook (e.g. Husky, Lefthook)
+            backup_file = f"{hook_file}.backup"
+            shutil.copy2(hook_file, backup_file)
+            print(f"  {YELLOW}[BACKUP] Existing pre-push hook backed up to:{RESET} {backup_file}")
+
+            # Append non-destructively
+            final_content = existing_content.rstrip() + "\n" + hook_snippet
+        else:
+            final_content = "#!/bin/sh\n" + hook_snippet
+
         with open(hook_file, "w", encoding="utf-8", newline="\n") as f:
-            f.write(hook_content)
+            f.write(final_content)
 
         # Attempt to make executable on Unix-like environments
         try:
@@ -223,7 +266,7 @@ exit 0
         except Exception:
             pass
 
-        print(f"  {GREEN}[OK] Installed automated Pre-Push Git Hook:{RESET} {hook_file}")
+        print(f"  {GREEN}[OK] Configured automated Pre-Push Git Hook:{RESET} {hook_file} (pinned to v{pkg_ver})")
         return True
     except Exception as e:
         print(f"  ⚠️ Could not install Git hook: {e}")
@@ -375,7 +418,65 @@ def install_universal_ai_bridges(target_dir):
     return True
 
 
-def run_setup(target_repo):
+def uninstall_setup(target_repo: str) -> int:
+    """Safely reverts and removes files installed by setup_project in the target repo."""
+    print(f"\n{BOLD}{YELLOW}======================================================================{RESET}")
+    print(f"{BOLD}{YELLOW}          SYNAPSE HUB — REVERT & UNINSTALL SETUP                      {RESET}")
+    print(f"{BOLD}{YELLOW}======================================================================{RESET}")
+    print(f"Target Repository: {target_repo}")
+
+    reverted_items = 0
+
+    # 1. Remove PROJECT_AI_GUIDE.md
+    guide_file = os.path.join(target_repo, "PROJECT_AI_GUIDE.md")
+    if os.path.exists(guide_file):
+        os.remove(guide_file)
+        print(f"  {GREEN}[REMOVED]{RESET} {guide_file}")
+        reverted_items += 1
+
+    # 2. Restore/Remove Git Pre-Push Hook
+    hook_file = os.path.join(target_repo, ".git", "hooks", "pre-push")
+    backup_file = os.path.join(target_repo, ".git", "hooks", "pre-push.bak")
+    if os.path.exists(backup_file):
+        if os.path.exists(hook_file):
+            os.remove(hook_file)
+        shutil.move(backup_file, hook_file)
+        print(f"  {GREEN}[RESTORED]{RESET} Restored original pre-push hook from backup")
+        reverted_items += 1
+    elif os.path.exists(hook_file):
+        with open(hook_file, "r", encoding="utf-8", errors="ignore") as f:
+            content = f.read()
+        if "Synapse-Hub" in content or "synapse-hub" in content:
+            os.remove(hook_file)
+            print(f"  {GREEN}[REMOVED]{RESET} Cleaned Synapse-Hub pre-push hook")
+            reverted_items += 1
+
+    # 3. Remove Cursor rule
+    cursor_rule = os.path.join(target_repo, ".cursor", "rules", "synapse-qa.mdc")
+    if os.path.exists(cursor_rule):
+        os.remove(cursor_rule)
+        print(f"  {GREEN}[REMOVED]{RESET} {cursor_rule}")
+        reverted_items += 1
+
+    # 4. Remove Copilot instruction
+    copilot_file = os.path.join(target_repo, ".github", "copilot-instructions.md")
+    if os.path.exists(copilot_file):
+        os.remove(copilot_file)
+        print(f"  {GREEN}[REMOVED]{RESET} {copilot_file}")
+        reverted_items += 1
+
+    # 5. Remove Windsurf rules
+    windsurf_file = os.path.join(target_repo, ".windsurfrules")
+    if os.path.exists(windsurf_file):
+        os.remove(windsurf_file)
+        print(f"  {GREEN}[REMOVED]{RESET} {windsurf_file}")
+        reverted_items += 1
+
+    print(f"\n{GREEN}✅ Uninstall complete! Cleaned {reverted_items} configuration files/hooks.{RESET}\n")
+    return 0
+
+
+def run_setup(target_repo, dry_run=False, profile="auto"):
     """Main execution entrypoint for automated project setup."""
     print(f"\n{BOLD}{CYAN}======================================================================{RESET}")
     print(f"{BOLD}{CYAN}      AUTONOMOUS ZERO-COMMAND PROJECT BOOTSTRAP (AI-READY SETUP)     {RESET}")
@@ -387,9 +488,40 @@ def run_setup(target_repo):
     print(f"🔍 Detected Stack  : {BOLD}{stack_info['framework']}{RESET} ({stack_info['language']})")
     print(f"📂 Structure Scope : Pages: `{stack_info['page_dir']}` | Tests: `{stack_info['test_dir']}`\n")
 
+    # Resolve active profile
+    if profile == "auto":
+        fw = stack_info.get("framework", "").lower()
+        lang = stack_info.get("language", "").lower()
+        if "playwright" in fw:
+            profile = "playwright"
+        elif "pytest" in fw or "python" in lang:
+            profile = "pytest"
+        elif "cypress" in fw:
+            profile = "cypress"
+        elif "katalon" in fw:
+            profile = "katalon"
+        else:
+            profile = "full"
+
+    print(f"🎯 Selected Profile: {BOLD}{profile.upper()}{RESET}")
+    if dry_run:
+        print(f"Operational Mode   : {YELLOW}DRY-RUN (Simulating without modifying files on disk){RESET}\n")
+    else:
+        print(f"Operational Mode   : APPLY CHANGES\n")
+
+    if dry_run:
+        print(f"{YELLOW}[DRY-RUN PREVIEW]{RESET}")
+        print(f"  • Profile: {profile.upper()}")
+        print(f"  • Would generate: {os.path.join(target_repo, 'PROJECT_AI_GUIDE.md')}")
+        print(f"  • Would deploy AI bridges: .cursor/rules/synapse-qa.mdc, .github/copilot-instructions.md, .windsurfrules")
+        print(f"  • Would install pre-push hook: {os.path.join(target_repo, '.git', 'hooks', 'pre-push')}")
+        print(f"  • Would initialize: Central Agent Memory (~/.agent_memory/global_cache.db)")
+        print(f"\n{GREEN}✅ Dry-run completed successfully. Zero changes written to disk.{RESET}\n")
+        return 0
+
     # 2. Ensure PROJECT_AI_GUIDE.md & PROJECT_STATE.md
     print(f"{BOLD}[1/5] Checking Project AI Guide & State Anchor...{RESET}")
-    guide_created = ensure_project_ai_guide(target_repo, stack_info)
+    guide_created = ensure_project_ai_guide(target_repo, stack_info, profile=profile)
     project_state.init_state(target_repo)
 
     # 3. Deploy Universal AI Bridges (Cursor, Claude Code, GitHub Copilot, Windsurf)
@@ -420,6 +552,7 @@ def run_setup(target_repo):
     print(f"{BOLD}{CYAN}            🎉 PROJECT IS NOW 100% AI-READY (LEVEL 5 SETUP)           {RESET}")
     print(f"{BOLD}{CYAN}======================================================================{RESET}")
     print(f"  Target Framework    : {stack_info['framework']}")
+    print(f"  Active Profile      : {profile.upper()}")
     print(f"  AI Project Guide    : {os.path.join(target_repo, 'PROJECT_AI_GUIDE.md')}")
     print(f"  Universal Bridges   : Cursor (.cursor/rules), Claude Code, Copilot, Windsurf")
     print(f"  Antigravity Plugin  : {'ACTIVE (~/.gemini/config/plugins/synapse-hub)' if plugin_injected else 'STANDALONE'}")
@@ -435,6 +568,14 @@ def main():
     parser = argparse.ArgumentParser(description="Autonomous Enterprise QA Project Setup")
     parser.add_argument("target", nargs="?", default=None, help="Target repository path to setup")
     parser.add_argument("--repo", "--path", dest="repo_path", default=None, help="Target repository path")
+    parser.add_argument(
+        "--profile",
+        default="auto",
+        choices=["auto", "core", "web-e2e", "api-perf", "full", "playwright", "pytest", "cypress", "katalon"],
+        help="Skills profile to install (auto, core, web-e2e, api-perf, full, playwright, pytest, cypress, katalon)"
+    )
+    parser.add_argument("--dry-run", action="store_true", help="Simulate setup actions without modifying disk")
+    parser.add_argument("--uninstall", action="store_true", help="Revert and remove files installed by setup_project")
     args = parser.parse_args()
 
     try:
@@ -443,7 +584,10 @@ def main():
         print(f"❌ Error: {e}")
         return 1
 
-    return run_setup(target_repo)
+    if args.uninstall:
+        return uninstall_setup(target_repo)
+
+    return run_setup(target_repo, dry_run=args.dry_run, profile=args.profile)
 
 
 if __name__ == "__main__":

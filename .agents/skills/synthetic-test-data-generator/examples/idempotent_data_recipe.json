@@ -1,0 +1,9 @@
+{
+  "entity": "user",
+  "prefix": "AUTO_",
+  "timestampPattern": "EPOCH_MS",
+  "fields": {
+    "email": "AUTO_USER@example-qa.com",
+    "phone": "+15551234567"
+  }
+}

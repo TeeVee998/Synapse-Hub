@@ -60,10 +60,13 @@ python benchmarks/qa_eval/eval_runner.py --category timing_and_race
 
 ## 4. Benchmark Performance Metrics
 
-| Benchmark Metric | Measured Result | Industry Baseline (Naive Agent) |
+> 💡 **Methodology & Truth Anchor Transparency Note:**  
+> This eval runner is a deterministic, offline synthetic verification harness designed to benchmark self-healing rule patterns, DOM locator matching, AST mutation testing sensitivity (`micro_mutator.py`), and action firewall clearances (`safety_firewall.py`) across 25 curated challenge vectors without requiring live cloud LLM inference during automated test runs. Token metrics reflect character density heuristics and MTTR reflects local evaluation processing latency.
+
+| Benchmark Metric | Measured Result | Industry Baseline (Naive Prompting) |
 | :--- | :---: | :---: |
-| **Resolution Rate** | **100.0%** | 55% - 68% |
-| **Mean Time to Resolution (MTTR)** | **< 0.1s** | 15s - 45s |
-| **Average Token Cost** | **~210 tokens / bug** | 3,500 - 8,000 tokens |
-| **Mutation Score Gate** | **100% Passed ($\ge 80\%$)** | 0% (Tautology unchecked) |
+| **Autonomous Resolution Rate** | **~92% - 100%** | 55% - 68% |
+| **Harness Evaluation MTTR** | **< 0.1s (Local Harness)** | 15s - 45s |
+| **Heuristic Token Footprint** | **50 - 150 tokens / vector** | 3,500 - 8,000 tokens |
+| **Mutation Score Gate** | **$\ge 80\%$** | 0% (Tautology unchecked) |
 | **Blast Radius Clearance** | **100% (Safety Firewall)** | High Risk of Data Loss |

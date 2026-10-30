@@ -1,0 +1,33 @@
+name: Cleanup Old NPM Versions
+
+on:
+  workflow_dispatch:
+    inputs:
+      otp:
+        description: '6-digit OTP from your Authenticator app (e.g. 123456)'
+        required: true
+        type: string
+
+jobs:
+  cleanup-npm:
+    name: Deprecate and Unpublish Old NPM Versions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Deprecate versions prior to 2.2.2
+        run: |
+          npm deprecate synapse-hub@"< 2.2.2" "Phien ban cu da bi thu hoi do cap nhat bao mat & ban quyen. Vui long su dung ban chinh thuc synapse-hub@2.2.2 tro len." --otp="${{ inputs.otp }}"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Unpublish recent versions (< 72h)
+        run: |
+          npm unpublish synapse-hub@2.2.1 --force --otp="${{ inputs.otp }}" || echo "2.2.1 unpublish skipped"
+          npm unpublish synapse-hub@2.2.0 --force --otp="${{ inputs.otp }}" || echo "2.2.0 unpublish skipped"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

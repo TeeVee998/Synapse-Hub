@@ -17,6 +17,7 @@ import os
 import re
 import sys
 import json
+import shlex
 import argparse
 import subprocess
 import tempfile
@@ -68,7 +69,7 @@ ASSERTION_PATTERN = re.compile(
 
 # Tautological / fake assertions that do not test application logic
 TAUTOLOGY_PATTERN = re.compile(
-    r'(?:assert\s+(?:true|1\s*==\s*1)\b|assertEquals\s*\(\s*true\s*,\s*true\s*\)|expect\s*\(\s*true\s*\)\.toBe\s*\(\s*true\s*\)|assertTrue\s*\(\s*true\s*\))',
+    r'(?:assert\s+(?:true|1\s*==\s*1)\b|assert\s+([a-zA-Z_]\w*)\s*==\s*\1\b|assertEquals\s*\(\s*([a-zA-Z_]\w*)\s*,\s*\2\s*\)|expect\s*\(\s*([a-zA-Z_]\w*)\s*\)\.toBe\s*\(\s*\3\s*\)|assertTrue\s*\(\s*true\s*\))',
     re.IGNORECASE
 )
 
@@ -195,7 +196,12 @@ def evaluate_mutants_statically(code: str, mutants: List[Dict[str, Any]]) -> Tup
     - If mutant is inside an unasserted block or swallowed exception: mutant SURVIVES.
     """
     if not mutants:
-        return mutants, 100.0
+        has_asserts = any(
+            ASSERTION_PATTERN.search(l) and not TAUTOLOGY_PATTERN.search(l)
+            for l in code.splitlines()
+            if not l.strip().startswith(("//", "#", "/*"))
+        )
+        return mutants, (100.0 if has_asserts else 0.0)
 
     lines = code.splitlines()
     has_empty_catch = bool(EMPTY_CATCH_PATTERN.search(code))
@@ -245,6 +251,72 @@ def evaluate_mutants_statically(code: str, mutants: List[Dict[str, Any]]) -> Tup
     return mutants, score
 
 
+def evaluate_mutants_dynamically(file_path: str, code: str, mutants: List[Dict[str, Any]], test_cmd: str) -> Tuple[List[Dict[str, Any]], float]:
+    """
+    Executes live mutation testing by injecting mutants into disk file and executing test_cmd.
+    If the test command fails (exit code != 0), the mutant is KILLED by the test suite.
+    If the test command passes (exit code == 0), the mutant SURVIVED (unasserted logic branch).
+    Safely restores original file content in all cases.
+    """
+    if not mutants:
+        return mutants, 0.0
+
+    killed_count = 0
+    abs_path = os.path.abspath(file_path)
+    backup_path = abs_path + ".synapse_mutator_bak"
+
+    # F3 Safety Discipline: Create a dedicated atomic backup file
+    # and guarantee recovery via try/finally and os.replace
+    try:
+        with open(backup_path, "w", encoding="utf-8") as bf:
+            bf.write(code)
+
+        for m in mutants:
+            mutated_code = m["mutated_code"]
+            with open(abs_path, "w", encoding="utf-8") as f:
+                f.write(mutated_code)
+
+            try:
+                cmd_args = shlex.split(test_cmd, posix=sys.platform != "win32") if isinstance(test_cmd, str) else test_cmd
+                proc = subprocess.run(
+                    cmd_args,
+                    capture_output=True,
+                    timeout=30,
+                    text=True
+                )
+                if proc.returncode != 0:
+                    m["status"] = "KILLED"
+                    m["reason"] = f"Dynamic test caught mutant: command failed (exit code {proc.returncode})"
+                    killed_count += 1
+                else:
+                    m["status"] = "SURVIVED"
+                    m["reason"] = "Dynamic test suite passed unconditionally: missing assertion for this mutant."
+            except subprocess.TimeoutExpired:
+                m["status"] = "KILLED"
+                m["reason"] = "Mutant triggered execution timeout (> 30s): caught by runtime guard"
+                killed_count += 1
+            except Exception as e:
+                m["status"] = "SURVIVED"
+                m["reason"] = f"Test execution error: {e}"
+    finally:
+        # Atomic restore guaranteed from backup file
+        if os.path.exists(backup_path):
+            with open(backup_path, "r", encoding="utf-8") as bf:
+                clean_content = bf.read()
+            with open(abs_path, "w", encoding="utf-8") as f:
+                f.write(clean_content)
+            try:
+                os.remove(backup_path)
+            except Exception:
+                pass
+        else:
+            with open(abs_path, "w", encoding="utf-8") as f:
+                f.write(code)
+
+    score = evaluate_mutation_score(killed_count, len(mutants))
+    return mutants, score
+
+
 def scan_directory_for_mutants(target_dir: str) -> List[Dict[str, Any]]:
     """Scans target test/page scripts and generates a collection of mutants."""
     all_mutants = []
@@ -269,21 +341,23 @@ def scan_directory_for_mutants(target_dir: str) -> List[Dict[str, Any]]:
 def evaluate_target(target_path: str, min_score: float = 80.0, test_cmd: str = "") -> Dict[str, Any]:
     """
     Evaluates target file or directory for mutation robustness.
-    Returns complete mutation report dictionary.
+    Dispatches to live test execution if test_cmd is provided, or static heuristic otherwise.
     """
     target = os.path.abspath(target_path)
     all_mutants = []
+    exec_mode = "DYNAMIC" if test_cmd else "STATIC"
 
     if os.path.isfile(target):
         with open(target, "r", encoding="utf-8", errors="ignore") as f:
             code = f.read()
         mutants = generate_mutants_for_code(code, file_path=os.path.basename(target))
-        evaluated_mutants, score = evaluate_mutants_statically(code, mutants)
+        if test_cmd:
+            evaluated_mutants, score = evaluate_mutants_dynamically(target, code, mutants, test_cmd)
+        else:
+            evaluated_mutants, score = evaluate_mutants_statically(code, mutants)
         all_mutants.extend(evaluated_mutants)
     else:
-        # Directory evaluation
         valid_exts = {".groovy", ".py", ".ts", ".js"}
-        total_killed = 0
         for root, _, files in os.walk(target):
             for f in files:
                 if any(f.endswith(ext) for ext in valid_exts):
@@ -293,7 +367,10 @@ def evaluate_target(target_path: str, min_score: float = 80.0, test_cmd: str = "
                             code = fp.read()
                         rel_path = os.path.relpath(file_full, target)
                         f_mutants = generate_mutants_for_code(code, file_path=rel_path)
-                        eval_m, _ = evaluate_mutants_statically(code, f_mutants)
+                        if test_cmd:
+                            eval_m, _ = evaluate_mutants_dynamically(file_full, code, f_mutants, test_cmd)
+                        else:
+                            eval_m, _ = evaluate_mutants_statically(code, f_mutants)
                         all_mutants.extend(eval_m)
                     except Exception:
                         pass
@@ -304,6 +381,18 @@ def evaluate_target(target_path: str, min_score: float = 80.0, test_cmd: str = "
     killed = sum(1 for m in all_mutants if m["status"] == "KILLED")
     survived = sum(1 for m in all_mutants if m["status"] == "SURVIVED")
     passed = score >= min_score
+
+    return {
+        "target": target,
+        "mode": exec_mode,
+        "total_mutants": len(all_mutants),
+        "killed": killed,
+        "survived": survived,
+        "mutation_score": score,
+        "min_score": min_score,
+        "passed": passed,
+        "mutants": all_mutants
+    }
 
     return {
         "target": target,

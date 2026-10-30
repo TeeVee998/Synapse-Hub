@@ -1,0 +1,9 @@
+{
+  "maskSelectors": [
+    ".dynamic-timestamp",
+    ".live-chart-canvas",
+    ".user-avatar-badge"
+  ],
+  "thresholdSSIM": 0.98,
+  "maxDiffPixels": 25
+}

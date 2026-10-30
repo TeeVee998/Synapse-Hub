@@ -4,7 +4,17 @@
 
 > **Bộ não trí tuệ dùng chung và mạng lưới kỹ năng tự hành, tăng cường năng lực cho các trợ lý AI (Google Antigravity, Cursor, Windsurf, Claude Code) trên mọi hệ sinh thái kiểm thử tự động.**  
 > **Tác giả:** Thế Vị ([@TeeVee998](https://github.com/TeeVee998))  
-> **Phiên bản Hub:** `v2.1.1` | **Quy mô:** 27 Kỹ năng chuẩn hóa, 6 Vai trò AI Swarm, 7 Quy tắc cốt lõi, 20+ Công cụ tự động.
+> **Phiên bản Hub:** `v2.3.0` | **Quy mô:** 28 Kỹ năng chuẩn hóa, 6 Vai trò AI Swarm, 7 Quy tắc cốt lõi, 50+ Công cụ tự động.
+
+---
+
+### 🚫 Phạm Vi Hoạt Động & Những Gì Dự Án KHÔNG Làm (Non-Goals)
+
+Để duy trì kiến trúc tinh gọn và chuyên sâu cho Quality Engineering, Synapse Hub xác định rõ ranh giới kiến trúc:
+- **KHÔNG phải là Test Runner thay thế:** Synapse Hub không tự phát minh test runner mới; dự án tận dụng và điều phối các runner tiêu chuẩn công nghiệp (Playwright, Pytest, Katalon/Gradle, Newman, JMeter).
+- **KHÔNG can thiệp mã nguồn ứng dụng (AUT Production Code):** Hub chỉ tập trung vào mã kiểm thử, Page Object, bộ lọc log, dữ liệu tổng hợp và cổng chất lượng.
+- **KHÔNG lưu trữ thông tin nhạy cảm tập trung:** Toàn bộ session, cookies, mật khẩu phải được quản trị qua biến môi trường hoặc file cục bộ được gitignore (`.auth/*.json`), không bao giờ đồng bộ lên remote.
+- **KHÔNG ép buộc công nghệ cố định:** Thiết kế theo mô hình tách rời (Decoupled Hub & Spoke), hỗ trợ linh hoạt đa ngôn ngữ (TypeScript, Python, Java, Groovy) qua Universal Intermediate Representation (IR).
 
 ---
 
@@ -14,8 +24,8 @@
 
 ```mermaid
 flowchart TD
-    subgraph Hub["🧠 Synapse Hub (Intelligence Core v2.1.1)"]
-        Skills[".agents/skills/ (27 Skills)"]
+    subgraph Hub["🧠 Synapse Hub (Intelligence Core v2.3.0)"]
+        Skills[".agents/skills/ (28 Skills)"]
         Agents[".agents/agents/ (6 Specialized Roles)"]
         Rules[".agents/rules/ (7 Core Rules)"]
         Tools["tools/ (20+ Universal Python Tools)"]
@@ -58,21 +68,23 @@ flowchart TD
 
 #### 3. 📊 So Sánh Hiệu Năng Thực Tế:
 
-| Tiêu chí đánh giá | Cách làm thông thường (Naive AI Prompting) | Khi sử dụng Synapse Hub 🧠 |
-| :--- | :---: | :---: |
-| **Token tiêu thụ / mỗi lần fix lỗi** | 15.000 – 40.000 tokens *(đọc cả file lớn, dump cả log)* | **300 – 800 tokens (Tiết kiệm > 90%)** |
-| **Tỷ lệ Fake-Pass (Test pass ảo, 0 assert)** | 30% – 50% *(AI có xu hướng nuốt lỗi để báo PASS)* | **0% (Chặn đứng bởi Truth Anchor & 8 DoD Gates)** |
-| **Trí nhớ sửa lỗi xuyên phiên (Cross-Session)** | Quên sạch ngay khi mở tab chat mới | **Bền vững qua SQLite Central Cache (0 token)** |
-| **Hiện tượng quên ngữ cảnh (Context Rot)** | Xảy ra nhanh chóng sau 40k – 60k tokens | **Miễn nhiễm nhờ 3 tầng Progressive Disclosure** |
-| **Thời gian tự phục hồi lỗi (MTTR)** | 5 – 15 phút mò mẫm thử nghiệm | **< 1 giây (Tra cứu kinh nghiệm có sẵn)** |
+| Tiêu chí đánh giá | Cách làm thông thường (Naive AI Prompting) | Khi sử dụng Synapse Hub 🧠 | Phương pháp & Bằng chứng kiểm chứng |
+| :--- | :---: | :---: | :--- |
+| **Token tiêu thụ / mỗi lần fix lỗi** | 15.000 – 40.000 tokens *(đọc cả file lớn, dump cả log)* | **300 – 800 tokens** | Đo trên micro-turn fix locator: `tools/distill_log.py` giảm 95% log + `tools/repo_map.py` nén AST signatures < 600 tokens (chưa gồm ~7k token system prefix ban đầu). |
+| **Tỷ lệ Fake-Pass (Test pass ảo, 0 assert)** | 30% – 50% *(AI có xu hướng nuốt lỗi để báo PASS)* | **Chặn đứng ở Gates** | Gate 0 & Gate 7 (`tools/infer_linter.py`) quét AST bắt nuốt exception và script thiếu assert; Gate 8 (`tools/micro_mutator.py`) yêu cầu Mutation Score $\ge 80\%$. |
+| **Trí nhớ sửa lỗi xuyên phiên (Cross-Session)** | Quên sạch ngay khi mở tab chat mới | **Bền vững qua SQLite Central Cache** | Lưu và tra cứu giải pháp qua SQLite vector cosine tại `~/.agent_memory/global_cache.db` (lệnh: `python tools/cache_resolver.py query "<error>"`). |
+| **Hiện tượng quên ngữ cảnh (Context Rot)** | Xảy ra nhanh chóng sau 40k – 60k tokens | **Giảm thiểu rõ rệt** | Phân tầng thông tin 3 cấp: repo_map (Tier 1) ➔ dependency graph (Tier 2) ➔ micro-read 20-50 dòng (Tier 3). |
+| **Thời gian tự phục hồi lỗi (MTTR)** | 5 – 15 phút mò mẫm thử nghiệm | **Tức thì khi cache hit (< 1s)** | Khi lỗi đã có trong SQLite cache, `cache_resolver.py` giải quyết trong < 0.1s thay vì lặp prompt tìm kiếm. |
+
+*(Lưu ý: 300–800 token là chi phí ngữ cảnh động của từng lượt sửa lỗi vi mô (micro-turn payload) nhờ repo_map và distill_log; chưa tính chi phí nạp hệ thống/rules ban đầu của IDE ~7.000 tokens).*
 
 ---
 
 ## 🚀 2. Hướng Dẫn Bắt Đầu & Tích Hợp (3 Cách Dùng)
 
 [![npm version](https://img.shields.io/npm/v/synapse-hub.svg?style=flat-square&color=blue)](https://www.npmjs.com/package/synapse-hub)
-[![npm downloads](https://img.shields.io/npm/dm/synapse-hub.svg?style=flat-square)](https://www.npmjs.com/package/synapse-hub)
-[![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](https://github.com/TeeVee998/Synapse-Hub/blob/main/package.json)
+[![node version](https://img.shields.io/badge/node-%3E%3D16.0.0-brightgreen.svg?style=flat-square)](https://nodejs.org)
+[![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](https://github.com/TeeVee998/Synapse-Hub/blob/main/LICENSE)
 
 ---
 
@@ -84,13 +96,13 @@ Mở terminal ngay tại thư mục **dự án kiểm thử của bạn** và ch
 npx synapse-hub setup
 ```
 👉 **Đúng 1 lệnh này sẽ tự động hoàn tất toàn bộ trong 5 giây:**
-1. 🧠 **Tự động bơm vào Antigravity Global Plugin:** Triển khai Synapse-Hub vào `~/.gemini/config/plugins/synapse-hub`. Kể từ giây phút này, **mọi dự án** mở trên Google Antigravity đều tự động sở hữu toàn bộ 27 Skills và 6 Subagents mà không cần cấu hình thêm!
+1. 🧠 **Tự động bơm vào Antigravity Global Plugin:** Triển khai Synapse-Hub vào `~/.gemini/config/plugins/synapse-hub`. Kể từ giây phút này, **mọi dự án** mở trên Google Antigravity đều tự động sở hữu toàn bộ 28 Skills và 6 Subagents mà không cần cấu hình thêm!
 2. 🌐 **Triển Khai Cầu Nối Đa IDE & AI (Universal AI Bridges):** Tự động sinh file cấu hình và quy chuẩn cho mọi trợ lý AI khác nhau ngay trong dự án của bạn:
    - 🖱️ **Cursor:** `.cursor/rules/synapse-qa.mdc` (Tự động kích hoạt khi mở file trong Cursor)
    - 🤖 **Claude Code:** `CLAUDE.md` (Hướng dẫn quy chuẩn QA, commands và Clean POM)
    - 🐙 **GitHub Copilot:** `.github/copilot-instructions.md` (Chỉ dẫn hệ thống cho VS Code / JetBrains Copilot)
    - 🏄 **Windsurf (Cascade):** `.windsurfrules` (Nguyên tắc kiểm thử bắt buộc)
-   *(Mọi thành viên dù dùng Antigravity, Cursor, Claude Code, Copilot hay Windsurf đều chung 1 chuẩn Clean POM, 1 nguyên tắc Truth Anchor chống pass ảo, và 8 Cổng Kiểm Định DoD!)*
+   *(Mọi thành viên dù dùng Antigravity, Cursor, Claude Code, Copilot hay Windsurf đều chung 1 chuẩn Clean POM, 1 nguyên tắc Truth Anchor chống pass ảo, và 9 Cổng Kiểm Định DoD (Gate 0–8)!)*
 3. 🔍 **Nhận diện Framework:** Tự động phát hiện Playwright TypeScript/JS, Katalon Studio Groovy, Cypress, hoặc Pytest.
 4. 📋 **Sinh Hướng Dẫn Nghiệp Vụ:** Tạo file `PROJECT_AI_GUIDE.md` ngay trong dự án của bạn để AI hiểu sâu kiến trúc và quy chuẩn code.
 5. 🛡️ **Cài Đặt Cổng Gác Git (Pre-Push Hook):** Tự cài `.git/hooks/pre-push` gọi `npx synapse-hub verify` để chặn đứng mã lỗi và lộ mật khẩu trước khi push.
@@ -99,7 +111,7 @@ npx synapse-hub setup
 
 Sau đó, bạn có thể thực thi kiểm định bất cứ lúc nào:
 ```bash
-# Kiểm định 8 Cổng Chất Lượng (DoD Quality Gates)
+# Kiểm định 9 Cổng Chất Lượng (DoD Quality Gates Gate 0–8)
 npx synapse-hub verify
 
 # Đánh giá sức khỏe toàn diện dự án (5-in-1 Project Health Report)
@@ -112,7 +124,7 @@ npx synapse-hub lint
 ---
 
 ### 🥈 Cách 2: Tối Ưu Cho Antigravity — Cài Đặt 1 Lần Thành "Global Plugin"
-*Cài đặt 1 lần duy nhất: Kể từ đó **BẤT KỲ DỰ ÁN NÀO** mở trên Google Antigravity cũng tự động có sẵn toàn bộ 27 Skills và 6 Subagents mà không cần cấu hình thêm.*
+*Cài đặt 1 lần duy nhất: Kể từ đó **BẤT KỲ DỰ ÁN NÀO** mở trên Google Antigravity cũng tự động có sẵn toàn bộ 28 Skills và 6 Subagents mà không cần cấu hình thêm.*
 
 #### Bước cài đặt 1-Click:
 ```powershell
@@ -162,11 +174,11 @@ Hub phân chia năng lực rõ ràng cho 6 vai trò Agent, mỗi Agent được 
 | **`pom-crafter`** | Kỹ sư Clean POM, kiểm tra API drift, sinh test từ User Story. | `clean-pom-crafter`, `lam-script-generator`, `synthetic-test-data-generator`, `api-spec-to-e2e-matrix`, `file-and-report-validator`, `db-state-verifier-and-seeder` | `tools/generate_tc_from_story.py`, `tools/generate_api_matrix.py`, `tools/api_drift_sentinel.py`, `tools/repo_map.py` |
 | **`test-runner`** | Quản lý chạy test headless CLI, chia tải thời gian chạy trên CI. | `katalon-cli-runner`, `e2e-testing-patterns`, `bats-testing-patterns`, `auth-session-and-cookie-manager`, `flaky-test-sentinel-and-quarantine` | `tools/matrix_sharder.py`, `tools/distill_log.py`, `tools/pinpoint_failure.py`, `tools/flaky_detector.py` |
 | **`failure-analyst`**| Tự động chẩn đoán lỗi, tính điểm tin cậy & tự tạo PR đối soát. | `failure-autopsy-and-healing`, `self-healing-locator`, `file-and-report-validator` | `tools/auto_heal.py`, `tools/heal_pr_automator.py`, `tools/pinpoint_failure.py`, `tools/cache_resolver.py` |
-| **`quality-gatekeeper`**| Gác cổng chất lượng 7 Gates DoD, quét Fake-Pass, bơm mutant. | `antigravity-test-sentinel`, `code-refactoring-refactor-clean`, `wcag-audit-patterns`, `web-vitals-and-performance-profiler`, `db-state-verifier-and-seeder`, `security-dast-sentinel` | `tools/verify_all.py`, `tools/infer_linter.py`, `tools/micro_mutator.py`, `tools/trace_data_flow.py`, `tools/wcag_audit.py`, `tools/lint_ai_docs.py` |
+| **`quality-gatekeeper`**| Gác cổng chất lượng 9 Gates DoD (Gate 0–8), quét Fake-Pass, bơm mutant. | `antigravity-test-sentinel`, `code-refactoring-refactor-clean`, `wcag-audit-patterns`, `web-vitals-and-performance-profiler`, `db-state-verifier-and-seeder`, `security-dast-sentinel`, `skillspector-security-guard` | `tools/verify_all.py`, `tools/infer_linter.py`, `tools/micro_mutator.py`, `tools/trace_data_flow.py`, `tools/wcag_audit.py`, `tools/lint_ai_docs.py`, `tools/skillspector.py` |
 
 ---
 
-## 📦 4. Danh Mục 27 Kỹ Năng Chuẩn Hóa (.agents/skills/)
+## 📦 4. Danh Mục 28 Kỹ Năng Chuẩn Hóa (.agents/skills/)
 
 | STT | Tên Kỹ Năng (Skill) | Phạm Vi Hoạt Động Cốt Lõi |
 |:---:|---|---|
@@ -197,10 +209,11 @@ Hub phân chia năng lực rõ ràng cho 6 vai trò Agent, mỗi Agent được 
 | 25 | `visual-regression-sentinel` | So sánh giao diện mức pixel và SSIM, hỗ trợ dynamic masking chống flaky test. |
 | 26 | `wcag-audit-patterns` | Kiểm toán tiếp cận web WCAG 2.2 Level A/AA tự động qua AST và `@axe-core`. |
 | 27 | `web-vitals-and-performance-profiler` | Đo lường Core Web Vitals (LCP, CLS, TTFB) và giám sát API endpoint chậm qua CDP. |
+| 28 | `skillspector-security-guard` | Kiểm toán bảo mật AI Agent skills & MCP configs với 71 vector lỗ hổng (Prompt Injection, Data Exfiltration, Privilege Escalation) theo chuẩn NVIDIA SkillSpector. |
 
 ---
 
-## 📜 5. Danh Mục 7 Quy Tắc Cốt Lõi (.agents/rules/)
+## 📜 5. Danh Mục 8 Quy Tắc Cốt Lõi (.agents/rules/)
 
 1. **`context-engineering.md`**: Giao thức lọc log thừa (Observation Masking), khai báo lười (Lazy Loading) và tối ưu hóa KV-Cache.
 2. **`git-push-protocol.md`**: Giao thức Git Push chuẩn hóa cho dự án mục tiêu (Clean SCM by Architecture, loại bỏ hoàn toàn nhu cầu dual-remote/smart-push nhờ tách repo độc lập).
@@ -208,15 +221,27 @@ Hub phân chia năng lực rõ ràng cho 6 vai trò Agent, mỗi Agent được 
 4. **`lessons-learned.md`**: Danh sách bài học kinh nghiệm và anti-patterns (giới hạn cứng < 40 dòng).
 5. **`mandatory-playwright-live.md`**: Quy chuẩn chạy headless Full HD 1920x1080 và khảo sát live DOM trước khi codify.
 6. **`skill-precedence.md`**: Thứ tự ưu tiên kỹ năng cục bộ, chống xung đột trigger với plugin bên ngoài.
-7. **`systematic-debugging.md`**: Kỷ luật điều tra lỗi có căn cứ, cấm đoán mò và verify-first (7 Quality Gates).
+7. **`systematic-debugging.md`**: Kỷ luật điều tra lỗi có căn cứ, cấm đoán mò và verify-first (9 Quality Gates DoD).
+8. **`author-integrity-guard.md`**: Bảo toàn thông báo bản quyền tác giả theo giấy phép MIT và phòng chống đạo văn.
 
 ---
 
-## 🛠️ 6. Sổ Tay Công Cụ Tự Động Hóa (tools/ & scripts/)
+## 🛠️ 6. Sổ Tay 50+ Công Cụ Tự Động Hóa Chuyên Biệt (tools/ & scripts/)
 
 Chi tiết đầy đủ xem tại [tools/TOOLS_RUNBOOK.md](tools/TOOLS_RUNBOOK.md):
 
-- `tools/verify_all.py`: Cổng thẩm định 7 Gates DoD (UTF-8, No XPaths, UniqueCode, Clean POM).
+- `tools/verify_all.py`: Cổng thẩm định 9 Gates DoD (Gate 0–8: UTF-8, No XPaths, UniqueCode, Clean POM, AST Mutation).
+- `tools/generate_jmx_plan.py`: Sinh kịch bản Apache JMeter 5.x (.jmx) đa giao thức (HTTP, JDBC, WS, gRPC, Kafka) kèm Traffic Shaping Pareto.
+- `tools/jtl_analyzer.py`: Phân tích kết quả JTL, kiểm soát SLA percentiles ($P_{90}, P_{95}, P_{99}$) và làm Quality Gate CI/CD.
+- `tools/telemetry_correlator.py`: Phân tích tương quan Pearson giữa Client Latency và Server APM (CPU, RAM, DB Pool).
+- `tools/export_postman_collection.py`: Xuất Postman Collection v2.1 với AJV JSON Schema, DDT, và Zero-Input synthesis.
+- `tools/newman_analyzer.py`: Phân tích kết quả Newman, triage lỗi assertion và làm Quality Gate cho API.
+- `tools/api_fuzzer.py`: Autonomous API Fuzzer phát hiện lỗi HTTP 500, rò rỉ stacktrace DB và vi phạm SLA độ trễ.
+- `tools/api_drift_sentinel.py`: Bắt breaking change giữa các phiên bản OpenAPI / Swagger specifications.
+- `tools/auto_heal.py`: Tự phục hồi locator gãy dựa trên AOM diffing mà không cần chạy lại toàn bộ test suite.
+- `tools/flaky_detector.py`: Phát hiện kiểm thử chập chờn (Flaky tests) và quản lý vòng đời cách ly Quarantine.
+- `tools/skillspector.py`: Quét kiểm toán an ninh AI Agent Skills & MCP (71 vectors theo chuẩn NVIDIA SkillSpector).
+- `tools/omni_transpiler.py`: Chuyển đổi mã kiểm thử 0-token đa ngôn ngữ (Playwright TS/Python, Java, Groovy, Cypress).
 - `tools/infer_linter.py`: Phân tích tĩnh AST phát hiện fake-pass (0 assertion) và khối try-catch nuốt lỗi.
 - `tools/test_impact.py`: Phân tích git diff và khoanh vùng chính xác test cases bị ảnh hưởng.
 - `tools/cache_resolver.py`: Quản lý bộ nhớ đệm lỗi SQLite trung tâm (`~/.agent_memory/global_cache.db`).
@@ -229,7 +254,7 @@ Chi tiết đầy đủ xem tại [tools/TOOLS_RUNBOOK.md](tools/TOOLS_RUNBOOK.m
 - `tools/generate_tc_from_story.py`: Large Action Model parser sinh khung Clean POM từ User Story.
 - `tools/trace_data_flow.py`: Kiểm tra luồng dữ liệu kiểm thử, phát hiện rác dữ liệu DB (Orphan Data).
 - `scripts/install.ps1` & `scripts/setup.sh`: Script cài đặt 1-click tự động khởi tạo môi trường Hub.
-- `scripts/lint_skills.ps1`: Linter kiểm tra tính toàn vẹn 30 skills và metadata manifest.
+- `scripts/lint_skills.ps1`: Linter kiểm tra tính toàn vẹn 28 skills và metadata manifest.
 - `pyproject.toml` & `tools/cli.py`: Đóng gói chuẩn PEP 621 cho lệnh CLI toàn cầu `agent-qa`.
 
 ---
@@ -269,13 +294,36 @@ Dự án **Synapse Hub** được tổng hợp, kế thừa và phát triển d�
 
 ---
 
+## 📄 9. Bản Quyền & Điều Khoản Sử Dụng (License & Attribution)
+
+Dự án được phân phối chính thức dưới giấy phép **[MIT License](LICENSE)**.
+
+**Quyền sở hữu tác giả & Xuất xứ (Provenance):**
+- **Tác giả & Nhà sáng lập:** Thế Vị ([@TeeVee998](https://github.com/TeeVee998))
+- **Mã nguồn gốc:** [https://github.com/TeeVee998/Synapse-Hub](https://github.com/TeeVee998/Synapse-Hub)
+- **Bản quyền:** Copyright © 2026 Thế Vị (@TeeVee998). Phân phối theo giấy phép MIT.
+
+> ⚖️ **Điều khoản phân phối theo giấy phép MIT:** Bạn được toàn quyền sử dụng, sao chép, sửa đổi, hợp nhất, xuất bản và phân phối mã nguồn này cho bất kỳ mục đích cá nhân hay thương mại nào, **VỚI ĐIỀU KIỆN** thông báo bản quyền gốc ghi nhận tác giả **Thế Vị (@TeeVee998)** cùng điều khoản cấp phép này phải được giữ nguyên vẹn trong toàn bộ bản sao hoặc các phần quan trọng của phần mềm.
+
+---
+
 # 🌐 English Edition
 
 # 🧠 Synapse Hub — AI Agent Intelligence Core & Skill Network
 
 > **The shared intelligence core and autonomous skill hub empowering AI coding assistants (Google Antigravity / Cursor / Windsurf / Claude Code) across automated testing suites.**  
 > **Author:** Thế Vị ([@TeeVee998](https://github.com/TeeVee998))  
-> **Hub Version:** `v2.1.1` (Semantic Versioning) | **Integrity Index:** 27 Skills, 6 Agent Swarm Roles, 7 Core Rules, 20+ Python Tools.
+> **Hub Version:** `v2.3.0` (Semantic Versioning) | **Integrity Index:** 28 Skills, 6 Agent Swarm Roles, 8 Core Rules, 50+ Specialized Python Tools, 9 Quality Gates.
+
+---
+
+### 🚫 Project Scope & Explicit Non-Goals
+
+To maintain a lightweight and focused architecture for Quality Engineering, Synapse Hub defines clear boundaries:
+- **NOT an Alternative Test Runner:** Synapse Hub does not reinvent test runners; it orchestrates and supercharges industry-standard runners (Playwright, Pytest, Katalon/Gradle, Newman, JMeter).
+- **Zero Modifications to AUT Production Code:** Synapse Hub operates strictly on test code, page objects, log filters, synthetic test data, and quality gates.
+- **Zero Centralized Secret Storage:** All sessions, cookies, and tokens are stored in environment variables or gitignored local files (`.auth/*.json`), never committed to remote repositories.
+- **Framework & Vendor Agnostic:** Adheres to a decoupled Hub-and-Spoke topology, accommodating polyglot stacks (TypeScript, Python, Java, Groovy) via Universal Intermediate Representation (IR).
 
 ---
 
@@ -285,11 +333,11 @@ Dự án **Synapse Hub** được tổng hợp, kế thừa và phát triển d�
 
 ```mermaid
 flowchart TD
-    subgraph Hub["🧠 Synapse Hub (Intelligence Core v2.1.1)"]
-        Skills[".agents/skills/ (27 Skills)"]
+    subgraph Hub["🧠 Synapse Hub (Intelligence Core v2.3.0)"]
+        Skills[".agents/skills/ (28 Skills)"]
         Agents[".agents/agents/ (6 Specialized Roles)"]
-        Rules[".agents/rules/ (7 Core Rules)"]
-        Tools["tools/ (20+ Universal Python Tools)"]
+        Rules[".agents/rules/ (8 Core Rules)"]
+        Tools["tools/ (50+ Universal Python Tools)"]
         Workflows[".agents/workflows/"]
     end
 
@@ -329,21 +377,23 @@ flowchart TD
 
 #### 3. 📊 Quantitative Performance Benchmark:
 
-| Evaluation Metric | Naive AI Coding Prompting | With Synapse Hub 🧠 |
-| :--- | :---: | :---: |
-| **Tokens Consumed per Bug Fix** | 15,000 – 40,000 tokens *(dumps entire classes & logs)* | **300 – 800 tokens (> 90% Savings)** |
-| **Fake-Pass Rate (0 asserts, false passes)** | 30% – 50% *(LLMs tend to relax asserts)* | **0% (Locked by Truth Anchor & 8 DoD Gates)** |
-| **Cross-Session Fix Memory** | 100% forgotten upon new chat session | **Persistent via SQLite Central Cache (0 token)** |
-| **Context Rot / Lost-in-the-Middle** | High degradation after 40k – 60k tokens | **Immune via 3-Tier Progressive Disclosure** |
-| **Mean Time-to-Heal (MTTR)** | 5 – 15 minutes of trial-and-error | **< 1 second (Direct cache resolution)** |
+| Evaluation Metric | Naive AI Coding Prompting | With Synapse Hub 🧠 | Empirical Verification Method |
+| :--- | :---: | :---: | :--- |
+| **Tokens Consumed per Bug Fix** | 15,000 – 40,000 tokens *(dumps entire classes & logs)* | **300 – 800 tokens** | Measured per micro-turn locator fix via `distill_log.py` (95% log compression) + `repo_map.py` (< 600 token signatures). Excludes ~7k tokens one-time system prompt prefix. |
+| **Fake-Pass Rate (0 asserts, false passes)** | 30% – 50% *(LLMs tend to relax asserts)* | **Enforced by Quality Gates** | Gate 0 & Gate 7 (`infer_linter.py`) block swallowed exceptions and missing asserts; Gate 8 (`micro_mutator.py`) enforces Mutation Score $\ge 80\%$. |
+| **Cross-Session Fix Memory** | 100% forgotten upon new chat session | **Persistent via SQLite Central Cache** | Persisted and queried offline via SQLite vector cosine in `~/.agent_memory/global_cache.db` (CLI: `python tools/cache_resolver.py query "<error>"`). |
+| **Context Rot / Lost-in-the-Middle** | High degradation after 40k – 60k tokens | **Significantly Mitigated** | 3-tier Progressive Disclosure: repo_map (Tier 1) ➔ dependency graph (Tier 2) ➔ micro-read 20-50 lines (Tier 3). |
+| **Mean Time-to-Heal (MTTR)** | 5 – 15 minutes of trial-and-error | **Sub-second on cache hits** | Pre-cached failure vectors resolve deterministically in < 0.1s without repetitive trial-and-error prompt iterations. |
+
+*(Note: 300–800 tokens represents the dynamic micro-turn execution payload achieved via repo_map and distill_log, excluding the one-time IDE system rules prefix overhead of ~7,000 tokens).*
 
 ---
 
 ## 🚀 2. Getting Started & Integration (3 Approaches)
 
 [![npm version](https://img.shields.io/npm/v/synapse-hub.svg?style=flat-square&color=blue)](https://www.npmjs.com/package/synapse-hub)
-[![npm downloads](https://img.shields.io/npm/dm/synapse-hub.svg?style=flat-square)](https://www.npmjs.com/package/synapse-hub)
-[![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](https://github.com/TeeVee998/Synapse-Hub/blob/main/package.json)
+[![node version](https://img.shields.io/badge/node-%3E%3D16.0.0-brightgreen.svg?style=flat-square)](https://nodejs.org)
+[![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](https://github.com/TeeVee998/Synapse-Hub/blob/main/LICENSE)
 
 ---
 
@@ -355,13 +405,13 @@ Run directly from your **target automation project root**:
 npx synapse-hub setup
 ```
 👉 **This single command automatically completes everything in 5 seconds:**
-1. 🧠 **Injects Antigravity Global Plugin:** Deploys Synapse-Hub into `~/.gemini/config/plugins/synapse-hub`. From this moment on, **ALL projects** opened in Google Antigravity automatically inherit all 27 Skills and 6 Subagent profiles!
+1. 🧠 **Injects Antigravity Global Plugin:** Deploys Synapse-Hub into `~/.gemini/config/plugins/synapse-hub`. From this moment on, **ALL projects** opened in Google Antigravity automatically inherit all 28 Skills and 6 Subagent profiles!
 2. 🌐 **Universal AI Bridges Deployment:** Automatically generates tailored configuration rules for all leading AI IDEs and assistants:
    - 🖱️ **Cursor:** `.cursor/rules/synapse-qa.mdc`
    - 🤖 **Claude Code:** `CLAUDE.md`
    - 🐙 **GitHub Copilot:** `.github/copilot-instructions.md`
    - 🏄 **Windsurf (Cascade):** `.windsurfrules`
-   *(Empowers team members across Antigravity, Cursor, Claude Code, Copilot, or Windsurf to enforce the exact same Clean POM architecture, Truth Anchor, and 8 Quality Gates DoD!)*
+   *(Empowers team members across Antigravity, Cursor, Claude Code, Copilot, or Windsurf to enforce the exact same Clean POM architecture, Truth Anchor, and 9 Quality Gates DoD (Gate 0–8)!)*
 3. 🔍 **Tech Stack Detection:** Auto-detects Playwright TypeScript/JS, Katalon Groovy, Cypress, or Pytest.
 4. 📋 **Project AI Guide Synthesis:** Generates `PROJECT_AI_GUIDE.md` so AI assistants strictly adhere to project workflows.
 5. 🛡️ **Zero-Leakage Git Pre-Push Hook:** Installs `.git/hooks/pre-push` invoking `npx synapse-hub verify` before any git push.
@@ -370,7 +420,7 @@ npx synapse-hub setup
 
 Run verification anytime:
 ```bash
-# Run 8 Quality Gates DoD Verification
+# Run 9 Quality Gates DoD Verification (Gate 0–8)
 npx synapse-hub verify
 
 # Comprehensive 5-in-1 Project Health Audit
@@ -383,7 +433,7 @@ npx synapse-hub lint
 ---
 
 ### 🥈 Method 2: Antigravity-Native — Install Once as Global Plugin
-*Install once: From that moment onward, **ANY project** opened in Google Antigravity automatically inherits all 27 Skills and 6 Subagent Swarm profiles.*
+*Install once: From that moment onward, **ANY project** opened in Google Antigravity automatically inherits all 28 Skills and 6 Subagent Swarm profiles.*
 
 #### 1-Click Plugin Installation:
 ```powershell
@@ -442,11 +492,11 @@ Synapse Hub clearly partitions capabilities across 6 specialized AI roles, pre-c
 | **`pom-crafter`** | Clean POM engineer, API drift detection, User Story to test generation. | `clean-pom-crafter`, `lam-script-generator`, `synthetic-test-data-generator`, `api-spec-to-e2e-matrix`, `file-and-report-validator`, `db-state-verifier-and-seeder` | `tools/generate_tc_from_story.py`, `tools/generate_api_matrix.py`, `tools/api_drift_sentinel.py`, `tools/repo_map.py` |
 | **`test-runner`** | Headless CLI suite manager, CI parallel sharding and log distillation. | `katalon-cli-runner`, `e2e-testing-patterns`, `bats-testing-patterns`, `auth-session-and-cookie-manager`, `flaky-test-sentinel-and-quarantine` | `tools/matrix_sharder.py`, `tools/distill_log.py`, `tools/pinpoint_failure.py`, `tools/flaky_detector.py` |
 | **`failure-analyst`**| Automated closed-loop failure triage, MTTR scoring, self-healing PR drafting. | `failure-autopsy-and-healing`, `self-healing-locator`, `file-and-report-validator` | `tools/auto_heal.py`, `tools/heal_pr_automator.py`, `tools/pinpoint_failure.py`, `tools/cache_resolver.py` |
-| **`quality-gatekeeper`**| Enforces 8 Quality Gates DoD, scans fake passes, runs AST mutation testing. | `antigravity-test-sentinel`, `code-refactoring-refactor-clean`, `wcag-audit-patterns`, `web-vitals-and-performance-profiler`, `db-state-verifier-and-seeder`, `security-dast-sentinel` | `tools/verify_all.py`, `tools/infer_linter.py`, `tools/micro_mutator.py`, `tools/trace_data_flow.py`, `tools/wcag_audit.py`, `tools/lint_ai_docs.py` |
+| **`quality-gatekeeper`**| Enforces 9 Quality Gates DoD (Gate 0–8), scans fake passes, runs AST mutation testing. | `antigravity-test-sentinel`, `code-refactoring-refactor-clean`, `wcag-audit-patterns`, `web-vitals-and-performance-profiler`, `db-state-verifier-and-seeder`, `security-dast-sentinel`, `skillspector-security-guard` | `tools/verify_all.py`, `tools/infer_linter.py`, `tools/micro_mutator.py`, `tools/trace_data_flow.py`, `tools/wcag_audit.py`, `tools/lint_ai_docs.py`, `tools/skillspector.py` |
 
 ---
 
-## 📦 4. Standardized 27 Skills Catalog (.agents/skills/)
+## 📦 4. Standardized 28 Skills Catalog (.agents/skills/)
 
 | # | Skill Name | Core Operational Scope |
 |:---:|---|---|
@@ -477,10 +527,11 @@ Synapse Hub clearly partitions capabilities across 6 specialized AI roles, pre-c
 | 25 | `visual-regression-sentinel` | Pixel-level and SSIM visual regression testing with dynamic masking. |
 | 26 | `wcag-audit-patterns` | Automated WCAG 2.2 Level A/AA accessibility auditing via AST and `@axe-core`. |
 | 27 | `web-vitals-and-performance-profiler` | Core Web Vitals (LCP, CLS, TTFB) profiling and slow API endpoint detection via CDP. |
+| 28 | `skillspector-security-guard` | AI agent skill & MCP config security auditing against 71 vulnerability vectors (Prompt Injection, Data Exfiltration, Privilege Escalation) powered by NVIDIA SkillSpector spec. |
 
 ---
 
-## 📜 5. 7 Core Rules Catalog (.agents/rules/)
+## 📜 5. 8 Core Rules Catalog (.agents/rules/)
 
 1. **`context-engineering.md`**: Observation masking, lazy progressive disclosure, and KV-cache optimization.
 2. **`git-push-protocol.md`**: Clean git push protocol (decoupled architecture guarantees zero AI leakage).
@@ -488,15 +539,27 @@ Synapse Hub clearly partitions capabilities across 6 specialized AI roles, pre-c
 4. **`lessons-learned.md`**: Episodic anti-pattern blacklist (strictly capped under 40 lines).
 5. **`mandatory-playwright-live.md`**: Mandatory headless Full HD 1920x1080 and live DOM probing before codifying.
 6. **`skill-precedence.md`**: Tier-1 local skill precedence resolving external plugin collisions.
-7. **`systematic-debugging.md`**: Evidence-first debugging discipline; zero guessing; 8 Quality Gates DoD.
+7. **`systematic-debugging.md`**: Evidence-first debugging discipline; zero guessing; 9 Quality Gates DoD.
+8. **`author-integrity-guard.md`**: Mandatory MIT copyright notice preservation and anti-plagiarism guard.
 
 ---
 
-## 🛠️ 6. Automated Tools Runbook (tools/ & scripts/)
+## 🛠️ 6. Automated Tools Runbook (50+ Specialized Python Tools)
 
 For full details, refer to [tools/TOOLS_RUNBOOK.md](tools/TOOLS_RUNBOOK.md):
 
-- `tools/verify_all.py`: 8 Quality Gates DoD verification (UTF-8, No XPaths, UniqueCode, Clean POM).
+- `tools/verify_all.py`: 9 Quality Gates DoD verification (Gate 0–8: UTF-8, No XPaths, UniqueCode, Clean POM, AST Mutation).
+- `tools/generate_jmx_plan.py`: Multi-protocol Apache JMeter 5.x (.jmx) plan generator (HTTP, JDBC, WS, gRPC, Kafka) with Pareto traffic shaping.
+- `tools/jtl_analyzer.py`: JTL execution metrics analyzer, P95/P99 SLA gatekeeper, and CI/CD Quality Gate enforcer.
+- `tools/telemetry_correlator.py`: Full-stack Pearson correlation analyzer between client-side latency and server APM (CPU, RAM, DB Pool).
+- `tools/export_postman_collection.py`: Exports Postman Collections v2.1 with native AJV JSON Schema, DDT CSV, and Zero-Input domain synthesis.
+- `tools/newman_analyzer.py`: Newman automated test results analyzer, assertion failure triage, and CI/CD Quality Gate.
+- `tools/api_fuzzer.py`: Autonomous API fuzzer detecting HTTP 500 crashes, database stacktrace leaks, and latency SLA breaches.
+- `tools/api_drift_sentinel.py`: Contract drift detector comparing OpenAPI/Swagger specifications for breaking changes.
+- `tools/auto_heal.py`: In-place locator self-healing engine correlating JUnit XML and screenshots via AOM diffing.
+- `tools/flaky_detector.py`: Flaky test detector and automated quarantine lifecycle manager.
+- `tools/skillspector.py`: AI Agent Skill & MCP Security Sentinel (71 detection vectors, Prohibition Context Engine, SARIF/JSON reporting).
+- `tools/omni_transpiler.py`: 0-token polyglot test transpiler (Playwright TS/Python, Java, Groovy, Cypress).
 - `tools/infer_linter.py`: Static AST analysis detecting fake passes (zero asserts) and empty catch blocks.
 - `tools/test_impact.py`: Scopes affected test cases based on git diffs.
 - `tools/cache_resolver.py`: Manages the central SQLite error memory cache (`~/.agent_memory/global_cache.db`).
@@ -526,6 +589,7 @@ pip install -e .
 agent-qa --help
 agent-qa verify
 agent-qa lint
+agent-qa skillspector
 ```
 
 ---
@@ -536,6 +600,7 @@ agent-qa lint
 
 | Project & Author | Architectural Inspiration in Synapse Hub |
 | :--- | :--- |
+| **[NVIDIA/SkillSpector](https://github.com/NVIDIA/SkillSpector)** *(NVIDIA AI Security Team)* | AI Agent skill & MCP security vetting engine (`tools/skillspector.py`, Skill #28 `skillspector-security-guard`) featuring 71 vulnerability vectors across 17 categories and the Prohibition Context Engine. |
 | **[muratcankoylan/Agent-Skills-for-Context-Engineering](https://github.com/muratcankoylan/Agent-Skills-for-Context-Engineering)** | Context Engineering foundations, observation masking, and LLM attention budget optimization. |
 | **[alexgreensh/token-optimizer](https://github.com/alexgreensh/token-optimizer)** | Token-efficient reasoning, 95% log distillation, and KV-cache serialization protocols. |
 | **[obra/superpowers](https://github.com/obra/superpowers)** *(Jesse Vincent)* | Systematic evidence-based debugging, cognitive forcing functions, and Red-Team vs Blue-Team verification. |
@@ -546,4 +611,18 @@ agent-qa lint
 | **[dequelabs/axe-core](https://github.com/dequelabs/axe-core)** | Automated accessibility rule heuristics inspiring WCAG 2.2 Level A/AA AST auditing. |
 | **[bats-core/bats-core](https://github.com/bats-core/bats-core)** | Bash Automated Testing System patterns for CI/CD pipelines and cross-platform CLI verification. |
 | **[npryce/adr-tools](https://github.com/npryce/adr-tools)** | Architecture Decision Record (ADR) conventions and lifecycle workflows. |
+
+---
+
+## 📄 9. License & Author Attribution
+
+This project is licensed under the **[MIT License](LICENSE)**.
+
+**Provenance & Copyright Notice:**
+- **Author & Founder:** Thế Vị ([@TeeVee998](https://github.com/TeeVee998))
+- **Original Repository:** [https://github.com/TeeVee998/Synapse-Hub](https://github.com/TeeVee998/Synapse-Hub)
+- **Copyright:** Copyright (c) 2026 Thế Vị (@TeeVee998). Distributed under the MIT License.
+
+> ⚖️ **MIT License Attribution Requirement:** Under the terms of the MIT License, you are granted permission to use, copy, modify, merge, publish, and distribute this software freely, **PROVIDED** that the original copyright notice crediting **Thế Vị (@TeeVee998)** and this permission notice are included in all copies or substantial portions of the Software.
+
 

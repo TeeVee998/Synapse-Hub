@@ -1,6 +1,6 @@
 {
   "name": "synapse-hub",
-  "version": "2.1.1",
+  "version": "2.3.0",
   "description": "Enterprise AI Agent Intelligence Hub & Autonomous Skill Network",
   "publishConfig": {
     "access": "public"
@@ -25,7 +25,7 @@
     "url": "git+https://github.com/TeeVee998/Synapse-Hub.git"
   },
   "license": "MIT",
-  "author": "AI QA Engineering Swarm <qa-swarm@enterprise.internal>",
+  "author": "Thế Vị (@TeeVee998) <https://github.com/TeeVee998>",
   "main": "bin/agent-qa.js",
   "bin": {
     "synapse-hub": "bin/agent-qa.js",
@@ -35,11 +35,16 @@
   },
   "files": [
     ".agents",
+    ".cursor",
     "bin",
     "tools",
     "templates",
+    "LICENSE",
     "README.md",
     "AGENTS.md",
+    "CLAUDE.md",
+    ".cursorrules",
+    ".windsurfrules",
     "skills_manifest.json",
     "!**/__pycache__/**",
     "!**/*.py[cod]",

@@ -21,10 +21,11 @@ HUB_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
 OUTPUT_TXT = os.path.join(SCRIPT_DIR, "repo_map.txt")
 OUTPUT_JSON = os.path.join(SCRIPT_DIR, "repo_map.json")
 
-# Regex patterns for Groovy classes and methods
-CLASS_PATTERN = re.compile(r'^\s*(?:public\s+)?class\s+(\w+)(?:\s+extends\s+(\w+))?', re.MULTILINE)
+# Regex patterns for Groovy/Java classes and methods
+CLASS_PATTERN = re.compile(r'^\s*(?:public\s+|export\s+)?class\s+(\w+)(?:\s+extends\s+(\w+))?', re.MULTILINE)
+PY_CLASS_PATTERN = re.compile(r'^\s*class\s+(\w+)(?:\(([^)]*)\))?\s*:', re.MULTILINE)
 METHOD_PATTERN = re.compile(
-    r'^\s*(?:@\w+\s+)*(?:public\s+|protected\s+|private\s+)?(?:static\s+)?(?:def\s+|void\s+|[\w<>\[\],]+\s+)?(\w+)\s*\(([^)]*)\)\s*(?:throws\s+[\w,\s]+)?\s*\{',
+    r'^\s*(?:@\w+\s+)*(?:public\s+|protected\s+|private\s+)?(?:static\s+)?(?:async\s+)?(?:def\s+|void\s+|[\w<>\[\],]+\s+)?(\w+)\s*\(([^)]*)\)\s*(?:throws\s+[\w,\s]+)?\s*\{',
     re.MULTILINE
 )
 DOC_PATTERN = re.compile(r'/\*\*(.*?)\*/', re.DOTALL)
@@ -35,7 +36,7 @@ def resolve_target_repo(cli_target=None, cli_repo=None):
     Resolves the target repository path for repo mapping:
     1. Explicit CLI flag: --repo / --path or positional target.
     2. Environment variable: TARGET_PROJECT_DIR.
-    3. Current Working Directory (if different from Hub and has Keywords/ or Scripts/).
+    3. Current Working Directory (if different from Hub and has Keywords/, pages/, or tests/).
     4. Default fallback: QA Hub root (parent of tools/).
     """
     chosen = cli_repo or cli_target
@@ -51,14 +52,15 @@ def resolve_target_repo(cli_target=None, cli_repo=None):
 
     cwd = os.path.abspath(os.getcwd())
     if cwd.lower() != HUB_ROOT.lower():
-        if os.path.exists(os.path.join(cwd, "Keywords")) or os.path.exists(os.path.join(cwd, "Scripts")):
+        markers = ("Keywords", "Scripts", "pages", "tests", "src/pages", "e2e")
+        if any(os.path.exists(os.path.join(cwd, m)) for m in markers):
             return cwd
 
     return HUB_ROOT
 
 
 def extract_class_info(file_path, repo_root=None):
-    """Parses a Groovy file and extracts class name, parent, and exported methods."""
+    """Parses a Groovy, TypeScript, JavaScript, or Python file and extracts class name and methods."""
     with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
         content = f.read()
 
@@ -68,48 +70,72 @@ def extract_class_info(file_path, repo_root=None):
     except ValueError:
         rel_path = os.path.abspath(file_path)
 
-    class_match = CLASS_PATTERN.search(content)
-    if not class_match:
-        return None
-
-    class_name = class_match.group(1)
-    extends_name = class_match.group(2) or ""
-
+    ext = os.path.splitext(file_path)[1].lower()
     methods = []
-    control_keywords = {"if", "for", "while", "switch", "catch", "synchronized"}
+    control_keywords = {"if", "for", "while", "switch", "catch", "synchronized", "constructor"}
 
-    lines = content.splitlines()
-    for idx, line in enumerate(lines):
-        line_clean = line.strip()
-        if not line_clean or line_clean.startswith("//") or line_clean.startswith("/*") or line_clean.startswith("*"):
-            continue
+    if ext in (".groovy", ".java", ".ts", ".js"):
+        class_match = CLASS_PATTERN.search(content)
+        if not class_match:
+            return None
+        class_name = class_match.group(1)
+        extends_name = class_match.group(2) or ""
 
-        # If '=' appears before '(', it's a variable assignment / constant declaration, not a method
-        if "=" in line_clean:
-            eq_pos = line_clean.find("=")
-            paren_pos = line_clean.find("(")
-            if paren_pos != -1 and eq_pos < paren_pos:
+        lines = content.splitlines()
+        for idx, line in enumerate(lines):
+            line_clean = line.strip()
+            if not line_clean or line_clean.startswith(("//", "/*", "*")):
                 continue
 
-        # Must have parentheses and end with '{' or next line starts with '{'
-        if "(" in line_clean and ")" in line_clean:
-            has_brace = line_clean.endswith("{") or (idx + 1 < len(lines) and lines[idx + 1].strip().startswith("{"))
-            if has_brace:
-                # Match method definition: modifiers + return type + name + (params)
-                m = re.search(r'(?:public\s+|protected\s+|private\s+|static\s+|def\s+|void\s+|[\w<>\[\],]+\s+)+([a-zA-Z_]\w*)\s*\(([^)]*)\)', line_clean)
+            if "=" in line_clean:
+                eq_pos = line_clean.find("=")
+                paren_pos = line_clean.find("(")
+                if paren_pos != -1 and eq_pos < paren_pos:
+                    continue
+
+            if "(" in line_clean and ")" in line_clean:
+                has_brace = "{" in line_clean or (idx + 1 < len(lines) and lines[idx + 1].strip().startswith("{"))
+                if has_brace:
+                    m = re.search(r'(?:public\s+|protected\s+|private\s+|static\s+|async\s+|def\s+|void\s+|[\w<>\[\],]+\s+)*([a-zA-Z_]\w*)\s*\(([^)]*)\)', line_clean)
+                    if m:
+                        name = m.group(1)
+                        params = m.group(2).strip()
+                        if name not in control_keywords and name != class_name:
+                            comment = ""
+                            if idx > 0 and lines[idx - 1].strip().startswith("//"):
+                                comment = lines[idx - 1].strip().lstrip("/ ").strip()
+                            methods.append({
+                                "name": name,
+                                "params": re.sub(r'\s+', ' ', params),
+                                "comment": comment
+                            })
+
+    elif ext == ".py":
+        class_match = PY_CLASS_PATTERN.search(content)
+        if not class_match:
+            return None
+        class_name = class_match.group(1)
+        extends_name = class_match.group(2) or ""
+
+        lines = content.splitlines()
+        for idx, line in enumerate(lines):
+            line_clean = line.strip()
+            if line_clean.startswith("def "):
+                m = re.search(r'def\s+([a-zA-Z_]\w*)\s*\(([^)]*)\):', line_clean)
                 if m:
                     name = m.group(1)
-                    params = m.group(2).strip()
-                    if name not in control_keywords and name != class_name:
-                        # Extract preceding single-line comment if any
+                    params = m.group(2).replace("self,", "").replace("self", "").strip()
+                    if not name.startswith("__") and name not in control_keywords:
                         comment = ""
-                        if idx > 0 and lines[idx - 1].strip().startswith("//"):
-                            comment = lines[idx - 1].strip().lstrip("/ ").strip()
+                        if idx + 1 < len(lines) and '"""' in lines[idx + 1]:
+                            comment = lines[idx + 1].replace('"""', '').strip()
                         methods.append({
                             "name": name,
                             "params": re.sub(r'\s+', ' ', params),
                             "comment": comment
                         })
+    else:
+        return None
 
     # Deduplicate methods preserving order
     seen = set()
@@ -120,6 +146,7 @@ def extract_class_info(file_path, repo_root=None):
             seen.add(sig)
             unique_methods.append(meth)
 
+    lines = content.splitlines()
     return {
         "rel_path": rel_path,
         "class_name": class_name,
@@ -131,7 +158,7 @@ def extract_class_info(file_path, repo_root=None):
 
 
 def build_repo_map(target_repo=None, output_txt=None, output_json=None):
-    """Scans Keywords in target_repo and builds the condensed repo map."""
+    """Scans Page Classes across polyglot targets (Groovy, TypeScript, Python) and builds map."""
     repo = target_repo or resolve_target_repo()
     txt_dest = output_txt or OUTPUT_TXT
     json_dest = output_json or OUTPUT_JSON
@@ -140,18 +167,31 @@ def build_repo_map(target_repo=None, output_txt=None, output_json=None):
     total_raw_bytes = 0
     total_raw_lines = 0
 
-    keywords_dir = os.path.join(repo, "Keywords")
+    candidate_dirs = [
+        os.path.join(repo, "Keywords"),
+        os.path.join(repo, "pages"),
+        os.path.join(repo, "page-objects"),
+        os.path.join(repo, "page_objects"),
+        os.path.join(repo, "src", "pages"),
+        os.path.join(repo, "tests", "pages"),
+    ]
 
-    if os.path.isdir(keywords_dir):
-        for root, dirs, files in os.walk(keywords_dir):
-            for fname in sorted(files):
-                if fname.endswith(".groovy"):
-                    full_path = os.path.join(root, fname)
-                    info = extract_class_info(full_path, repo_root=repo)
-                    if info:
-                        classes.append(info)
-                        total_raw_bytes += info["raw_size_bytes"]
-                        total_raw_lines += info["line_count"]
+    scanned_files = set()
+    for d in candidate_dirs:
+        if os.path.isdir(d):
+            for root, _, files in os.walk(d):
+                if any(ignored in root for ignored in (".git", "node_modules", "__pycache__", ".venv")):
+                    continue
+                for fname in sorted(files):
+                    if fname.endswith((".groovy", ".ts", ".js", ".py", ".java")):
+                        full_path = os.path.join(root, fname)
+                        if full_path not in scanned_files:
+                            scanned_files.add(full_path)
+                            info = extract_class_info(full_path, repo_root=repo)
+                            if info and info.get("methods"):
+                                classes.append(info)
+                                total_raw_bytes += info["raw_size_bytes"]
+                                total_raw_lines += info["line_count"]
 
     # Sort classes: BasePage first, then alphabetical
     classes.sort(key=lambda c: (0 if c["class_name"] == "BasePage" else 1, c["class_name"]))
