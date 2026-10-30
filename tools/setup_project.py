@@ -228,6 +228,73 @@ exit 0
         return False
 
 
+def inject_antigravity_global_plugin():
+    """
+    Automatically injects Synapse-Hub into Antigravity's Global Plugin Directory
+    (~/.gemini/config/plugins/synapse-hub).
+    Ensures that running `npx synapse-hub setup` activates the 27 skills and 6 subagents
+    globally across ALL projects in Google Antigravity.
+    """
+    try:
+        plugins_dir = os.path.expanduser("~/.gemini/config/plugins")
+        target_plugin_dir = os.path.join(plugins_dir, "synapse-hub")
+        os.makedirs(target_plugin_dir, exist_ok=True)
+
+        # 1. plugin.json
+        src_plugin_json = os.path.join(HUB_ROOT, "plugin.json")
+        dst_plugin_json = os.path.join(target_plugin_dir, "plugin.json")
+        if os.path.exists(src_plugin_json):
+            if not os.path.exists(dst_plugin_json) or not os.path.samefile(src_plugin_json, dst_plugin_json):
+                shutil.copy2(src_plugin_json, dst_plugin_json)
+
+        # 2. README.md
+        src_readme = os.path.join(HUB_ROOT, "README.md")
+        dst_readme = os.path.join(target_plugin_dir, "README.md")
+        if os.path.exists(src_readme):
+            if not os.path.exists(dst_readme) or not os.path.samefile(src_readme, dst_readme):
+                shutil.copy2(src_readme, dst_readme)
+
+        # Helper to sync directory (junction or copy)
+        def sync_dir(src, dst):
+            if not os.path.exists(src):
+                return
+            if os.path.exists(dst) and os.path.samefile(src, dst):
+                return
+            if os.path.islink(dst):
+                try:
+                    os.unlink(dst)
+                except Exception:
+                    pass
+            if sys.platform == "win32":
+                try:
+                    import _winapi
+                    if not os.path.exists(dst):
+                        _winapi.CreateJunction(src, dst)
+                        return
+                except Exception:
+                    pass
+            shutil.copytree(src, dst, dirs_exist_ok=True, ignore=shutil.ignore_patterns("__pycache__", "*.pyc", "*.tmp"))
+
+        sync_dir(os.path.join(HUB_ROOT, ".agents", "skills"), os.path.join(target_plugin_dir, "skills"))
+        sync_dir(os.path.join(HUB_ROOT, ".agents", "agents"), os.path.join(target_plugin_dir, "agents"))
+        sync_dir(os.path.join(HUB_ROOT, "tools"), os.path.join(target_plugin_dir, "tools"))
+
+        # 3. Rules (AGENTS.md)
+        dst_rules = os.path.join(target_plugin_dir, "rules")
+        os.makedirs(dst_rules, exist_ok=True)
+        src_agents_md = os.path.join(HUB_ROOT, "AGENTS.md")
+        dst_agents_md = os.path.join(dst_rules, "AGENTS.md")
+        if os.path.exists(src_agents_md):
+            if not os.path.exists(dst_agents_md) or not os.path.samefile(src_agents_md, dst_agents_md):
+                shutil.copy2(src_agents_md, dst_agents_md)
+
+        print(f"  {GREEN}[OK] Injected Antigravity Global Plugin:{RESET} {target_plugin_dir}")
+        return True
+    except Exception as e:
+        print(f"  ⚠️ Antigravity Global Plugin notice: {e}")
+        return False
+
+
 def run_setup(target_repo):
     """Main execution entrypoint for automated project setup."""
     print(f"\n{BOLD}{CYAN}======================================================================{RESET}")
@@ -241,11 +308,15 @@ def run_setup(target_repo):
     print(f"📂 Structure Scope : Pages: `{stack_info['page_dir']}` | Tests: `{stack_info['test_dir']}`\n")
 
     # 2. Ensure PROJECT_AI_GUIDE.md & PROJECT_STATE.md
-    print(f"{BOLD}[1/3] Checking Project AI Guide & State Anchor...{RESET}")
+    print(f"{BOLD}[1/4] Checking Project AI Guide & State Anchor...{RESET}")
     guide_created = ensure_project_ai_guide(target_repo, stack_info)
     project_state.init_state(target_repo)
 
-    # 2.1 Initialize Central Agent Memory (SQLite Cache)
+    # 3. Inject Antigravity Global Plugin
+    print(f"\n{BOLD}[2/4] Injecting Antigravity Global Plugin (~/.gemini/config/plugins)...{RESET}")
+    plugin_injected = inject_antigravity_global_plugin()
+
+    # 3.1 Initialize Central Agent Memory (SQLite Cache)
     try:
         import cache_resolver
         cache_resolver.init_db(seed=True)
@@ -253,12 +324,12 @@ def run_setup(target_repo):
     except Exception as e:
         print(f"  ⚠️ Could not initialize memory cache: {e}")
 
-    # 3. Install Pre-Push Git Hook
-    print(f"\n{BOLD}[2/3] Installing Zero-Leakage Git Pre-Push Hook...{RESET}")
+    # 4. Install Pre-Push Git Hook
+    print(f"\n{BOLD}[3/4] Installing Zero-Leakage Git Pre-Push Hook...{RESET}")
     hook_installed = install_git_pre_push_hook(target_repo)
 
-    # 4. Run 5-in-1 Comprehensive Health & AST Analysis
-    print(f"\n{BOLD}[3/3] Executing Initial Health Audit & AST Mapping...{RESET}")
+    # 5. Run 5-in-1 Comprehensive Health & AST Analysis
+    print(f"\n{BOLD}[4/4] Executing Initial Health Audit & AST Mapping...{RESET}")
     analysis_code = analyze_project.run_full_analysis(target_repo)
 
     print(f"\n{BOLD}{CYAN}======================================================================{RESET}")
@@ -269,6 +340,7 @@ def run_setup(target_repo):
     print(f"  AST Method Map      : {os.path.join(target_repo, 'repo_map.txt')}")
     print(f"  Health Report       : {os.path.join(target_repo, 'PROJECT_HEALTH_REPORT.md')}")
     print(f"  Pre-Push Sentinel   : {'ACTIVE (.git/hooks/pre-push)' if hook_installed else 'MANUAL (No .git folder)'}")
+    print(f"  Antigravity Plugin  : {'ACTIVE (~/.gemini/config/plugins/synapse-hub)' if plugin_injected else 'STANDALONE'}")
     print(f"{BOLD}{CYAN}======================================================================{RESET}\n")
 
     return analysis_code

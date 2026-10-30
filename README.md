@@ -76,19 +76,20 @@ flowchart TD
 
 ---
 
-### 🥇 Cách 1: Nhanh Nhất — Chạy 1 Lệnh Duy Nhất Với NPX (Zero-Clone)
-*Dành cho người dùng muốn áp dụng ngay vào dự án kiểm thử của mình: **KHÔNG CẦN clone repo Hub**, **KHÔNG CẦN mở Multi-root workspace**.*
+### ⚡ Khởi Động Siêu Tốc: Đúng 1 Lệnh Duy Nhất Với NPX (All-in-One 🚀)
+*Tất cả trong một: **KHÔNG CẦN clone repo Hub**, **KHÔNG CẦN mở Multi-root workspace**, tự động cấu hình dự án **VÀ tự động bơm thẳng vào Antigravity Global Plugin**.*
 
 Mở terminal ngay tại thư mục **dự án kiểm thử của bạn** và chạy đúng 1 dòng:
 ```bash
 npx synapse-hub setup
 ```
-👉 **Lệnh này tự động thực hiện trong 5 giây:**
-1. Nhận diện framework dự án (Playwright TypeScript/JS, Katalon Studio Groovy, Cypress, Pytest).
-2. Tự sinh file `PROJECT_AI_GUIDE.md` để AI hiểu tường tận nghiệp vụ dự án của bạn.
-3. Tự cài Git Pre-Push Hook (`.git/hooks/pre-push`) bảo vệ chất lượng mã nguồn tự động.
-4. Tự khởi tạo bộ nhớ kinh nghiệm sửa lỗi SQLite (`~/.agent_memory/global_cache.db`).
-5. Quét sơ bộ mã nguồn và xuất bản đồ hàm AST (`repo_map.txt`).
+👉 **Đúng 1 lệnh này sẽ tự động hoàn tất toàn bộ trong 5 giây:**
+1. 🧠 **Tự động bơm vào Antigravity Global Plugin:** Triển khai Synapse-Hub vào `~/.gemini/config/plugins/synapse-hub`. Kể từ giây phút này, **mọi dự án** mở trên Google Antigravity đều tự động sở hữu toàn bộ 27 Skills và 6 Subagents mà không cần cấu hình thêm!
+2. 🔍 **Nhận diện Framework:** Tự động phát hiện Playwright TypeScript/JS, Katalon Studio Groovy, Cypress, hoặc Pytest.
+3. 📋 **Sinh Hướng Dẫn Nghiệp Vụ:** Tạo file `PROJECT_AI_GUIDE.md` ngay trong dự án của bạn để AI hiểu sâu kiến trúc và quy chuẩn code.
+4. 🛡️ **Cài Đặt Cổng Gác Git (Pre-Push Hook):** Tự cài `.git/hooks/pre-push` gọi `npx synapse-hub verify` để chặn đứng mã lỗi và lộ mật khẩu trước khi push.
+5. 💾 **Khởi Tạo Bộ Nhớ Kinh Nghiệm (SQLite Cache):** Khởi tạo và nạp giải pháp sửa lỗi UI vào `~/.agent_memory/global_cache.db` (chi phí 0 token).
+6. 🗺️ **Quét AST & Xuất Bản Đồ Hàm:** Tự động phân tích codebase và trích xuất `repo_map.txt` cô đọng.
 
 Sau đó, bạn có thể thực thi kiểm định bất cứ lúc nào:
 ```bash
@@ -340,19 +341,20 @@ flowchart TD
 
 ---
 
-### 🥇 Method 1: Fastest — Zero-Clone Execution via NPX 1-Liner
-*For developers and QA engineers who want to immediately enhance their project: **NO git cloning**, **NO multi-root workspace setup required**.*
+### ⚡ Instant All-in-One Setup: Single NPX Command (Zero-Clone 🚀)
+*All-in-one execution: **NO git cloning**, **NO multi-root workspace setup**, configures the target project **AND automatically injects into Antigravity Global Plugin**.*
 
 Run directly from your **target automation project root**:
 ```bash
 npx synapse-hub setup
 ```
-👉 **Automatically completes in 5 seconds:**
-1. Detects project automation framework (Playwright TypeScript/JS, Katalon Groovy, Cypress, Pytest).
-2. Generates tailored `PROJECT_AI_GUIDE.md` so AI agents master project workflows.
-3. Installs automated Git Pre-Push Hook (`.git/hooks/pre-push`) for zero-leakage protection.
-4. Initializes SQLite Central Agent Memory (`~/.agent_memory/global_cache.db`).
-5. Extracts condensed AST method signatures (`repo_map.txt`).
+👉 **This single command automatically completes everything in 5 seconds:**
+1. 🧠 **Injects Antigravity Global Plugin:** Deploys Synapse-Hub into `~/.gemini/config/plugins/synapse-hub`. From this moment on, **ALL projects** opened in Google Antigravity automatically inherit all 27 Skills and 6 Subagent profiles!
+2. 🔍 **Tech Stack Detection:** Auto-detects Playwright TypeScript/JS, Katalon Groovy, Cypress, or Pytest.
+3. 📋 **Project AI Guide Synthesis:** Generates `PROJECT_AI_GUIDE.md` so AI assistants strictly adhere to project workflows.
+4. 🛡️ **Zero-Leakage Git Pre-Push Hook:** Installs `.git/hooks/pre-push` invoking `npx synapse-hub verify` before any git push.
+5. 💾 **Central Agent Memory Initialization:** Seeds offline SQLite healing memory at `~/.agent_memory/global_cache.db` (0 token cost).
+6. 🗺️ **AST Architecture Mapping:** Scans project methods and exports condensed context map (`repo_map.txt`).
 
 Run verification anytime:
 ```bash
