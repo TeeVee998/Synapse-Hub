@@ -85,11 +85,17 @@ npx synapse-hub setup
 ```
 👉 **Đúng 1 lệnh này sẽ tự động hoàn tất toàn bộ trong 5 giây:**
 1. 🧠 **Tự động bơm vào Antigravity Global Plugin:** Triển khai Synapse-Hub vào `~/.gemini/config/plugins/synapse-hub`. Kể từ giây phút này, **mọi dự án** mở trên Google Antigravity đều tự động sở hữu toàn bộ 27 Skills và 6 Subagents mà không cần cấu hình thêm!
-2. 🔍 **Nhận diện Framework:** Tự động phát hiện Playwright TypeScript/JS, Katalon Studio Groovy, Cypress, hoặc Pytest.
-3. 📋 **Sinh Hướng Dẫn Nghiệp Vụ:** Tạo file `PROJECT_AI_GUIDE.md` ngay trong dự án của bạn để AI hiểu sâu kiến trúc và quy chuẩn code.
-4. 🛡️ **Cài Đặt Cổng Gác Git (Pre-Push Hook):** Tự cài `.git/hooks/pre-push` gọi `npx synapse-hub verify` để chặn đứng mã lỗi và lộ mật khẩu trước khi push.
-5. 💾 **Khởi Tạo Bộ Nhớ Kinh Nghiệm (SQLite Cache):** Khởi tạo và nạp giải pháp sửa lỗi UI vào `~/.agent_memory/global_cache.db` (chi phí 0 token).
-6. 🗺️ **Quét AST & Xuất Bản Đồ Hàm:** Tự động phân tích codebase và trích xuất `repo_map.txt` cô đọng.
+2. 🌐 **Triển Khai Cầu Nối Đa IDE & AI (Universal AI Bridges):** Tự động sinh file cấu hình và quy chuẩn cho mọi trợ lý AI khác nhau ngay trong dự án của bạn:
+   - 🖱️ **Cursor:** `.cursor/rules/synapse-qa.mdc` (Tự động kích hoạt khi mở file trong Cursor)
+   - 🤖 **Claude Code:** `CLAUDE.md` (Hướng dẫn quy chuẩn QA, commands và Clean POM)
+   - 🐙 **GitHub Copilot:** `.github/copilot-instructions.md` (Chỉ dẫn hệ thống cho VS Code / JetBrains Copilot)
+   - 🏄 **Windsurf (Cascade):** `.windsurfrules` (Nguyên tắc kiểm thử bắt buộc)
+   *(Mọi thành viên dù dùng Antigravity, Cursor, Claude Code, Copilot hay Windsurf đều chung 1 chuẩn Clean POM, 1 nguyên tắc Truth Anchor chống pass ảo, và 8 Cổng Kiểm Định DoD!)*
+3. 🔍 **Nhận diện Framework:** Tự động phát hiện Playwright TypeScript/JS, Katalon Studio Groovy, Cypress, hoặc Pytest.
+4. 📋 **Sinh Hướng Dẫn Nghiệp Vụ:** Tạo file `PROJECT_AI_GUIDE.md` ngay trong dự án của bạn để AI hiểu sâu kiến trúc và quy chuẩn code.
+5. 🛡️ **Cài Đặt Cổng Gác Git (Pre-Push Hook):** Tự cài `.git/hooks/pre-push` gọi `npx synapse-hub verify` để chặn đứng mã lỗi và lộ mật khẩu trước khi push.
+6. 💾 **Khởi Tạo Bộ Nhớ Kinh Nghiệm (SQLite Cache):** Khởi tạo và nạp giải pháp sửa lỗi UI vào `~/.agent_memory/global_cache.db` (chi phí 0 token).
+7. 🗺️ **Quét AST & Xuất Bản Đồ Hàm:** Tự động phân tích codebase và trích xuất `repo_map.txt` cô đọng.
 
 Sau đó, bạn có thể thực thi kiểm định bất cứ lúc nào:
 ```bash
@@ -350,11 +356,17 @@ npx synapse-hub setup
 ```
 👉 **This single command automatically completes everything in 5 seconds:**
 1. 🧠 **Injects Antigravity Global Plugin:** Deploys Synapse-Hub into `~/.gemini/config/plugins/synapse-hub`. From this moment on, **ALL projects** opened in Google Antigravity automatically inherit all 27 Skills and 6 Subagent profiles!
-2. 🔍 **Tech Stack Detection:** Auto-detects Playwright TypeScript/JS, Katalon Groovy, Cypress, or Pytest.
-3. 📋 **Project AI Guide Synthesis:** Generates `PROJECT_AI_GUIDE.md` so AI assistants strictly adhere to project workflows.
-4. 🛡️ **Zero-Leakage Git Pre-Push Hook:** Installs `.git/hooks/pre-push` invoking `npx synapse-hub verify` before any git push.
-5. 💾 **Central Agent Memory Initialization:** Seeds offline SQLite healing memory at `~/.agent_memory/global_cache.db` (0 token cost).
-6. 🗺️ **AST Architecture Mapping:** Scans project methods and exports condensed context map (`repo_map.txt`).
+2. 🌐 **Universal AI Bridges Deployment:** Automatically generates tailored configuration rules for all leading AI IDEs and assistants:
+   - 🖱️ **Cursor:** `.cursor/rules/synapse-qa.mdc`
+   - 🤖 **Claude Code:** `CLAUDE.md`
+   - 🐙 **GitHub Copilot:** `.github/copilot-instructions.md`
+   - 🏄 **Windsurf (Cascade):** `.windsurfrules`
+   *(Empowers team members across Antigravity, Cursor, Claude Code, Copilot, or Windsurf to enforce the exact same Clean POM architecture, Truth Anchor, and 8 Quality Gates DoD!)*
+3. 🔍 **Tech Stack Detection:** Auto-detects Playwright TypeScript/JS, Katalon Groovy, Cypress, or Pytest.
+4. 📋 **Project AI Guide Synthesis:** Generates `PROJECT_AI_GUIDE.md` so AI assistants strictly adhere to project workflows.
+5. 🛡️ **Zero-Leakage Git Pre-Push Hook:** Installs `.git/hooks/pre-push` invoking `npx synapse-hub verify` before any git push.
+6. 💾 **Central Agent Memory Initialization:** Seeds offline SQLite healing memory at `~/.agent_memory/global_cache.db` (0 token cost).
+7. 🗺️ **AST Architecture Mapping:** Scans project methods and exports condensed context map (`repo_map.txt`).
 
 Run verification anytime:
 ```bash

@@ -51,10 +51,24 @@
   ```bash
   [e.g., npx playwright test tests/e2e/login.spec.ts]
   ```
-- **Execute 7 Quality Gates Verification:**
+- **Execute 8 Quality Gates Verification:**
   ```bash
+  npx synapse-hub verify
+  # or
   python tools/verify_all.py
   ```
+
+---
+
+## 6. Universal Multi-IDE & Multi-AI Setup
+This repository supports multi-agent and multi-IDE automation natively through Synapse-Hub bridges:
+- **Google Antigravity:** Powered globally via Global Plugin (`~/.gemini/config/plugins/synapse-hub`).
+- **Cursor:** Automated rules at `.cursor/rules/synapse-qa.mdc`.
+- **Claude Code:** Project guide at `CLAUDE.md`.
+- **GitHub Copilot:** Custom system instructions at `.github/copilot-instructions.md`.
+- **Windsurf (Cascade):** Automation invariants at `.windsurfrules`.
+
+All bridges enforce Clean POM, Truth Anchor, and 8 Quality Gates DoD automatically.
 
 ---
 

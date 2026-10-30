@@ -8,8 +8,10 @@ Dispatched automatically by AI Agents (Zero-Command Protocol) or via 'agent-qa s
 Automated actions:
   1. Detects project tech stack (Katalon, Playwright, Cypress, Pytest).
   2. Generates tailored 'PROJECT_AI_GUIDE.md' if missing.
-  3. Installs automated Git Pre-Push Hook (.git/hooks/pre-push) for zero-leakage protection.
-  4. Triggers 5-in-1 Health Audit (tools/analyze_project.py):
+  3. Deploys Universal AI Bridges (.cursor/rules, CLAUDE.md, .github/copilot-instructions.md, .windsurfrules).
+  4. Injects Antigravity Global Plugin (~/.gemini/config/plugins/synapse-hub).
+  5. Installs automated Git Pre-Push Hook (.git/hooks/pre-push) for zero-leakage protection.
+  6. Triggers 5-in-1 Health Audit (tools/analyze_project.py):
      - Maps AST method signatures (repo_map.txt).
      - Scans fake passes (infer_linter).
      - Audits database teardown hygiene (trace_data_flow).
@@ -295,6 +297,84 @@ def inject_antigravity_global_plugin():
         return False
 
 
+def install_universal_ai_bridges(target_dir):
+    """
+    Deploys Universal AI Bridge configuration files into the target project workspace
+    for seamless integration with Cursor, Claude Code, GitHub Copilot, and Windsurf.
+    """
+    bridges_dir = os.path.join(TEMPLATES_DIR, "ai_bridges")
+    if not os.path.exists(bridges_dir):
+        return False
+
+    deployed = []
+
+    # 1. Cursor (.cursor/rules/synapse-qa.mdc)
+    cursor_dir = os.path.join(target_dir, ".cursor", "rules")
+    os.makedirs(cursor_dir, exist_ok=True)
+    src_cursor = os.path.join(bridges_dir, "cursor_synapse_qa.mdc")
+    dst_cursor = os.path.join(cursor_dir, "synapse-qa.mdc")
+    if os.path.exists(src_cursor):
+        shutil.copy2(src_cursor, dst_cursor)
+        deployed.append("Cursor (.cursor/rules/synapse-qa.mdc)")
+
+    # 2. Claude Code (CLAUDE.md)
+    dst_claude = os.path.join(target_dir, "CLAUDE.md")
+    src_claude = os.path.join(bridges_dir, "CLAUDE.md")
+    if os.path.exists(src_claude):
+        if not os.path.exists(dst_claude):
+            shutil.copy2(src_claude, dst_claude)
+            deployed.append("Claude Code (CLAUDE.md)")
+        else:
+            with open(dst_claude, "r", encoding="utf-8", errors="ignore") as f:
+                c_content = f.read()
+            if "Synapse-Hub" not in c_content:
+                with open(src_claude, "r", encoding="utf-8") as f:
+                    append_data = f.read()
+                with open(dst_claude, "a", encoding="utf-8") as f:
+                    f.write("\n\n" + append_data)
+                deployed.append("Claude Code (appended to CLAUDE.md)")
+
+    # 3. GitHub Copilot (.github/copilot-instructions.md)
+    github_dir = os.path.join(target_dir, ".github")
+    os.makedirs(github_dir, exist_ok=True)
+    dst_copilot = os.path.join(github_dir, "copilot-instructions.md")
+    src_copilot = os.path.join(bridges_dir, "copilot-instructions.md")
+    if os.path.exists(src_copilot):
+        if not os.path.exists(dst_copilot):
+            shutil.copy2(src_copilot, dst_copilot)
+            deployed.append("GitHub Copilot (.github/copilot-instructions.md)")
+        else:
+            with open(dst_copilot, "r", encoding="utf-8", errors="ignore") as f:
+                cp_content = f.read()
+            if "Synapse-Hub" not in cp_content:
+                with open(src_copilot, "r", encoding="utf-8") as f:
+                    append_data = f.read()
+                with open(dst_copilot, "a", encoding="utf-8") as f:
+                    f.write("\n\n" + append_data)
+                deployed.append("GitHub Copilot (appended to copilot-instructions.md)")
+
+    # 4. Windsurf (.windsurfrules)
+    dst_windsurf = os.path.join(target_dir, ".windsurfrules")
+    src_windsurf = os.path.join(bridges_dir, "windsurfrules")
+    if os.path.exists(src_windsurf):
+        if not os.path.exists(dst_windsurf):
+            shutil.copy2(src_windsurf, dst_windsurf)
+            deployed.append("Windsurf (.windsurfrules)")
+        else:
+            with open(dst_windsurf, "r", encoding="utf-8", errors="ignore") as f:
+                w_content = f.read()
+            if "Synapse-Hub" not in w_content:
+                with open(src_windsurf, "r", encoding="utf-8") as f:
+                    append_data = f.read()
+                with open(dst_windsurf, "a", encoding="utf-8") as f:
+                    f.write("\n\n" + append_data)
+                deployed.append("Windsurf (appended to .windsurfrules)")
+
+    if deployed:
+        print(f"  {GREEN}[OK] Deployed Universal AI Bridges:{RESET} {', '.join(deployed)}")
+    return True
+
+
 def run_setup(target_repo):
     """Main execution entrypoint for automated project setup."""
     print(f"\n{BOLD}{CYAN}======================================================================{RESET}")
@@ -308,15 +388,19 @@ def run_setup(target_repo):
     print(f"📂 Structure Scope : Pages: `{stack_info['page_dir']}` | Tests: `{stack_info['test_dir']}`\n")
 
     # 2. Ensure PROJECT_AI_GUIDE.md & PROJECT_STATE.md
-    print(f"{BOLD}[1/4] Checking Project AI Guide & State Anchor...{RESET}")
+    print(f"{BOLD}[1/5] Checking Project AI Guide & State Anchor...{RESET}")
     guide_created = ensure_project_ai_guide(target_repo, stack_info)
     project_state.init_state(target_repo)
 
-    # 3. Inject Antigravity Global Plugin
-    print(f"\n{BOLD}[2/4] Injecting Antigravity Global Plugin (~/.gemini/config/plugins)...{RESET}")
+    # 3. Deploy Universal AI Bridges (Cursor, Claude Code, GitHub Copilot, Windsurf)
+    print(f"\n{BOLD}[2/5] Deploying Universal AI Bridges (Cursor, Claude, Copilot, Windsurf)...{RESET}")
+    bridges_deployed = install_universal_ai_bridges(target_repo)
+
+    # 4. Inject Antigravity Global Plugin
+    print(f"\n{BOLD}[3/5] Injecting Antigravity Global Plugin (~/.gemini/config/plugins)...{RESET}")
     plugin_injected = inject_antigravity_global_plugin()
 
-    # 3.1 Initialize Central Agent Memory (SQLite Cache)
+    # 4.1 Initialize Central Agent Memory (SQLite Cache)
     try:
         import cache_resolver
         cache_resolver.init_db(seed=True)
@@ -324,12 +408,12 @@ def run_setup(target_repo):
     except Exception as e:
         print(f"  ⚠️ Could not initialize memory cache: {e}")
 
-    # 4. Install Pre-Push Git Hook
-    print(f"\n{BOLD}[3/4] Installing Zero-Leakage Git Pre-Push Hook...{RESET}")
+    # 5. Install Pre-Push Git Hook
+    print(f"\n{BOLD}[4/5] Installing Zero-Leakage Git Pre-Push Hook...{RESET}")
     hook_installed = install_git_pre_push_hook(target_repo)
 
-    # 5. Run 5-in-1 Comprehensive Health & AST Analysis
-    print(f"\n{BOLD}[4/4] Executing Initial Health Audit & AST Mapping...{RESET}")
+    # 6. Run 5-in-1 Comprehensive Health & AST Analysis
+    print(f"\n{BOLD}[5/5] Executing Initial Health Audit & AST Mapping...{RESET}")
     analysis_code = analyze_project.run_full_analysis(target_repo)
 
     print(f"\n{BOLD}{CYAN}======================================================================{RESET}")
@@ -337,10 +421,11 @@ def run_setup(target_repo):
     print(f"{BOLD}{CYAN}======================================================================{RESET}")
     print(f"  Target Framework    : {stack_info['framework']}")
     print(f"  AI Project Guide    : {os.path.join(target_repo, 'PROJECT_AI_GUIDE.md')}")
+    print(f"  Universal Bridges   : Cursor (.cursor/rules), Claude Code, Copilot, Windsurf")
+    print(f"  Antigravity Plugin  : {'ACTIVE (~/.gemini/config/plugins/synapse-hub)' if plugin_injected else 'STANDALONE'}")
     print(f"  AST Method Map      : {os.path.join(target_repo, 'repo_map.txt')}")
     print(f"  Health Report       : {os.path.join(target_repo, 'PROJECT_HEALTH_REPORT.md')}")
     print(f"  Pre-Push Sentinel   : {'ACTIVE (.git/hooks/pre-push)' if hook_installed else 'MANUAL (No .git folder)'}")
-    print(f"  Antigravity Plugin  : {'ACTIVE (~/.gemini/config/plugins/synapse-hub)' if plugin_injected else 'STANDALONE'}")
     print(f"{BOLD}{CYAN}======================================================================{RESET}\n")
 
     return analysis_code

@@ -10,6 +10,7 @@ Contains real behavioral assertions and fixture-based functional tests.
 import os
 import sys
 import json
+import shutil
 import tempfile
 import io
 import subprocess
@@ -102,10 +103,11 @@ class TestToolsIntegrityAndBehavior(unittest.TestCase):
         self.assertIn("synapse", pkg_data.get("bin", {}))
         self.assertIn("agent-qa", pkg_data.get("bin", {}))
 
-        # Test node bin launcher execution
-        res = subprocess.run(["node", bin_path, "version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd=REPO_ROOT)
-        self.assertEqual(res.returncode, 0, f"Node bin launcher failed: {res.stderr}")
-        self.assertIn(f"Agent-QA Hub CLI v{current_version}", res.stdout)
+        # Test node bin launcher execution if node is installed
+        if shutil.which("node"):
+            res = subprocess.run(["node", bin_path, "version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd=REPO_ROOT)
+            self.assertEqual(res.returncode, 0, f"Node bin launcher failed: {res.stderr}")
+            self.assertIn(f"Agent-QA Hub CLI v{current_version}", res.stdout)
 
     def test_cache_resolver_cosine_similarity(self):
         """Validates compute_cosine_similarity calculation in cache_resolver."""
@@ -706,6 +708,45 @@ class TestToolsIntegrityAndBehavior(unittest.TestCase):
                 content = hf.read()
             self.assertIn("AI-GUARD", content)
             self.assertIn("verify_all.py", content)
+
+    def test_setup_project_install_universal_ai_bridges(self):
+        """Validates that setup_project deploys bridge configs for Cursor, Claude, Copilot, and Windsurf."""
+        import setup_project
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # 1. Fresh deployment
+            deployed = setup_project.install_universal_ai_bridges(temp_dir)
+            self.assertTrue(deployed)
+
+            cursor_rule = os.path.join(temp_dir, ".cursor", "rules", "synapse-qa.mdc")
+            claude_md = os.path.join(temp_dir, "CLAUDE.md")
+            copilot_md = os.path.join(temp_dir, ".github", "copilot-instructions.md")
+            windsurf_rules = os.path.join(temp_dir, ".windsurfrules")
+
+            self.assertTrue(os.path.exists(cursor_rule), "Cursor rule should exist")
+            self.assertTrue(os.path.exists(claude_md), "CLAUDE.md should exist")
+            self.assertTrue(os.path.exists(copilot_md), "copilot-instructions.md should exist")
+            self.assertTrue(os.path.exists(windsurf_rules), ".windsurfrules should exist")
+
+            with open(cursor_rule, "r", encoding="utf-8") as f:
+                self.assertIn("Synapse-Hub", f.read())
+            with open(claude_md, "r", encoding="utf-8") as f:
+                self.assertIn("Synapse-Hub", f.read())
+            with open(copilot_md, "r", encoding="utf-8") as f:
+                self.assertIn("Synapse-Hub", f.read())
+            with open(windsurf_rules, "r", encoding="utf-8") as f:
+                self.assertIn("Synapse-Hub", f.read())
+
+            # 2. Existing file append test
+            with tempfile.TemporaryDirectory() as existing_dir:
+                custom_claude = os.path.join(existing_dir, "CLAUDE.md")
+                with open(custom_claude, "w", encoding="utf-8") as f:
+                    f.write("# Existing Project Notes\nDo not break this.\n")
+
+                setup_project.install_universal_ai_bridges(existing_dir)
+                with open(custom_claude, "r", encoding="utf-8") as f:
+                    content = f.read()
+                self.assertIn("# Existing Project Notes", content)
+                self.assertIn("Synapse-Hub", content)
 
     def test_project_state_rolling_window_cap(self):
         """Validates that project_state enforces strict rolling window and caps size under 50 lines."""

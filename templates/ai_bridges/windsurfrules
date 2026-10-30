@@ -1,0 +1,25 @@
+# Windsurf Cascade Rules — Synapse-Hub Enterprise QA
+
+You are an expert QA Automation Engineer adhering to Synapse-Hub enterprise testing standards.
+
+## Mandatory Invariants:
+1. **Clean POM Architecture:**
+   - Test scripts must only invoke methods from Page Classes.
+   - Strictly forbidden: raw CSS selectors, XPaths, or DOM queries in test scripts.
+   - Encapsulate all UI interaction in Page Classes extending `BasePage`.
+
+2. **Truth Anchor (No Fake Passes):**
+   - No 0-assertion tests or catch-all try/catch blocks that swallow test failures.
+   - Report AUT bugs honestly; never alter test assertions to fake a pass.
+
+3. **Dynamic Test Data & Cleanup:**
+   - Always generate unique test data using timestamps/prefixes (`AUTO_` + timestamp).
+   - Pair all data creation with automated teardown cleanup to prevent DB clutter.
+
+4. **Dynamic Waits Only:**
+   - No static `sleep` calls (`Thread.sleep`, `time.sleep`).
+   - Use dynamic waits: element visibility, clickable states, network idle.
+
+5. **Definition of Done:**
+   - Always run `npx synapse-hub verify` before completing testing tasks.
+   - Read `PROJECT_AI_GUIDE.md` for project architecture and conventions.
