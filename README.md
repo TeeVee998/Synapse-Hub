@@ -4,7 +4,7 @@
 
 > **Bộ não trí tuệ dùng chung và mạng lưới kỹ năng tự hành, tăng cường năng lực cho các trợ lý AI (Google Antigravity, Cursor, Windsurf, Claude Code) trên mọi hệ sinh thái kiểm thử tự động.**  
 > **Tác giả:** Thế Vị ([@TeeVee998](https://github.com/TeeVee998))  
-> **Phiên bản Hub:** `v2.2.4` | **Quy mô:** 28 Kỹ năng chuẩn hóa, 6 Vai trò AI Swarm, 7 Quy tắc cốt lõi, 50+ Công cụ tự động.
+> **Phiên bản Hub:** `v2.3.0` | **Quy mô:** 28 Kỹ năng chuẩn hóa, 6 Vai trò AI Swarm, 7 Quy tắc cốt lõi, 50+ Công cụ tự động.
 
 ---
 
@@ -24,7 +24,7 @@
 
 ```mermaid
 flowchart TD
-    subgraph Hub["🧠 Synapse Hub (Intelligence Core v2.2.4)"]
+    subgraph Hub["🧠 Synapse Hub (Intelligence Core v2.3.0)"]
         Skills[".agents/skills/ (28 Skills)"]
         Agents[".agents/agents/ (6 Specialized Roles)"]
         Rules[".agents/rules/ (7 Core Rules)"]
@@ -313,7 +313,7 @@ Dự án được phân phối chính thức dưới giấy phép **[MIT License
 
 > **The shared intelligence core and autonomous skill hub empowering AI coding assistants (Google Antigravity / Cursor / Windsurf / Claude Code) across automated testing suites.**  
 > **Author:** Thế Vị ([@TeeVee998](https://github.com/TeeVee998))  
-> **Hub Version:** `v2.2.4` (Semantic Versioning) | **Integrity Index:** 28 Skills, 6 Agent Swarm Roles, 8 Core Rules, 50+ Specialized Python Tools, 9 Quality Gates.
+> **Hub Version:** `v2.3.0` (Semantic Versioning) | **Integrity Index:** 28 Skills, 6 Agent Swarm Roles, 8 Core Rules, 50+ Specialized Python Tools, 9 Quality Gates.
 
 ---
 
@@ -333,7 +333,7 @@ To maintain a lightweight and focused architecture for Quality Engineering, Syna
 
 ```mermaid
 flowchart TD
-    subgraph Hub["🧠 Synapse Hub (Intelligence Core v2.2.4)"]
+    subgraph Hub["🧠 Synapse Hub (Intelligence Core v2.3.0)"]
         Skills[".agents/skills/ (28 Skills)"]
         Agents[".agents/agents/ (6 Specialized Roles)"]
         Rules[".agents/rules/ (8 Core Rules)"]
