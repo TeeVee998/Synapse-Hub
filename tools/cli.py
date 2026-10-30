@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: Copyright (c) 2026 Thế Vị (@TeeVee998). All rights reserved.
+# SPDX-License-Identifier: MIT
+# Project: Synapse-Hub (https://github.com/TeeVee998/Synapse-Hub)
+
 """
 Enterprise Agent-QA CLI Entrypoint
 ----------------------------------
@@ -25,7 +29,7 @@ sys.path.insert(0, SCRIPT_DIR)
 
 def cmd_version(args):
     manifest_path = os.path.join(REPO_ROOT, "skills_manifest.json")
-    version = "2.2.0"
+    version = "2.2.1"
     if os.path.exists(manifest_path):
         try:
             import json
@@ -35,15 +39,27 @@ def cmd_version(args):
         except Exception:
             pass
     print(f"Agent-QA Hub CLI v{version}")
-    manifest_skills = 27
+    manifest_skills = 28
     if os.path.exists(manifest_path):
         try:
             import json
             with open(manifest_path, "r", encoding="utf-8") as f:
-                manifest_skills = json.load(f).get("totalSkills", 27)
+                manifest_skills = json.load(f).get("totalSkills", 28)
         except Exception:
             pass
     print(f"Catalog: {manifest_skills} Standardized Skills | 6 Subagent Swarm Profiles")
+    print("Created by: Thế Vị (@TeeVee998) <https://github.com/TeeVee998/Synapse-Hub>")
+    print("License   : MIT (Attribution Required)")
+
+
+def cmd_verify_author(args):
+    from author_integrity import verify_author_attribution, get_canonical_watermark, enforce_author_attribution
+    valid, violations = verify_author_attribution()
+    if valid:
+        print(f"✅ Author attribution & provenance verified: {get_canonical_watermark()}")
+        sys.exit(0)
+    else:
+        enforce_author_attribution(strict=True)
 
 
 def cmd_verify(args):
@@ -489,6 +505,10 @@ def main():
     p_skillspector.add_argument("--strict", action="store_true", help="Fail with non-zero exit code on HIGH/CRITICAL finding")
     p_skillspector.set_defaults(func=cmd_skillspector)
 
+    # verify-author (Author Provenance & Anti-Tamper Integrity Guard)
+    p_author = subparsers.add_parser("verify-author", help="Verify author attribution, provenance, and anti-tamper integrity")
+    p_author.set_defaults(func=cmd_verify_author)
+
     args, unknown = parser.parse_known_args()
     if getattr(args, "offline", False):
         os.environ["AGENT_QA_OFFLINE"] = "1"
@@ -497,6 +517,10 @@ def main():
     if not args.subcommand:
         parser.print_help()
         sys.exit(0)
+
+    # Enforce mandatory author attribution under MIT License
+    from author_integrity import enforce_author_attribution
+    enforce_author_attribution(strict=True)
 
     # Non-intrusive cached update notification (24h cache)
     if args.subcommand not in ("update", "mcp-serve", "version"):

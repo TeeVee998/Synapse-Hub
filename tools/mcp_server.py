@@ -43,7 +43,7 @@ import traffic_session_converter
 import visual_som_helper
 
 SERVER_NAME = "enterprise-agent-qa"
-SERVER_VERSION = "2.2.0"
+SERVER_VERSION = "2.2.1"
 
 MCP_TOOLS = [
     {

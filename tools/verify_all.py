@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: Copyright (c) 2026 Thế Vị (@TeeVee998). All rights reserved.
+# SPDX-License-Identifier: MIT
+# Project: Synapse-Hub (https://github.com/TeeVee998/Synapse-Hub)
+
 """
 Enterprise Multi-Project DoD Verifier (One Command Quality Gate)
 ---------------------------------------------------------
 Consolidates all definition-of-done criteria into a single executable command.
 
 Verifies:
+  Gate 0: Author Attribution & Copyright Integrity: Verifies author provenance (Thế Vị @TeeVee998).
   Gate 1: 100% UTF-8 No BOM across all repository files (8 extensions).
   Gate 2: Path Portability: Zero absolute machine paths (file:///C:, /Users/...).
   Gate 3: Clean POM & Flat Architecture: Zero raw XPaths or findTestObject in Scripts/.
@@ -122,6 +127,29 @@ def resolve_target_repo(cli_target=None, cli_repo=None):
 
     # 4. Default fallback to QA Hub root
     return hub_root
+
+
+def gate_0_author_integrity(repo_root, mode="AUTO"):
+    print("\n[GATE 0] Running Author Attribution & Anti-Tamper Integrity Guard...")
+    try:
+        from author_integrity import verify_author_attribution, get_canonical_watermark, DEFAULT_REPO_ROOT
+    except ImportError:
+        import sys
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from author_integrity import verify_author_attribution, get_canonical_watermark, DEFAULT_REPO_ROOT
+
+    # In HUB mode, verify the Hub repository itself.
+    # In TARGET mode, verify the Hub tools root to guarantee engine integrity.
+    check_root = repo_root if mode == "HUB" else DEFAULT_REPO_ROOT
+    valid, violations = verify_author_attribution(check_root)
+    if not valid:
+        print("[FAIL] Author Attribution & Copyright Integrity Violated:")
+        for v in violations:
+            print(f"   • {v}")
+        print("   Under MIT License, original author attribution to 'Thế Vị (@TeeVee998)' must be preserved.")
+        return False
+    print(f"[PASS] Author Attribution & Copyright Notice verified intact: {get_canonical_watermark()}")
+    return True
 
 
 def gate_1_bom_check(repo_root, mode="AUTO"):
@@ -463,6 +491,7 @@ def main():
     print(f"Operational Mode : {effective_mode}")
 
     gates = [
+        ("Gate 0: Author Attribution & Integrity", gate_0_author_integrity),
         ("Gate 1: UTF-8 No BOM", gate_1_bom_check),
         ("Gate 2: Path Portability", gate_2_path_portability),
         ("Gate 3: Clean POM & Flat Architecture", gate_3_clean_pom),
@@ -481,7 +510,7 @@ def main():
 
     print("\n" + "=" * 70)
     if all_passed:
-        print("[ALL 8 GATES PASSED - 100% DoD COMPLIANT]")
+        print("[ALL QUALITY GATES PASSED - 100% DoD COMPLIANT]")
         print("   Repository is 100% compliant, secure, and ready for execution/CI/CD.")
         print("=" * 70 + "\n")
         return 0

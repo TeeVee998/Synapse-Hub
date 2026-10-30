@@ -56,6 +56,7 @@
 | **Lookup Test Case metadata** | `tools/lookup_tc.py` | `python tools/lookup_tc.py "<keyword_or_id>"` |
 | **Linting Markdown documentation quality** | `tools/lint_ai_docs.py` | `python tools/lint_ai_docs.py` |
 | **Auditing AI Agent Skills & MCP Security** | `tools/skillspector.py` | `python tools/skillspector.py [path]` (or `agent-qa skillspector [path]` / `npx synapse-hub skillspector`) |
+| **Author Provenance & Anti-Tamper Integrity Guard** | `tools/author_integrity.py` | `python tools/author_integrity.py` (or `agent-qa verify-author` / `verify_all Gate 0`) |
 | **Upstream Version Check & 1-Click Self-Update** | `tools/update_sentinel.py` | `python tools/update_sentinel.py --check / --update` (or `agent-qa update` / `npx synapse-hub update`) |
 
 ---
@@ -535,6 +536,25 @@ agent-qa update
 - `tools/mcp_excel_server.ps1`: Specialized Model Context Protocol (MCP) server for structured Excel data interaction.
 - `tools/e2e_flow_prober.ps1`: Automated E2E smoke flow prober across target web environments.
 - `tools/bump_version.py`: Automated SemVer version bumper for Synapse-Hub releases.
+
+---
+
+### 36. `tools/author_integrity.py` (Author Provenance & Anti-Tamper Integrity Guard)
+- **Purpose:** Cryptographic and textual provenance validator enforcing the mandatory author attribution condition of the MIT License:
+  *"The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software."*
+  Protects original creator **Thế Vị (@TeeVee998)** against unauthorized author stripping or copyright tampering across `LICENSE`, `package.json`, `README.md`, and `pyproject.toml`.
+- **Trigger Condition:** Runs autonomously as **Gate 0** in `tools/verify_all.py`, pre-dispatch in `agent-qa` CLI, or on-demand via `agent-qa verify-author`.
+- **CLI Syntax:**
+  ```bash
+  # 1. Verify author attribution and provenance
+  python tools/author_integrity.py
+  agent-qa verify-author
+
+  # 2. Enforced autonomously during Quality Gate verification
+  python tools/verify_all.py
+  agent-qa verify
+  ```
+
 
 
 

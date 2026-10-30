@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: Copyright (c) 2026 Thế Vị (@TeeVee998). All rights reserved.
+# SPDX-License-Identifier: MIT
+# Project: Synapse-Hub (https://github.com/TeeVee998/Synapse-Hub)
+
 """
 Enterprise SkillSpector Sentinel (AI Agent Skill & MCP Security Scanner)
 -------------------------------------------------------------------------

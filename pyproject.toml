@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "agent-qa"
-version = "2.2.0"
+version = "2.2.1"
 description = "Enterprise AI Agent Quality Engineering & Test Automation Hub"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
 authors = [
-    { name = "AI QA Engineering Swarm", email = "qa-swarm@enterprise.internal" }
+    { name = "Thế Vị (@TeeVee998)", email = "https://github.com/TeeVee998" }
 ]
 keywords = ["qa", "testing", "ai-agents", "playwright", "clean-pom", "quality-gates"]
 classifiers = [

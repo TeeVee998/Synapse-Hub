@@ -4,7 +4,7 @@
 
 > **Bộ não trí tuệ dùng chung và mạng lưới kỹ năng tự hành, tăng cường năng lực cho các trợ lý AI (Google Antigravity, Cursor, Windsurf, Claude Code) trên mọi hệ sinh thái kiểm thử tự động.**  
 > **Tác giả:** Thế Vị ([@TeeVee998](https://github.com/TeeVee998))  
-> **Phiên bản Hub:** `v2.2.0` | **Quy mô:** 28 Kỹ năng chuẩn hóa, 6 Vai trò AI Swarm, 7 Quy tắc cốt lõi, 20+ Công cụ tự động.
+> **Phiên bản Hub:** `v2.2.1` | **Quy mô:** 28 Kỹ năng chuẩn hóa, 6 Vai trò AI Swarm, 7 Quy tắc cốt lõi, 20+ Công cụ tự động.
 
 ---
 
@@ -14,7 +14,7 @@
 
 ```mermaid
 flowchart TD
-    subgraph Hub["🧠 Synapse Hub (Intelligence Core v2.2.0)"]
+    subgraph Hub["🧠 Synapse Hub (Intelligence Core v2.2.1)"]
         Skills[".agents/skills/ (28 Skills)"]
         Agents[".agents/agents/ (6 Specialized Roles)"]
         Rules[".agents/rules/ (7 Core Rules)"]
@@ -72,7 +72,7 @@ flowchart TD
 
 [![npm version](https://img.shields.io/npm/v/synapse-hub.svg?style=flat-square&color=blue)](https://www.npmjs.com/package/synapse-hub)
 [![node version](https://img.shields.io/badge/node-%3E%3D16.0.0-brightgreen.svg?style=flat-square)](https://nodejs.org)
-[![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](https://github.com/TeeVee998/Synapse-Hub/blob/main/package.json)
+[![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](https://github.com/TeeVee998/Synapse-Hub/blob/main/LICENSE)
 
 ---
 
@@ -281,13 +281,26 @@ Dự án **Synapse Hub** được tổng hợp, kế thừa và phát triển d�
 
 ---
 
+## 📄 9. Bản Quyền & Điều Khoản Sử Dụng (License & Attribution)
+
+Dự án được phân phối chính thức dưới giấy phép **[MIT License](LICENSE)**.
+
+**Quyền sở hữu tác giả & Xuất xứ (Provenance):**
+- **Tác giả & Nhà sáng lập:** Thế Vị ([@TeeVee998](https://github.com/TeeVee998))
+- **Mã nguồn gốc:** [https://github.com/TeeVee998/Synapse-Hub](https://github.com/TeeVee998/Synapse-Hub)
+- **Bản quyền:** Copyright © 2026 Thế Vị (@TeeVee998). All rights reserved.
+
+> ⚖️ **Quy định bản quyền quốc tế & MIT:** Bạn được toàn quyền sử dụng, sửa đổi, tích hợp và phân phối lại mã nguồn này cho bất kỳ mục đích cá nhân hay thương mại nào, **VỚI ĐIỀU KIỆN** thông báo bản quyền gốc ghi nhận tác giả **Thế Vị (@TeeVee998)** cùng liên kết mã nguồn gốc phải được giữ nguyên vẹn trong toàn bộ bản sao hoặc các phần phái sinh quan trọng của phần mềm. Mọi hành vi xóa bỏ tên tác giả khỏi dự án đều cấu thành hành vi vi phạm điều khoản giấy phép MIT.
+
+---
+
 # 🌐 English Edition
 
 # 🧠 Synapse Hub — AI Agent Intelligence Core & Skill Network
 
 > **The shared intelligence core and autonomous skill hub empowering AI coding assistants (Google Antigravity / Cursor / Windsurf / Claude Code) across automated testing suites.**  
 > **Author:** Thế Vị ([@TeeVee998](https://github.com/TeeVee998))  
-> **Hub Version:** `v2.2.0` (Semantic Versioning) | **Integrity Index:** 28 Skills, 6 Agent Swarm Roles, 7 Core Rules, 20+ Python Tools.
+> **Hub Version:** `v2.2.1` (Semantic Versioning) | **Integrity Index:** 28 Skills, 6 Agent Swarm Roles, 7 Core Rules, 20+ Python Tools.
 
 ---
 
@@ -297,7 +310,7 @@ Dự án **Synapse Hub** được tổng hợp, kế thừa và phát triển d�
 
 ```mermaid
 flowchart TD
-    subgraph Hub["🧠 Synapse Hub (Intelligence Core v2.2.0)"]
+    subgraph Hub["🧠 Synapse Hub (Intelligence Core v2.2.1)"]
         Skills[".agents/skills/ (28 Skills)"]
         Agents[".agents/agents/ (6 Specialized Roles)"]
         Rules[".agents/rules/ (7 Core Rules)"]
@@ -355,7 +368,7 @@ flowchart TD
 
 [![npm version](https://img.shields.io/npm/v/synapse-hub.svg?style=flat-square&color=blue)](https://www.npmjs.com/package/synapse-hub)
 [![node version](https://img.shields.io/badge/node-%3E%3D16.0.0-brightgreen.svg?style=flat-square)](https://nodejs.org)
-[![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](https://github.com/TeeVee998/Synapse-Hub/blob/main/package.json)
+[![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](https://github.com/TeeVee998/Synapse-Hub/blob/main/LICENSE)
 
 ---
 
@@ -572,4 +585,18 @@ agent-qa skillspector
 | **[dequelabs/axe-core](https://github.com/dequelabs/axe-core)** | Automated accessibility rule heuristics inspiring WCAG 2.2 Level A/AA AST auditing. |
 | **[bats-core/bats-core](https://github.com/bats-core/bats-core)** | Bash Automated Testing System patterns for CI/CD pipelines and cross-platform CLI verification. |
 | **[npryce/adr-tools](https://github.com/npryce/adr-tools)** | Architecture Decision Record (ADR) conventions and lifecycle workflows. |
+
+---
+
+## 📄 9. License & Author Attribution
+
+This project is licensed under the **[MIT License](LICENSE)**.
+
+**Provenance & Copyright Notice:**
+- **Author & Founder:** Thế Vị ([@TeeVee998](https://github.com/TeeVee998))
+- **Original Repository:** [https://github.com/TeeVee998/Synapse-Hub](https://github.com/TeeVee998/Synapse-Hub)
+- **Copyright:** Copyright © 2026 Thế Vị (@TeeVee998). All rights reserved.
+
+> ⚖️ **Mandatory Attribution Condition:** Under the terms of the MIT License, you are granted permission to use, modify, merge, publish, and distribute this software freely, **PROVIDED** that the original copyright notice crediting **Thế Vị (@TeeVee998)** and repository provenance link are preserved in all copies or substantial portions of the Software. Stripping author attribution is a violation of international copyright treaties and MIT License conditions.
+
 
