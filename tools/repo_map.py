@@ -132,6 +132,12 @@ def extract_class_info(file_path, repo_root=None):
 
 def build_repo_map(target_repo=None, output_txt=None, output_json=None):
     """Scans Keywords in target_repo and builds the condensed repo map."""
+    try:
+        from author_integrity import assert_integrity_or_raise
+        assert_integrity_or_raise()
+    except Exception:
+        pass
+
     repo = target_repo or resolve_target_repo()
     txt_dest = output_txt or OUTPUT_TXT
     json_dest = output_json or OUTPUT_JSON

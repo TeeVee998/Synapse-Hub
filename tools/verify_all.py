@@ -132,13 +132,28 @@ def resolve_target_repo(cli_target=None, cli_repo=None):
 def gate_0_author_integrity(repo_root, mode="AUTO"):
     print("\n[GATE 0] Running Author Attribution & Anti-Tamper Integrity Guard...")
     try:
-        from author_integrity import verify_author_attribution, get_canonical_watermark, DEFAULT_REPO_ROOT
+        from author_integrity import (
+            verify_author_attribution,
+            get_canonical_watermark,
+            verify_author_fingerprint,
+            DEFAULT_REPO_ROOT,
+        )
     except ImportError:
         import sys
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-        from author_integrity import verify_author_attribution, get_canonical_watermark, DEFAULT_REPO_ROOT
+        from author_integrity import (
+            verify_author_attribution,
+            get_canonical_watermark,
+            verify_author_fingerprint,
+            DEFAULT_REPO_ROOT,
+        )
 
-    # In HUB mode, verify the Hub repository itself.
+    # 1. Cryptographic SHA-256 fingerprint verification
+    if not verify_author_fingerprint():
+        print("[FAIL] Cryptographic author fingerprint mismatch! Original creator ('Thế Vị @TeeVee998') has been tampered with.")
+        return False
+
+    # 2. In HUB mode, verify the Hub repository itself.
     # In TARGET mode, verify the Hub tools root to guarantee engine integrity.
     check_root = repo_root if mode == "HUB" else DEFAULT_REPO_ROOT
     valid, violations = verify_author_attribution(check_root)
@@ -148,7 +163,7 @@ def gate_0_author_integrity(repo_root, mode="AUTO"):
             print(f"   • {v}")
         print("   Under MIT License, original author attribution to 'Thế Vị (@TeeVee998)' must be preserved.")
         return False
-    print(f"[PASS] Author Attribution & Copyright Notice verified intact: {get_canonical_watermark()}")
+    print(f"[PASS] Author Attribution & Cryptographic Provenance verified intact: {get_canonical_watermark()}")
     return True
 
 

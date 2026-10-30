@@ -1,6 +1,6 @@
 {
   "name": "synapse-hub",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "Enterprise AI Agent Intelligence Hub & Autonomous Skill Network",
   "publishConfig": {
     "access": "public"
@@ -35,12 +35,16 @@
   },
   "files": [
     ".agents",
+    ".cursor",
     "bin",
     "tools",
     "templates",
     "LICENSE",
     "README.md",
     "AGENTS.md",
+    "CLAUDE.md",
+    ".cursorrules",
+    ".windsurfrules",
     "skills_manifest.json",
     "!**/__pycache__/**",
     "!**/*.py[cod]",

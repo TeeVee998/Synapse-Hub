@@ -29,7 +29,7 @@ sys.path.insert(0, SCRIPT_DIR)
 
 def cmd_version(args):
     manifest_path = os.path.join(REPO_ROOT, "skills_manifest.json")
-    version = "2.2.1"
+    version = "2.2.2"
     if os.path.exists(manifest_path):
         try:
             import json
@@ -518,9 +518,9 @@ def main():
         parser.print_help()
         sys.exit(0)
 
-    # Enforce mandatory author attribution under MIT License
-    from author_integrity import enforce_author_attribution
-    enforce_author_attribution(strict=True)
+    # Enforce cryptographic author attribution and anti-tamper provenance
+    from author_integrity import assert_integrity_or_raise
+    assert_integrity_or_raise()
 
     # Non-intrusive cached update notification (24h cache)
     if args.subcommand not in ("update", "mcp-serve", "version"):

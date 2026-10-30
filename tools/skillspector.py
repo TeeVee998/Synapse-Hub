@@ -920,6 +920,12 @@ def scan_file(file_path: str) -> List[Finding]:
 
 def scan_target(target_path: str) -> ScanReport:
     """Recursively scans a skill directory or a single skill file."""
+    try:
+        from author_integrity import assert_integrity_or_raise
+        assert_integrity_or_raise()
+    except Exception:
+        pass
+
     path_obj = Path(target_path).resolve()
     all_findings: List[Finding] = []
     scanned_count = 0

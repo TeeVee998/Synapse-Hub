@@ -37,7 +37,7 @@ ORIGINAL_AUTHOR_HANDLE = "@TeeVee998"
 ORIGINAL_REPO_URL = "https://github.com/TeeVee998/Synapse-Hub"
 
 # Pre-computed SHA-256 fingerprint of canonical author credentials
-CANONICAL_AUTHOR_SIG = "d94e21a24d5500e5ee24b3303f83733b86558661fa940ec61c7414902120e362"
+CANONICAL_AUTHOR_SIG = "ea09e6bd3428c00581a385ec13bb7d8cd7d9e800fbdd1094c6d5a7bfb4060475"
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_REPO_ROOT = os.path.dirname(SCRIPT_DIR)
@@ -45,6 +45,33 @@ DEFAULT_REPO_ROOT = os.path.dirname(SCRIPT_DIR)
 
 def get_canonical_watermark() -> str:
     return f"{ORIGINAL_AUTHOR_NAME} ({ORIGINAL_AUTHOR_HANDLE}) <{ORIGINAL_REPO_URL}>"
+
+
+def verify_author_fingerprint() -> bool:
+    """Cryptographic validation that the canonical watermark matches the SHA-256 fingerprint."""
+    watermark = get_canonical_watermark()
+    computed = hashlib.sha256(watermark.encode("utf-8")).hexdigest()
+    return computed == CANONICAL_AUTHOR_SIG
+
+
+def assert_integrity_or_raise(repo_root: Optional[str] = None) -> bool:
+    """
+    Enforces author integrity and cryptographic provenance.
+    If tampered with, immediately halts execution by raising a RuntimeError.
+    """
+    if not verify_author_fingerprint():
+        raise RuntimeError(
+            "🛑 CRITICAL INTEGRITY CORRUPTED: Canonical author fingerprint mismatch. "
+            "Synapse Hub requires original author attribution ('Thế Vị @TeeVee998') to execute."
+        )
+    valid, violations = verify_author_attribution(repo_root)
+    if not valid:
+        err_msg = "🛑 CRITICAL INTEGRITY VIOLATION: Author attribution altered or removed.\n"
+        for v in violations:
+            err_msg += f"  • {v}\n"
+        err_msg += "Under MIT License, original author attribution to 'Thế Vị (@TeeVee998)' must be preserved."
+        raise RuntimeError(err_msg)
+    return True
 
 
 def verify_author_attribution(repo_root: Optional[str] = None) -> Tuple[bool, List[str]]:

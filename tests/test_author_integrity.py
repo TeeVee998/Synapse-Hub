@@ -86,6 +86,23 @@ class TestAuthorIntegrity(unittest.TestCase):
         self.assertTrue(verify_all.gate_0_author_integrity(REPO_ROOT, mode="HUB"))
         self.assertTrue(verify_all.gate_0_author_integrity(REPO_ROOT, mode="TARGET"))
 
+    def test_cryptographic_fingerprint_valid(self):
+        self.assertTrue(author_integrity.verify_author_fingerprint())
+
+    def test_assert_integrity_or_raise_passes_on_canonical_repo(self):
+        self.assertTrue(author_integrity.assert_integrity_or_raise(REPO_ROOT))
+
+    def test_cryptographic_fingerprint_mismatch_raises_runtime_error(self):
+        orig_sig = author_integrity.CANONICAL_AUTHOR_SIG
+        try:
+            author_integrity.CANONICAL_AUTHOR_SIG = "0000000000000000000000000000000000000000000000000000000000000000"
+            self.assertFalse(author_integrity.verify_author_fingerprint())
+            with self.assertRaises(RuntimeError) as ctx:
+                author_integrity.assert_integrity_or_raise(REPO_ROOT)
+            self.assertIn("CRITICAL INTEGRITY CORRUPTED", str(ctx.exception))
+        finally:
+            author_integrity.CANONICAL_AUTHOR_SIG = orig_sig
+
 
 if __name__ == "__main__":
     unittest.main()
