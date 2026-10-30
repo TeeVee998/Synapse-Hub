@@ -68,22 +68,31 @@ flowchart TD
 
 ---
 
-## 🚀 2. Cách Sử Dụng (NPM / npx & Workspace Mount)
+## 🚀 2. Hướng Dẫn Bắt Đầu & Tích Hợp (3 Cách Dùng)
 
 [![npm version](https://img.shields.io/npm/v/synapse-hub.svg?style=flat-square&color=blue)](https://www.npmjs.com/package/synapse-hub)
 [![npm downloads](https://img.shields.io/npm/dm/synapse-hub.svg?style=flat-square)](https://www.npmjs.com/package/synapse-hub)
 [![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](https://github.com/TeeVee998/Synapse-Hub/blob/main/package.json)
 
-### Cách A: Sử dụng tức thì qua NPM Registry (Khuyên dùng)
-Gói chính thức đã được phát hành toàn cầu tại **[npmjs.com/package/synapse-hub](https://www.npmjs.com/package/synapse-hub)**. Bạn có thể sử dụng ngay mà không cần clone mã nguồn:
+---
 
-#### 1. Thực thi tức thì không cần cài đặt (`npx`):
-Tại thư mục gốc của bất kỳ dự án nào, thực thi trực tiếp:
+### 🥇 Cách 1: Nhanh Nhất — Chạy 1 Lệnh Duy Nhất Với NPX (Zero-Clone)
+*Dành cho người dùng muốn áp dụng ngay vào dự án kiểm thử của mình: **KHÔNG CẦN clone repo Hub**, **KHÔNG CẦN mở Multi-root workspace**.*
+
+Mở terminal ngay tại thư mục **dự án kiểm thử của bạn** và chạy đúng 1 dòng:
 ```bash
-# Khởi tạo tự động 1-Click (sinh PROJECT_AI_GUIDE.md, cài pre-push hook, trích xuất AST repo map)
 npx synapse-hub setup
+```
+👉 **Lệnh này tự động thực hiện trong 5 giây:**
+1. Nhận diện framework dự án (Playwright TypeScript/JS, Katalon Studio Groovy, Cypress, Pytest).
+2. Tự sinh file `PROJECT_AI_GUIDE.md` để AI hiểu tường tận nghiệp vụ dự án của bạn.
+3. Tự cài Git Pre-Push Hook (`.git/hooks/pre-push`) bảo vệ chất lượng mã nguồn tự động.
+4. Tự khởi tạo bộ nhớ kinh nghiệm sửa lỗi SQLite (`~/.agent_memory/global_cache.db`).
+5. Quét sơ bộ mã nguồn và xuất bản đồ hàm AST (`repo_map.txt`).
 
-# Chạy kiểm định 8 Cổng Chất Lượng (DoD Quality Gates)
+Sau đó, bạn có thể thực thi kiểm định bất cứ lúc nào:
+```bash
+# Kiểm định 8 Cổng Chất Lượng (DoD Quality Gates)
 npx synapse-hub verify
 
 # Đánh giá sức khỏe toàn diện dự án (5-in-1 Project Health Report)
@@ -92,45 +101,39 @@ npx synapse-hub analyze
 # Quét phát hiện mã giả, assertion rỗng (Fake-Pass AST Sentinel)
 npx synapse-hub lint
 ```
-> 💡 **Mẹo:** Bạn cũng có thể dùng lệnh gọi rút gọn: `npx synapse setup` hoặc `npx synapse verify`.
 
-#### 2. Cài đặt cố định vào dự án (DevDependency):
+---
+
+### 🥈 Cách 2: Tối Ưu Cho Antigravity — Cài Đặt 1 Lần Thành "Global Plugin"
+*Cài đặt 1 lần duy nhất: Kể từ đó **BẤT KỲ DỰ ÁN NÀO** mở trên Google Antigravity cũng tự động có sẵn toàn bộ 27 Skills và 6 Subagents mà không cần cấu hình thêm.*
+
+#### Bước cài đặt 1-Click:
+```powershell
+# Trên Windows PowerShell:
+./scripts/install_global_plugin.ps1
+
+# Trên macOS / Linux:
+./scripts/install_global_plugin.sh
+```
+
+*(Hoặc nếu chưa clone repo, chỉ cần clone thẳng vào thư mục plugin của Antigravity):*
 ```bash
-npm install -D synapse-hub
-```
-Sau đó có thể khai báo vào `scripts` trong file `package.json` của dự án mục tiêu:
-```json
-"scripts": {
-  "qa:verify": "synapse-hub verify",
-  "qa:analyze": "synapse-hub analyze"
-}
+git clone https://github.com/TeeVee998/Synapse-Hub.git "$HOME/.gemini/config/plugins/synapse-hub"
 ```
 
-#### 3. Cài đặt toàn cục (Global CLI):
-Để sử dụng công cụ ở bất cứ đâu trên máy tính:
-```bash
-npm install -g synapse-hub
+**Sau khi cài đặt:**
+- Mở Google Antigravity lên, bạn sẽ thấy `synapse-hub` xuất hiện trong danh mục Plugins toàn cục.
+- Mở bất kỳ thư mục dự án nào, AI Agent cũng tự động nắm bắt toàn bộ năng lực kiểm thử của Synapse-Hub!
 
-# Sử dụng trực tiếp:
-synapse-hub verify
-synapse setup
-```
+---
 
-### Cách B: Mở phiên làm việc đa thư mục (Multi-Root Workspace)
-Trong IDE (Google Antigravity / VS Code / Cursor):
-1. Mở thư mục dự án mục tiêu của bạn.
-2. Thêm thư mục `Synapse-Hub` vào Workspace (`File` -> `Add Folder to Workspace...`).
+### 🥉 Cách 3: Truyền Thống — Mở Multi-Root Workspace trong IDE
+*Dành cho Core Developers muốn chỉnh sửa, mở rộng hoặc đóng góp phát triển thêm Skills/Tools cho Synapse-Hub.*
 
-### Bước 2: Khởi tạo hướng dẫn dự án (`PROJECT_AI_GUIDE.md`)
-Copy file mẫu từ `templates/PROJECT_AI_GUIDE_TEMPLATE.md` vào thư mục gốc của dự án mục tiêu, đổi tên thành `PROJECT_AI_GUIDE.md` và điền thông tin cụ thể:
-- URL môi trường test/staging.
-- Tài khoản và cơ chế đăng nhập.
-- Cấu trúc thư mục mã nguồn.
-- Lệnh chạy test headless và công nghệ sử dụng.
-- **Dữ liệu tra cứu nhanh:** Khai báo đường dẫn `testcases.json` và `selectors.json` (hoặc đặt biến môi trường `TC_DATA_FILE` / `XPATH_DATA_FILE`) để công cụ `tools/lookup_tc.py` và `tools/lookup_xpath.py` nạp đúng dữ liệu của dự án.
-
-### Bước 3: Cài đặt tự động (One-Click Bootstrap)
-Chạy script cài đặt môi trường và phụ thuộc:
+1. Mở IDE (Google Antigravity / Cursor / VS Code).
+2. Mở thư mục dự án mục tiêu của bạn (`File -> Open Folder`).
+3. Thêm thư mục `Synapse-Hub` vào Workspace (`File -> Add Folder to Workspace...`).
+4. Chạy script bootstrap môi trường nội bộ:
 ```powershell
 # Windows PowerShell
 ./scripts/install.ps1
@@ -138,15 +141,6 @@ Chạy script cài đặt môi trường và phụ thuộc:
 # Linux / macOS
 ./scripts/setup.sh
 ```
-Script bootstrap sẽ tự động thiết lập `.venv`, cài dependencies, chạy lint kiểm tra 30 skills, và **khởi tạo nạp seed giải pháp ban đầu** cho SQLite Central Agent Memory (`~/.agent_memory/global_cache.db`).
-
-> 💡 **Khởi tạo SQLite Memory trên CI/CD & Docker sạch:**  
-> Trên agent runner CI hoặc container Docker mới tinh, chạy lệnh sau để cấp quyền và khởi tạo bộ nhớ 0-token:
-> ```bash
-> agent-qa heal init
-> # hoặc chạy trực tiếp:
-> python tools/cache_resolver.py init
-> ```
 
 ---
 
@@ -338,21 +332,30 @@ flowchart TD
 
 ---
 
-## 🚀 2. Getting Started & Usage (NPM / npx & Workspace Mount)
+## 🚀 2. Getting Started & Integration (3 Approaches)
 
 [![npm version](https://img.shields.io/npm/v/synapse-hub.svg?style=flat-square&color=blue)](https://www.npmjs.com/package/synapse-hub)
 [![npm downloads](https://img.shields.io/npm/dm/synapse-hub.svg?style=flat-square)](https://www.npmjs.com/package/synapse-hub)
 [![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](https://github.com/TeeVee998/Synapse-Hub/blob/main/package.json)
 
-### Method A: Instant Execution via NPM Registry (Recommended)
-The package is officially published at **[npmjs.com/package/synapse-hub](https://www.npmjs.com/package/synapse-hub)**. Execute directly without cloning:
+---
 
-#### 1. Zero-Install Execution (`npx`):
-Run from any target project directory:
+### 🥇 Method 1: Fastest — Zero-Clone Execution via NPX 1-Liner
+*For developers and QA engineers who want to immediately enhance their project: **NO git cloning**, **NO multi-root workspace setup required**.*
+
+Run directly from your **target automation project root**:
 ```bash
-# 1-Click Project Bootstrap (generates PROJECT_AI_GUIDE.md, installs pre-push hook, extracts AST repo map)
 npx synapse-hub setup
+```
+👉 **Automatically completes in 5 seconds:**
+1. Detects project automation framework (Playwright TypeScript/JS, Katalon Groovy, Cypress, Pytest).
+2. Generates tailored `PROJECT_AI_GUIDE.md` so AI agents master project workflows.
+3. Installs automated Git Pre-Push Hook (`.git/hooks/pre-push`) for zero-leakage protection.
+4. Initializes SQLite Central Agent Memory (`~/.agent_memory/global_cache.db`).
+5. Extracts condensed AST method signatures (`repo_map.txt`).
 
+Run verification anytime:
+```bash
 # Run 8 Quality Gates DoD Verification
 npx synapse-hub verify
 
@@ -362,45 +365,39 @@ npx synapse-hub analyze
 # Static Defect & Fake-Pass Sentinel scan
 npx synapse-hub lint
 ```
-> 💡 **Tip:** You can also use the shorthand alias: `npx synapse setup` or `npx synapse verify`.
 
-#### 2. Project-Local Installation (DevDependency):
+---
+
+### 🥈 Method 2: Antigravity-Native — Install Once as Global Plugin
+*Install once: From that moment onward, **ANY project** opened in Google Antigravity automatically inherits all 27 Skills and 6 Subagent Swarm profiles.*
+
+#### 1-Click Plugin Installation:
+```powershell
+# On Windows PowerShell:
+./scripts/install_global_plugin.ps1
+
+# On macOS / Linux:
+./scripts/install_global_plugin.sh
+```
+
+*(Or clone directly into Antigravity's Global Plugins folder):*
 ```bash
-npm install -D synapse-hub
-```
-Configure custom lifecycle scripts in your target project's `package.json`:
-```json
-"scripts": {
-  "qa:verify": "synapse-hub verify",
-  "qa:analyze": "synapse-hub analyze"
-}
+git clone https://github.com/TeeVee998/Synapse-Hub.git "$HOME/.gemini/config/plugins/synapse-hub"
 ```
 
-#### 3. Global CLI Installation:
-To use `synapse-hub` anywhere on your terminal:
-```bash
-npm install -g synapse-hub
+**Result:**
+- Google Antigravity registers `synapse-hub` globally.
+- Every workspace session automatically loads the complete QA intelligence core without manual workspace mounts!
 
-# Direct invocation:
-synapse-hub verify
-synapse setup
-```
+---
 
-### Method B: Multi-Root Workspace Mounting
-Within your AI IDE (Google Antigravity / VS Code / Cursor):
-1. Open your target project folder.
-2. Add the `Synapse-Hub` directory to your workspace (`File` -> `Add Folder to Workspace...`).
+### 🥉 Method 3: Multi-Root Workspace Mounting
+*For Core Developers looking to extend, customize, or contribute new Skills and Tools directly to Synapse-Hub.*
 
-### Step 2: Initialize Project AI Guide (`PROJECT_AI_GUIDE.md`)
-Copy `templates/PROJECT_AI_GUIDE_TEMPLATE.md` to target project root, rename to `PROJECT_AI_GUIDE.md`, and configure:
-- Test/staging environment URLs.
-- Credentials and authentication strategies.
-- Source code directory structure.
-- Headless execution commands and technology stack.
-- **Fast-Lookup Registers:** Point `testcases.json` and `selectors.json` (or set `TC_DATA_FILE` / `XPATH_DATA_FILE` env vars) for instant zero-token query via `tools/lookup_tc.py` and `tools/lookup_xpath.py`.
-
-### Step 3: One-Click Environment Bootstrap
-Execute the automated bootstrap script:
+1. Open your AI IDE (Google Antigravity / Cursor / VS Code).
+2. Open your target test project (`File -> Open Folder`).
+3. Add `Synapse-Hub` to your workspace (`File -> Add Folder to Workspace...`).
+4. Run the local environment bootstrap script:
 ```powershell
 # Windows PowerShell
 ./scripts/install.ps1

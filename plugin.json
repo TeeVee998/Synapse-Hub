@@ -1,0 +1,31 @@
+{
+  "name": "synapse-hub",
+  "displayName": "Synapse Hub Enterprise QA",
+  "version": "2.1.1",
+  "description": "Enterprise AI Agent Intelligence Hub & Autonomous Skill Network for Quality Engineering, Clean POM, and Automated Testing.",
+  "author": {
+    "name": "Thế Vị",
+    "email": "phamthevi@vnpt.vn"
+  },
+  "homepage": "https://github.com/TeeVee998/Synapse-Hub#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TeeVee998/Synapse-Hub.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "qa",
+    "automation",
+    "testing",
+    "playwright",
+    "clean-pom",
+    "quality-gates",
+    "antigravity"
+  ],
+  "suggestedPrompts": [
+    "Setup QA automation for this project with Synapse Hub",
+    "Verify 8 Quality Gates DoD on this codebase",
+    "Audit test project health and generate AST repo map",
+    "Probe live web elements with Playwright headless under 200ms"
+  ]
+}

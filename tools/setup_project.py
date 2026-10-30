@@ -187,19 +187,27 @@ def install_git_pre_push_hook(target_dir):
     analyze_script = os.path.join(SCRIPT_DIR, "analyze_project.py").replace("\\", "/")
 
     hook_content = f"""#!/bin/sh
-# Automated Zero-Leakage Pre-Push Hook (Installed by Enterprise Agent-QA)
-# Automatically enforces 7 Quality Gates and syncs project health before pushing.
+# Automated Zero-Leakage Pre-Push Hook (Installed by Synapse-Hub)
+# Enforces 8 Quality Gates DoD and syncs project intelligence before pushing.
 
-echo "\\n[AI-GUARD] Running Pre-Push Verification (7 Quality Gates DoD)..."
-python3 "{verify_all_script}" || python "{verify_all_script}"
+echo "\\n[AI-GUARD] Running Pre-Push Verification (8 Quality Gates DoD)..."
+if command -v npx >/dev/null 2>&1; then
+    npx synapse-hub verify
+elif [ -f "{verify_all_script}" ]; then
+    python3 "{verify_all_script}" || python "{verify_all_script}"
+fi
 if [ $? -ne 0 ]; then
-    echo "\\n[AI-GUARD - REJECTED] Git Push aborted: 7 Quality Gates verification failed!"
-    echo "Please fix defects or run 'agent-qa verify' locally before pushing.\\n"
+    echo "\\n[AI-GUARD - REJECTED] Git Push aborted: Quality Gates verification failed!"
+    echo "Please fix defects or run 'npx synapse-hub verify' locally before pushing.\\n"
     exit 1
 fi
 
-echo "[AI-GUARD - PASSED] 7 Quality Gates satisfied. Syncing project health report..."
-python3 "{analyze_script}" || python "{analyze_script}"
+echo "[AI-GUARD - PASSED] 8 Quality Gates satisfied. Syncing project health report..."
+if command -v npx >/dev/null 2>&1; then
+    npx synapse-hub analyze
+elif [ -f "{analyze_script}" ]; then
+    python3 "{analyze_script}" || python "{analyze_script}"
+fi
 echo "[AI-GUARD - READY] Pushing to remote...\\n"
 exit 0
 """
@@ -236,6 +244,14 @@ def run_setup(target_repo):
     print(f"{BOLD}[1/3] Checking Project AI Guide & State Anchor...{RESET}")
     guide_created = ensure_project_ai_guide(target_repo, stack_info)
     project_state.init_state(target_repo)
+
+    # 2.1 Initialize Central Agent Memory (SQLite Cache)
+    try:
+        import cache_resolver
+        cache_resolver.init_db(seed=True)
+        print(f"  {GREEN}[OK] Initialized Central Agent Memory (SQLite):{RESET} ~/.agent_memory/global_cache.db")
+    except Exception as e:
+        print(f"  ⚠️ Could not initialize memory cache: {e}")
 
     # 3. Install Pre-Push Git Hook
     print(f"\n{BOLD}[2/3] Installing Zero-Leakage Git Pre-Push Hook...{RESET}")
