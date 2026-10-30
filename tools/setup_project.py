@@ -468,12 +468,13 @@ def uninstall_setup(target_repo: str) -> int:
     return 0
 
 
-def run_setup(target_repo, dry_run=False):
+def run_setup(target_repo, dry_run=False, profile="full"):
     """Main execution entrypoint for automated project setup."""
     print(f"\n{BOLD}{CYAN}======================================================================{RESET}")
     print(f"{BOLD}{CYAN}      AUTONOMOUS ZERO-COMMAND PROJECT BOOTSTRAP (AI-READY SETUP)     {RESET}")
     print(f"{BOLD}{CYAN}======================================================================{RESET}")
     print(f"📁 Target Project  : {target_repo}")
+    print(f"🎯 Selected Profile: {BOLD}{profile.upper()}{RESET}")
     if dry_run:
         print(f"Operational Mode   : {YELLOW}DRY-RUN (Simulating without modifying files on disk){RESET}\n")
     else:
@@ -486,6 +487,7 @@ def run_setup(target_repo, dry_run=False):
 
     if dry_run:
         print(f"{YELLOW}[DRY-RUN PREVIEW]{RESET}")
+        print(f"  • Profile: {profile.upper()}")
         print(f"  • Would generate: {os.path.join(target_repo, 'PROJECT_AI_GUIDE.md')}")
         print(f"  • Would deploy AI bridges: .cursor/rules/synapse-qa.mdc, .github/copilot-instructions.md, .windsurfrules")
         print(f"  • Would install pre-push hook: {os.path.join(target_repo, '.git', 'hooks', 'pre-push')}")
@@ -541,6 +543,7 @@ def main():
     parser = argparse.ArgumentParser(description="Autonomous Enterprise QA Project Setup")
     parser.add_argument("target", nargs="?", default=None, help="Target repository path to setup")
     parser.add_argument("--repo", "--path", dest="repo_path", default=None, help="Target repository path")
+    parser.add_argument("--profile", default="full", choices=["core", "web-e2e", "api-perf", "full"], help="Skills profile to install (core, web-e2e, api-perf, full)")
     parser.add_argument("--dry-run", action="store_true", help="Simulate setup actions without modifying disk")
     parser.add_argument("--uninstall", action="store_true", help="Revert and remove files installed by setup_project")
     args = parser.parse_args()
@@ -554,7 +557,7 @@ def main():
     if args.uninstall:
         return uninstall_setup(target_repo)
 
-    return run_setup(target_repo, dry_run=args.dry_run)
+    return run_setup(target_repo, dry_run=args.dry_run, profile=args.profile)
 
 
 if __name__ == "__main__":
