@@ -1,0 +1,83 @@
+version: '3.8'
+
+# ==============================================================================
+# Apache JMeter 5.x Distributed Load Testing Cluster (Master + 3 Slaves)
+# Auto-provisioned by Synapse-Hub Performance Suite
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # Slave Injector Node 1
+  # ----------------------------------------------------------------------------
+  jmeter-slave-1:
+    image: justb4/jmeter:5.5
+    container_name: jmeter-slave-1
+    command: >
+      -n -s
+      -Dserver.rmi.ssl.disable=true
+      -Dserver_port=1099
+      -Dserver.rmi.localport=50000
+    expose:
+      - "1099"
+      - "50000"
+    networks:
+      - jmeter-cluster
+
+  # ----------------------------------------------------------------------------
+  # Slave Injector Node 2
+  # ----------------------------------------------------------------------------
+  jmeter-slave-2:
+    image: justb4/jmeter:5.5
+    container_name: jmeter-slave-2
+    command: >
+      -n -s
+      -Dserver.rmi.ssl.disable=true
+      -Dserver_port=1099
+      -Dserver.rmi.localport=50000
+    expose:
+      - "1099"
+      - "50000"
+    networks:
+      - jmeter-cluster
+
+  # ----------------------------------------------------------------------------
+  # Slave Injector Node 3
+  # ----------------------------------------------------------------------------
+  jmeter-slave-3:
+    image: justb4/jmeter:5.5
+    container_name: jmeter-slave-3
+    command: >
+      -n -s
+      -Dserver.rmi.ssl.disable=true
+      -Dserver_port=1099
+      -Dserver.rmi.localport=50000
+    expose:
+      - "1099"
+      - "50000"
+    networks:
+      - jmeter-cluster
+
+  # ----------------------------------------------------------------------------
+  # Master Controller Node
+  # ----------------------------------------------------------------------------
+  jmeter-master:
+    image: justb4/jmeter:5.5
+    container_name: jmeter-master
+    depends_on:
+      - jmeter-slave-1
+      - jmeter-slave-2
+      - jmeter-slave-3
+    volumes:
+      - ./plans:/jmeter/plans
+      - ./reports:/jmeter/reports
+    environment:
+      - JVM_ARGS="-Xms1g -Xmx2g"
+    entrypoint: ["/bin/sh", "-c"]
+    command: >
+      "tail -f /dev/null"
+    networks:
+      - jmeter-cluster
+
+networks:
+  jmeter-cluster:
+    driver: bridge
