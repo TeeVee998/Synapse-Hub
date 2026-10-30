@@ -281,6 +281,12 @@ def cmd_generate_jmx(args):
     sys.exit(jmx_main())
 
 
+def cmd_analyze_jtl(args):
+    from jtl_analyzer import main as jtl_main
+    sys.argv = [sys.argv[0]] + (sys.argv[2:] if len(sys.argv) > 2 else [])
+    sys.exit(jtl_main())
+
+
 def cmd_update(args):
     import update_sentinel
     if getattr(args, "check", False):
@@ -437,8 +443,12 @@ def main():
     p_postman.set_defaults(func=cmd_export_postman)
 
     # generate-jmx
-    p_jmx = subparsers.add_parser("generate-jmx", help="Generate Apache JMeter 5.x Test Plan XML (.jmx) from OpenAPI / Postman / HAR")
+    p_jmx = subparsers.add_parser("generate-jmx", help="Generate Apache JMeter 5.x Test Plan XML (.jmx) with JMeter 360 Enterprise Capabilities")
     p_jmx.set_defaults(func=cmd_generate_jmx)
+
+    # analyze-jtl
+    p_jtl = subparsers.add_parser("analyze-jtl", help="Analyze JMeter .jtl results, evaluate P90/P95/P99 SLA, and enforce CI/CD Quality Gate")
+    p_jtl.set_defaults(func=cmd_analyze_jtl)
 
     # update
     p_update = subparsers.add_parser("update", help="1-Click update Synapse-Hub to latest version from GitHub/NPM")
