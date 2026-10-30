@@ -36,6 +36,7 @@
 | **Generating E2E matrix from OpenAPI/Swagger** | `tools/generate_api_matrix.py` | `python tools/generate_api_matrix.py --spec <swagger.json>` |
 | **Exporting API tests to Postman Collection v2.1** | `tools/export_postman_collection.py` | `agent-qa export-postman --spec <swagger.json> -o col.json` |
 | **Generating JMeter Performance Test Plan (.jmx)** | `tools/generate_jmx_plan.py` | `agent-qa generate-jmx --spec <swagger.json> --vus 100 -o plan.jmx` |
+| **Analyzing JMeter JTL & Enforcing CI/CD SLA Gate** | `tools/jtl_analyzer.py` | `agent-qa analyze-jtl results.jtl --sla-p95 500 --max-error-rate 1.0` |
 | **Auditing Web Accessibility (WCAG 2.2)** | `tools/wcag_audit.py` | `python tools/wcag_audit.py <path_to_html_or_url>` |
 | **0-Token Polyglot Test Transpilation** | `tools/omni_transpiler.py` | `agent-qa transpile <file> --to <target>` (Playwright TS, Python, Java, Katalon, Cypress) |
 | **0-Token Repository Polyglot AST Scan** | `tools/omni_transpiler.py` | `agent-qa omni-scan [path]` (Instant inventory of Pages, Locators, Tests across languages) |
@@ -351,15 +352,38 @@ agent-qa update
 ---
 
 ### 22. `tools/generate_jmx_plan.py`
-- **Purpose:** Apache JMeter 5.x Performance Test Plan XML (.jmx) Generator. Ingests OpenAPI specifications, Postman Collections, or HAR recordings to output production-ready JMeter load, stress, and spike test plans with configurable VUs, ramp-up schedules, SLA assertions (< 500ms), and dynamic session token propagation.
+- **Purpose:** Apache JMeter 5.x Performance Test Plan XML (.jmx) Generator (JMeter 360° Suite). Ingests OpenAPI specifications, Postman Collections, or HAR recordings to output production-ready JMeter load, stress, spike, and soak test plans with HTTP Cookie & Cache Managers, CSV Data Set Config, Transaction Controllers, JSR223 Groovy HMAC payload signers, InfluxDB live APM telemetry, and SLA assertions.
 - **CLI Syntax:**
   ```bash
-  # Generate JMeter plan from OpenAPI with 100 Virtual Users for 10 minutes
+  # 1. Generate JMeter plan from OpenAPI with 100 Virtual Users for 10 minutes
   agent-qa generate-jmx --spec swagger.json -o load_plan.jmx --vus 100 --duration 600
 
-  # Convert existing Postman collection into JMeter performance test plan
-  agent-qa generate-jmx --postman collection.json -o perf_plan.jmx --vus 50 --ramp-up 20
+  # 2. Convert existing Postman collection with CSV data parameterization & Transaction Controllers
+  agent-qa generate-jmx --postman collection.json -o perf_plan.jmx --csv-data users.csv --group-transactions
 
-  # Run headless JMeter CLI
+  # 3. Generate Spike or Step-Up workload profile with JSR223 HMAC payload signer
+  agent-qa generate-jmx --spec swagger.json -o spike_plan.jmx --workload spike --jsr223-hmac
+
+  # 4. Generate with live InfluxDB / Grafana streaming
+  agent-qa generate-jmx --spec swagger.json -o perf_plan.jmx --influxdb-url http://influxdb:8086/write?db=jmeter
+
+  # 5. Run headless JMeter CLI
   jmeter -n -t load_plan.jmx -l results.jtl -e -o ./html_report
   ```
+
+---
+
+### 23. `tools/jtl_analyzer.py`
+- **Purpose:** Apache JMeter JTL Results Analyzer & CI/CD SLA Quality Gatekeeper. Parses `.jtl` (CSV or XML), computes statistical percentiles ($P_{50}, P_{90}, P_{95}, P_{99}$, Throughput, Error Rate), evaluates user SLA thresholds, and returns deterministic exit code `0` (Pass) or `1` (Fail) to enforce quality gates in automated pipelines.
+- **CLI Syntax:**
+  ```bash
+  # 1. Enforce CI/CD Quality Gate with P95 Latency SLA (< 500ms) and max error rate (< 1%)
+  agent-qa analyze-jtl results.jtl --sla-p95 500 --max-error-rate 1.0
+
+  # 2. Export GitHub / GitLab Pull Request Markdown report & JSON metrics
+  agent-qa analyze-jtl results.jtl --markdown pr_report.md --json metrics.json
+
+  # 3. Dry-run sample benchmark verification
+  agent-qa analyze-jtl --sample --sla-p95 500
+  ```
+
