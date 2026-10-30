@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "name": "Enterprise Agent Skills Hub",
   "version": "2.1.1",
-  "description": "Unified Catalog of 27 Specialized Skills for Autonomous AI Agents in Enterprise Software Quality Engineering, Performance, and Architecture.",
-  "totalSkills": 27,
+  "description": "Unified Catalog of 28 Specialized Skills for Autonomous AI Agents in Enterprise Software Quality Engineering, Performance, and Architecture.",
+  "totalSkills": 28,
   "categories": {
     "context_and_optimization": [
       "token-and-context-optimizer",
@@ -17,7 +17,8 @@
       "bats-testing-patterns",
       "lam-script-generator",
       "auth-session-and-cookie-manager",
-      "backend-load-and-stress-patterns"
+      "backend-load-and-stress-patterns",
+      "rbt-manual-testing"
     ],
     "verification_and_resilience": [
       "antigravity-test-sentinel",
@@ -202,6 +203,14 @@
       "category": "test_automation_and_execution",
       "path": ".agents/skills/playwright-live-interaction/SKILL.md",
       "summary": "Probe live web DOM/AOM and verify selectors under 200ms using headless Playwright.",
+      "version": "2.0.0"
+    },
+    {
+      "id": "rbt-manual-testing",
+      "name": "RBT Manual Testing",
+      "category": "test_automation_and_execution",
+      "path": ".agents/skills/rbt-manual-testing/SKILL.md",
+      "summary": "Comprehensive Risk-Based Testing (AI-RBT) 6-stage manual test generation, Ambiguity Q&A analysis, Traceability Matrix, Field-Level Validation Checklist (15 input field types), Non-Functional scenarios, and Excel export formatting.",
       "version": "2.0.0"
     },
     {

@@ -287,6 +287,12 @@ def cmd_analyze_jtl(args):
     sys.exit(jtl_main())
 
 
+def cmd_export_excel(args):
+    from md_to_xlsx import main as excel_main
+    sys.argv = [sys.argv[0]] + (sys.argv[2:] if len(sys.argv) > 2 else [])
+    sys.exit(excel_main())
+
+
 def cmd_update(args):
     import update_sentinel
     if getattr(args, "check", False):
@@ -449,6 +455,13 @@ def main():
     # analyze-jtl
     p_jtl = subparsers.add_parser("analyze-jtl", help="Analyze JMeter .jtl results, evaluate P90/P95/P99 SLA, and enforce CI/CD Quality Gate")
     p_jtl.set_defaults(func=cmd_analyze_jtl)
+
+    # export-excel
+    p_excel = subparsers.add_parser("export-excel", help="Convert Markdown Test Cases into Styled Enterprise Excel (.xlsx)")
+    p_excel.add_argument("input", nargs="?", help="Path to input Markdown file (.md)")
+    p_excel.add_argument("-o", "--output", help="Path to output Excel file (.xlsx)")
+    p_excel.add_argument("--sheet-name", default="Test Cases", help="Worksheet title (default: Test Cases)")
+    p_excel.set_defaults(func=cmd_export_excel)
 
     # update
     p_update = subparsers.add_parser("update", help="1-Click update Synapse-Hub to latest version from GitHub/NPM")

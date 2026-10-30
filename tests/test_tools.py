@@ -1273,6 +1273,39 @@ class TestToolsIntegrityAndBehavior(unittest.TestCase):
         self.assertIn("DRY RUN (Preview)", res.stdout)
         self.assertIn("Would update package.json", res.stdout)
 
+    def test_md_to_xlsx_conversion(self):
+        """Validates that md_to_xlsx parses Markdown tables and exports styled Excel."""
+        import md_to_xlsx
+        sample_md = """# Sample Test Cases
+| TC ID | Module | Risk Level | Test Title | Pre-Condition | Test Steps | Expected Result | Priority | Test Data |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| AUTH_01 | Login | High | Verify admin login | User registered | 1. Enter email<br>2. Click login | 1. Success alert | Critical | admin@qa.com |
+| AUTH_02 | Login | Low | Verify cancel button | On login page | 1. Click cancel | 1. Redirect home | Low | N/A |
+"""
+        with tempfile.NamedTemporaryFile("w", suffix=".md", delete=False, encoding="utf-8") as f:
+            f.write(sample_md)
+            temp_md = f.name
+
+        temp_xlsx = temp_md.replace(".md", ".xlsx")
+        try:
+            tables = md_to_xlsx.parse_markdown_tables(sample_md)
+            self.assertEqual(len(tables), 1)
+            headers, rows = tables[0]
+            self.assertEqual(len(rows), 2)
+            self.assertEqual(rows[0][0], "AUTH_01")
+            self.assertEqual(rows[0][2], "High")
+
+            # Test workbook creation
+            count = md_to_xlsx.create_styled_excel(tables, temp_xlsx)
+            self.assertEqual(count, 2)
+            self.assertTrue(os.path.exists(temp_xlsx))
+            self.assertGreater(os.path.getsize(temp_xlsx), 1000)
+        finally:
+            if os.path.exists(temp_md):
+                os.remove(temp_md)
+            if os.path.exists(temp_xlsx):
+                os.remove(temp_xlsx)
+
 
 if __name__ == "__main__":
     unittest.main()

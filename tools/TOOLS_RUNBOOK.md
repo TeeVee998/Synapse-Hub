@@ -387,3 +387,19 @@ agent-qa update
   agent-qa analyze-jtl --sample --sla-p95 500
   ```
 
+---
+
+### 24. `tools/md_to_xlsx.py`
+- **Purpose:** Enterprise Markdown-to-Excel Converter. Parses Markdown Test Case tables and converts them into professional, styled Excel workbooks (`.xlsx`) with Navy Blue headers, frozen header panes (`A2`), auto-filters, color-coded badges for Risk Level (High/Med/Low) and Priority (Critical/High/Med/Low), and multi-line wrapping.
+- **CLI Syntax:**
+  ```bash
+  # 1. Convert markdown test cases to styled Excel (.xlsx)
+  agent-qa export-excel test_cases_crm.md
+
+  # 2. Specify custom output path and sheet title
+  agent-qa export-excel test_cases_crm.md -o CRM_TestCases_v1.xlsx --sheet-name "CRM Login"
+
+  # 3. Direct python execution
+  python3 tools/md_to_xlsx.py path/to/cases.md -o export.xlsx
+  ```
+
