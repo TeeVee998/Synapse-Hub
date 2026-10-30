@@ -342,10 +342,28 @@ def cmd_update(args):
     update_sentinel.perform_update()
 
 
+def _hub_version():
+    manifest_path = os.path.join(REPO_ROOT, "skills_manifest.json")
+    version = "2.3.0"
+    if os.path.exists(manifest_path):
+        try:
+            import json
+            with open(manifest_path, "r", encoding="utf-8") as f:
+                version = json.load(f).get("version", version)
+        except Exception:
+            pass
+    return version
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog="agent-qa",
         description="Enterprise AI Agent Quality Engineering & Test Automation Hub CLI"
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"Agent-QA Hub CLI v{_hub_version()}"
     )
     parser.add_argument(
         "--offline", "--offline-deterministic",
