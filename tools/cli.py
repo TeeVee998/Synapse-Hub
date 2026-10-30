@@ -281,6 +281,21 @@ def cmd_generate_jmx(args):
     sys.exit(jmx_main())
 
 
+def cmd_update(args):
+    import update_sentinel
+    if getattr(args, "check", False):
+        has_update, cur, rem = update_sentinel.check_for_updates(force=True, notify=False)
+        print(f"Current Hub Version : v{cur}")
+        print(f"Latest Upstream     : v{rem if rem else 'Unknown'}")
+        if has_update:
+            print(f"⚠️ An update is available: v{cur} -> v{rem}. Run 'agent-qa update' to upgrade.")
+            sys.exit(1)
+        else:
+            print("✅ Synapse-Hub is up to date.")
+            sys.exit(0)
+    update_sentinel.perform_update()
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog="agent-qa",
@@ -425,6 +440,11 @@ def main():
     p_jmx = subparsers.add_parser("generate-jmx", help="Generate Apache JMeter 5.x Test Plan XML (.jmx) from OpenAPI / Postman / HAR")
     p_jmx.set_defaults(func=cmd_generate_jmx)
 
+    # update
+    p_update = subparsers.add_parser("update", help="1-Click update Synapse-Hub to latest version from GitHub/NPM")
+    p_update.add_argument("--check", action="store_true", help="Check for available updates without applying")
+    p_update.set_defaults(func=cmd_update)
+
     args, unknown = parser.parse_known_args()
     if getattr(args, "offline", False):
         os.environ["AGENT_QA_OFFLINE"] = "1"
@@ -433,6 +453,14 @@ def main():
     if not args.subcommand:
         parser.print_help()
         sys.exit(0)
+
+    # Non-intrusive cached update notification (24h cache)
+    if args.subcommand not in ("update", "mcp-serve", "version"):
+        try:
+            import update_sentinel
+            update_sentinel.check_for_updates(force=False, notify=True)
+        except Exception:
+            pass
 
     # Dispatch subcommand
     args.func(args)

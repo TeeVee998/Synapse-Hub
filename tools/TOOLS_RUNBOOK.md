@@ -52,10 +52,26 @@
 | **Lookup XPath Locator in cached memory** | `tools/lookup_xpath.py` | `python tools/lookup_xpath.py "<keyword>"` |
 | **Lookup Test Case metadata** | `tools/lookup_tc.py` | `python tools/lookup_tc.py "<keyword_or_id>"` |
 | **Linting Markdown documentation quality** | `tools/lint_ai_docs.py` | `python tools/lint_ai_docs.py` |
+| **Upstream Version Check & 1-Click Self-Update** | `tools/update_sentinel.py` | `python tools/update_sentinel.py --check / --update` (or `agent-qa update` / `npx synapse-hub update`) |
 
 ---
 
 ## 2. DETAILED TOOL USAGE
+
+### 0. `tools/update_sentinel.py` (Upstream Update & Drift Sentinel)
+Checks upstream releases on NPM Registry and GitHub, displaying non-blocking update notifications when a new version is published. Supports 1-click self-updating across local git repos and global plugins.
+
+```bash
+# Check if update is available without applying
+python tools/update_sentinel.py --check
+# or via CLI
+agent-qa update --check
+
+# Perform 1-click self-update (pulls git, syncs memory cache, verifies DoD)
+python tools/update_sentinel.py --update
+# or via CLI
+agent-qa update
+```
 
 ### 1. `tools/generate_api_matrix.py`
 - **Purpose:** Ingests OpenAPI / Swagger JSON schemas and automatically computes comprehensive E2E test matrices: Positive, Boundary Value (min/max length, special characters, XSS payloads), and Negative (invalid types, missing required fields).
