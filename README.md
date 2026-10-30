@@ -217,7 +217,18 @@ Hub phân chia năng lực rõ ràng cho 6 vai trò Agent, mỗi Agent được 
 
 Chi tiết đầy đủ xem tại [tools/TOOLS_RUNBOOK.md](tools/TOOLS_RUNBOOK.md):
 
-- `tools/verify_all.py`: Cổng thẩm định 7 Gates DoD (UTF-8, No XPaths, UniqueCode, Clean POM).
+- `tools/verify_all.py`: Cổng thẩm định 8 Gates DoD (UTF-8, No XPaths, UniqueCode, Clean POM, AST Mutation).
+- `tools/generate_jmx_plan.py`: Sinh kịch bản Apache JMeter 5.x (.jmx) đa giao thức (HTTP, JDBC, WS, gRPC, Kafka) kèm Traffic Shaping Pareto.
+- `tools/jtl_analyzer.py`: Phân tích kết quả JTL, kiểm soát SLA percentiles ($P_{90}, P_{95}, P_{99}$) và làm Quality Gate CI/CD.
+- `tools/telemetry_correlator.py`: Phân tích tương quan Pearson giữa Client Latency và Server APM (CPU, RAM, DB Pool).
+- `tools/export_postman_collection.py`: Xuất Postman Collection v2.1 với AJV JSON Schema, DDT, và Zero-Input synthesis.
+- `tools/newman_analyzer.py`: Phân tích kết quả Newman, triage lỗi assertion và làm Quality Gate cho API.
+- `tools/api_fuzzer.py`: Autonomous API Fuzzer phát hiện lỗi HTTP 500, rò rỉ stacktrace DB và vi phạm SLA độ trễ.
+- `tools/api_drift_sentinel.py`: Bắt breaking change giữa các phiên bản OpenAPI / Swagger specifications.
+- `tools/auto_heal.py`: Tự phục hồi locator gãy dựa trên AOM diffing mà không cần chạy lại toàn bộ test suite.
+- `tools/flaky_detector.py`: Phát hiện kiểm thử chập chờn (Flaky tests) và quản lý vòng đời cách ly Quarantine.
+- `tools/skillspector.py`: Quét kiểm toán an ninh AI Agent Skills & MCP (71 vectors theo chuẩn NVIDIA SkillSpector).
+- `tools/omni_transpiler.py`: Chuyển đổi mã kiểm thử 0-token đa ngôn ngữ (Playwright TS/Python, Java, Groovy, Cypress).
 - `tools/infer_linter.py`: Phân tích tĩnh AST phát hiện fake-pass (0 assertion) và khối try-catch nuốt lỗi.
 - `tools/test_impact.py`: Phân tích git diff và khoanh vùng chính xác test cases bị ảnh hưởng.
 - `tools/cache_resolver.py`: Quản lý bộ nhớ đệm lỗi SQLite trung tâm (`~/.agent_memory/global_cache.db`).
@@ -230,7 +241,7 @@ Chi tiết đầy đủ xem tại [tools/TOOLS_RUNBOOK.md](tools/TOOLS_RUNBOOK.m
 - `tools/generate_tc_from_story.py`: Large Action Model parser sinh khung Clean POM từ User Story.
 - `tools/trace_data_flow.py`: Kiểm tra luồng dữ liệu kiểm thử, phát hiện rác dữ liệu DB (Orphan Data).
 - `scripts/install.ps1` & `scripts/setup.sh`: Script cài đặt 1-click tự động khởi tạo môi trường Hub.
-- `scripts/lint_skills.ps1`: Linter kiểm tra tính toàn vẹn 30 skills và metadata manifest.
+- `scripts/lint_skills.ps1`: Linter kiểm tra tính toàn vẹn 28 skills và metadata manifest.
 - `pyproject.toml` & `tools/cli.py`: Đóng gói chuẩn PEP 621 cho lệnh CLI toàn cầu `agent-qa`.
 
 ---
@@ -498,7 +509,18 @@ Synapse Hub clearly partitions capabilities across 6 specialized AI roles, pre-c
 
 For full details, refer to [tools/TOOLS_RUNBOOK.md](tools/TOOLS_RUNBOOK.md):
 
-- `tools/verify_all.py`: 8 Quality Gates DoD verification (UTF-8, No XPaths, UniqueCode, Clean POM).
+- `tools/verify_all.py`: 8 Quality Gates DoD verification (UTF-8, No XPaths, UniqueCode, Clean POM, AST Mutation).
+- `tools/generate_jmx_plan.py`: Multi-protocol Apache JMeter 5.x (.jmx) plan generator (HTTP, JDBC, WS, gRPC, Kafka) with Pareto traffic shaping.
+- `tools/jtl_analyzer.py`: JTL execution metrics analyzer, P95/P99 SLA gatekeeper, and CI/CD Quality Gate enforcer.
+- `tools/telemetry_correlator.py`: Full-stack Pearson correlation analyzer between client-side latency and server APM (CPU, RAM, DB Pool).
+- `tools/export_postman_collection.py`: Exports Postman Collections v2.1 with native AJV JSON Schema, DDT CSV, and Zero-Input domain synthesis.
+- `tools/newman_analyzer.py`: Newman automated test results analyzer, assertion failure triage, and CI/CD Quality Gate.
+- `tools/api_fuzzer.py`: Autonomous API fuzzer detecting HTTP 500 crashes, database stacktrace leaks, and latency SLA breaches.
+- `tools/api_drift_sentinel.py`: Contract drift detector comparing OpenAPI/Swagger specifications for breaking changes.
+- `tools/auto_heal.py`: In-place locator self-healing engine correlating JUnit XML and screenshots via AOM diffing.
+- `tools/flaky_detector.py`: Flaky test detector and automated quarantine lifecycle manager.
+- `tools/skillspector.py`: AI Agent Skill & MCP Security Sentinel (71 detection vectors, Prohibition Context Engine, SARIF/JSON reporting).
+- `tools/omni_transpiler.py`: 0-token polyglot test transpiler (Playwright TS/Python, Java, Groovy, Cypress).
 - `tools/infer_linter.py`: Static AST analysis detecting fake passes (zero asserts) and empty catch blocks.
 - `tools/test_impact.py`: Scopes affected test cases based on git diffs.
 - `tools/cache_resolver.py`: Manages the central SQLite error memory cache (`~/.agent_memory/global_cache.db`).
@@ -510,7 +532,6 @@ For full details, refer to [tools/TOOLS_RUNBOOK.md](tools/TOOLS_RUNBOOK.md):
 - `tools/generate_api_matrix.py`: Generates positive, boundary, and negative test matrices from Swagger/OpenAPI.
 - `tools/generate_tc_from_story.py`: Large Action Model parser generating Clean POM skeletons from stories.
 - `tools/trace_data_flow.py`: Taint analysis tracking test data flow and preventing database orphan junk.
-- `tools/skillspector.py`: AI Agent Skill & MCP Security Sentinel (71 detection vectors, Prohibition Context Engine, SARIF/JSON reporting).
 - `scripts/install.ps1` & `scripts/setup.sh`: 1-click bootstrap scripts setting up the hub environment.
 - `scripts/lint_skills.ps1`: Linter verifying skill integrity and metadata manifest.
 - `pyproject.toml` & `tools/cli.py`: PEP 621 packaging for the global `agent-qa` CLI.

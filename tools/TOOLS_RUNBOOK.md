@@ -458,4 +458,83 @@ agent-qa update
   agent-qa analyze-newman --sample
   ```
 
+---
+
+### 27. `tools/auto_heal.py` & `tools/heuristic_locator_matcher.py` (Closed-Loop Test Failure Diagnosis & Locator Healing)
+- **Purpose:** In-place autonomous test failure healer powered by `tools/heuristic_locator_matcher.py`. Correlates JUnit XML failures and screenshots (`Screenshots/FAILED_*.png`) with live DOM state, computes semantic element diffs via Role/Label/TestId hierarchy, and patches broken Page Class locators without full rerun.
+- **CLI Syntax:**
+  ```bash
+  python tools/auto_heal.py
+  agent-qa auto-heal
+  ```
+
+---
+
+### 28. `tools/flaky_detector.py` (Flaky Test Sentinel & Quarantine Lifecycle)
+- **Purpose:** Detects non-deterministic test flakiness across test suites, calculates historical flakiness scores, and manages automated test quarantine lifecycles to protect CI/CD pipelines from false alarms.
+- **CLI Syntax:**
+  ```bash
+  python tools/flaky_detector.py --scan Reports/
+  agent-qa flaky --scan Reports/
+  ```
+
+---
+
+### 29. `tools/browser_helpers.js` (In-Browser Live AOM & Safe Interaction Prober)
+- **Purpose:** Client-side JavaScript helper injected into headless Playwright/Chrome sessions. Provides `window.__helper` and `window.qa` APIs: `qa.getCompactAOM()` (extracts interactive nodes sub-200ms under 500 tokens), safe click overlay bypassing for PrimeNG/AntD backdrops, and live selector hit-rate verification.
+- **Usage:** Injected automatically by `live-explorer` subagent and Playwright test fixtures.
+
+---
+
+### 30. `tools/project_state.py` (Compaction Anchoring & Persistent State Store)
+- **Purpose:** Persists mission-critical project state (active test cases, defect registers, test data tracking) into disk-anchored files (`PROJECT_STATE.md` and `.project_state.properties`). Prevents loss of context during Antigravity automated context compaction.
+- **Usage:** Autonomously invoked by the Lead Orchestrator agent across turn transitions.
+
+---
+
+### 31. `tools/universal_ir.py`, `tools/omni_parser.py`, `tools/omni_emitter.py`
+- **Purpose:** Universal Intermediate Representation (IR) engine powering 0-token polyglot test transpilation (`agent-qa transpile`). Parses test scripts from Groovy, TypeScript, Python, or Java into a framework-agnostic AST and emits clean, idiomatic code for target test frameworks.
+- **CLI Syntax:**
+  ```bash
+  agent-qa transpile Scripts/TC_Login.groovy --to playwright-ts
+  ```
+
+---
+
+### 32. `tools/check_env.py` (Prerequisites & Toolchain Diagnostic Checker)
+- **Purpose:** Rapid diagnostic tool that checks required local execution toolchains: Python 3.9+, Node.js 18+, Java JDK 11+, Playwright browser binaries, Git, and Docker.
+- **CLI Syntax:**
+  ```bash
+  python tools/check_env.py
+  ```
+
+---
+
+### 33. `tools/git_pre_commit_guard.py` (Zero-Leakage Git Pre-Commit Hook)
+- **Purpose:** Git hook gatekeeper preventing accidental commits of UTF-8 BOM characters, hardcoded secrets/API keys, absolute machine paths, or temporary dump files into git repositories.
+- **CLI Syntax:**
+  ```bash
+  python tools/git_pre_commit_guard.py
+  ```
+
+---
+
+### 34. `tools/validate_groovy_scripts.py` (Katalon / Groovy AST Syntax Guard)
+- **Purpose:** Static verification scanner for Groovy and Katalon test scripts. Ensures 100% adherence to Clean POM Flat Architecture, zero raw XPaths in test cases, and valid import signatures.
+- **CLI Syntax:**
+  ```bash
+  python tools/validate_groovy_scripts.py
+  ```
+
+---
+
+### 35. Platform Scripts & Automation Utilities
+- `tools/verify_all.sh`: macOS / Linux Bash equivalent for the 8 Quality Gates DoD verification.
+- `tools/generate_allure_report.ps1`: Automated generation and serving of Allure test execution dashboards.
+- `tools/generate_test_reports.ps1`: Automated consolidation of polyglot test reports into centralized Markdown summaries.
+- `tools/mcp_excel_server.ps1`: Specialized Model Context Protocol (MCP) server for structured Excel data interaction.
+- `tools/e2e_flow_prober.ps1`: Automated E2E smoke flow prober across target web environments.
+- `tools/bump_version.py`: Automated SemVer version bumper for Synapse-Hub releases.
+
+
 
