@@ -165,7 +165,7 @@ PROHIBITION_PREFIX = re.compile(
 )
 
 ALERT_BLOCK_PREFIX = re.compile(
-    r"^\s*>\s*\[!(?:WARNING|CAUTION|DANGER|ALERT|IMPORTANT|NOTE|TIP)\]",
+    r"^\s*>\s*\[!(?:WARNING|CAUTION|DANGER|ALERT)\]",
     re.IGNORECASE | re.MULTILINE,
 )
 
@@ -189,23 +189,20 @@ def is_in_prohibition_context(content: str, start: int, end: int) -> bool:
     if PROHIBITION_PREFIX.search(current_line):
         return True
 
-    # 2. Markdown Caution/Warning Callout Block
-    if any(ALERT_BLOCK_PREFIX.search(line) for line in lines[-5:]):
+    # 2. Markdown Caution/Warning Callout Block with explicit negative imperative
+    has_alert = any(ALERT_BLOCK_PREFIX.search(line) for line in lines[-5:])
+    if has_alert and any(re.search(r'\b(never|do not|don[\'’]t|must not|forbidden|prohibited|avoid)\b', line, re.IGNORECASE) for line in lines[-5:]):
         return True
 
     # 3. Defensive Guideline headings ("Anti-Pattern Blacklist", "Forbidden actions")
     preceding_lower = preceding_text.lower()
     defensive_markers = (
-        "anti-pattern",
+        "anti-pattern blacklist",
         "mistake / anti-pattern",
         "strictly forbidden",
         "never use",
         "mandatory avoidance",
         "forbidden actions",
-        "prohibited",
-        "blacklist",
-        "threat model",
-        "vulnerability check",
         "zero-token error blacklist",
     )
     if any(marker in preceding_lower for marker in defensive_markers):
@@ -927,6 +924,9 @@ def scan_target(target_path: str) -> ScanReport:
         pass
 
     path_obj = Path(target_path).resolve()
+    if not path_obj.exists():
+        raise FileNotFoundError(f"Target path does not exist: {target_path}")
+
     all_findings: List[Finding] = []
     scanned_count = 0
 

@@ -362,7 +362,7 @@ def main():
     parser.add_argument("--sla-p95", type=float, default=None, help="P95 Latency threshold in ms (fails if exceeded).")
     parser.add_argument("--sla-p99", type=float, default=None, help="P99 Latency threshold in ms (fails if exceeded).")
     parser.add_argument("--sla-avg", type=float, default=None, help="Average Latency threshold in ms (fails if exceeded).")
-    parser.add_argument("--max-error-rate", type=float, default=None, help="Maximum allowed error rate percentage (e.g. 1.0 = 1%).")
+    parser.add_argument("--max-error-rate", type=float, default=None, help="Maximum allowed error rate percentage (e.g. 1.0 = 1%%).")
     parser.add_argument("--markdown", "-m", help="Output path for Markdown summary report.")
     parser.add_argument("--json", "-j", help="Output path for JSON summary metrics.")
     parser.add_argument("--telemetry", help="Path to server telemetry CSV (timestamp, cpu_pct, memory_pct, db_pool_pct) for Full-Stack APM correlation.")

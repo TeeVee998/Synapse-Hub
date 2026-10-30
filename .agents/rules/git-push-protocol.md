@@ -51,7 +51,7 @@ git commit -m "<type>(<scope>): <summary>"
 # Examples:
 # git commit -m "feat(billing): add Clean POM for Invoice Reconciliation"
 # git commit -m "test(auth): add automated login boundary test cases"
-# git commit -m "fix(locators): heal stale table row selector in DataMiningPage"
+# git commit -m "fix(locators): heal stale table row selector in OrderSummaryPage"
 ```
 
 ### Step 4: Direct Push to Project Remote

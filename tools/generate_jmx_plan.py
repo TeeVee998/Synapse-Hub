@@ -122,6 +122,16 @@ def build_jmx_xml(
         f'            <stringProp name="Argument.value">{sla_p95}</stringProp>',
         '            <stringProp name="Argument.metadata">=</stringProp>',
         '          </elementProp>',
+        '          <elementProp name="MAX_LATENCY" elementType="Argument">',
+        '            <stringProp name="Argument.name">MAX_LATENCY</stringProp>',
+        f'            <stringProp name="Argument.value">${{__P(max_latency, {max(3000, sla_p95 * 2)})}}</stringProp>',
+        '            <stringProp name="Argument.metadata">=</stringProp>',
+        '          </elementProp>',
+        '          <elementProp name="LAST_CREATED_ID" elementType="Argument">',
+        '            <stringProp name="Argument.name">LAST_CREATED_ID</stringProp>',
+        '            <stringProp name="Argument.value">1</stringProp>',
+        '            <stringProp name="Argument.metadata">=</stringProp>',
+        '          </elementProp>',
         '          <elementProp name="BEARER_TOKEN" elementType="Argument">',
         '            <stringProp name="Argument.name">BEARER_TOKEN</stringProp>',
         '            <stringProp name="Argument.value"></stringProp>',
@@ -469,9 +479,9 @@ def build_jmx_xml(
             f'{indent}    <intProp name="Assertion.test_type">40</intProp>',
             f'{indent}  </ResponseAssertion>',
             f'{indent}  <hashTree/>',
-            f'{indent}  <!-- SLA Latency Assertion -->',
-            f'{indent}  <DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="Assert SLA Latency (&lt; ${{SLA_P95}}ms)" enabled="true">',
-            f'{indent}    <stringProp name="DurationAssertion.duration">${{SLA_P95}}</stringProp>',
+            f'{indent}  <!-- SLA Ceiling Assertion (Percentile P95 is validated post-run by jtl_analyzer.py) -->',
+            f'{indent}  <DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="Assert Max Latency Ceiling (&lt; ${{MAX_LATENCY}}ms)" enabled="true">',
+            f'{indent}    <stringProp name="DurationAssertion.duration">${{MAX_LATENCY}}</stringProp>',
             f'{indent}  </DurationAssertion>',
             f'{indent}  <hashTree/>'
         ])
@@ -492,7 +502,7 @@ def build_jmx_xml(
                 f'{indent}  <!-- Deep Correlation: Random Array Item Selection (Match No: 0) -->',
                 f'{indent}  <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="JSON Extractor - Random Item Selector" enabled="true">',
                 f'{indent}    <stringProp name="JSONPostProcessor.referenceNames">RANDOM_ITEM_ID</stringProp>',
-                f'{indent}    <stringProp name="JSONPostProcessor.jsonPathExprs">$..items[?(@.stock &gt; 0)].id, $..id, $..code</stringProp>',
+                f'{indent}    <stringProp name="JSONPostProcessor.jsonPathExprs">$..id</stringProp>',
                 f'{indent}    <stringProp name="JSONPostProcessor.match_numbers">0</stringProp>',
                 f'{indent}    <stringProp name="JSONPostProcessor.defaultValues">${{RANDOM_ITEM_ID}}</stringProp>',
                 f'{indent}  </JSONPostProcessor>',
@@ -505,7 +515,7 @@ def build_jmx_xml(
                 f'{indent}  <!-- Auto-Extract Dynamic Bearer Token -->',
                 f'{indent}  <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="JSON Extractor - Bearer Token" enabled="true">',
                 f'{indent}    <stringProp name="JSONPostProcessor.referenceNames">BEARER_TOKEN</stringProp>',
-                f'{indent}    <stringProp name="JSONPostProcessor.jsonPathExprs">$.token, $.access_token, $.data.token, $.data.access_token</stringProp>',
+                f'{indent}    <stringProp name="JSONPostProcessor.jsonPathExprs">$..[\'token\',\'access_token\']</stringProp>',
                 f'{indent}    <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>',
                 f'{indent}    <stringProp name="JSONPostProcessor.defaultValues">${{BEARER_TOKEN}}</stringProp>',
                 f'{indent}  </JSONPostProcessor>',
@@ -516,9 +526,9 @@ def build_jmx_xml(
                 f'{indent}  <!-- Auto-Extract Created Entity ID -->',
                 f'{indent}  <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="JSON Extractor - Entity ID" enabled="true">',
                 f'{indent}    <stringProp name="JSONPostProcessor.referenceNames">LAST_CREATED_ID</stringProp>',
-                f'{indent}    <stringProp name="JSONPostProcessor.jsonPathExprs">$.id, $.code, $.data.id, $.data.code</stringProp>',
+                f'{indent}    <stringProp name="JSONPostProcessor.jsonPathExprs">$..[\'id\',\'code\']</stringProp>',
                 f'{indent}    <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>',
-                f'{indent}    <stringProp name="JSONPostProcessor.defaultValues"></stringProp>',
+                f'{indent}    <stringProp name="JSONPostProcessor.defaultValues">${{LAST_CREATED_ID}}</stringProp>',
                 f'{indent}  </JSONPostProcessor>',
                 f'{indent}  <hashTree/>'
             ])
@@ -752,7 +762,10 @@ def parse_openapi_for_jmeter(spec_data: Dict[str, Any]) -> tuple:
 
             def replace_path_param(match):
                 pname = match.group(1)
-                if pname.lower() in ("id", "categoryid", "entityid", "userid"):
+                plow = pname.lower()
+                if plow in ("itemid", "productid", "item_id", "product_id"):
+                    return "${RANDOM_ITEM_ID}"
+                if plow in ("id", "categoryid", "entityid", "userid", "orderid", "order_id"):
                     return "${LAST_CREATED_ID}"
                 return f"${{{pname}}}"
 
@@ -793,6 +806,25 @@ def parse_openapi_for_jmeter(spec_data: Dict[str, Any]) -> tuple:
                 "body": body_str,
                 "expected_status": expected_status
             })
+
+    def sampler_sort_key(s: Dict[str, Any]) -> int:
+        p = s.get("path", "").lower()
+        m = s.get("method", "GET")
+        if "auth" in p or "login" in p or "token" in p:
+            return 1
+        if m == "POST" and "{" not in s.get("path", "") and "${" not in s.get("path", ""):
+            return 2
+        if m == "GET" and "{" not in s.get("path", "") and "${" not in s.get("path", ""):
+            return 3
+        if m == "GET":
+            return 4
+        if m in ("PUT", "PATCH"):
+            return 5
+        if m == "DELETE":
+            return 6
+        return 7
+
+    samplers.sort(key=sampler_sort_key)
 
     return plan_name, base_host, protocol, port, samplers
 
@@ -993,8 +1025,8 @@ def main():
         plan_name, base_host, protocol, port, samplers = parse_openapi_for_jmeter(spec_data)
     else:
         # Fallback to built-in sample spec
-        from export_postman_collection import get_sample_spec
-        spec_data = get_sample_spec()
+        from export_postman_collection import get_domain_spec
+        spec_data = get_domain_spec("ecommerce")
         plan_name, base_host, protocol, port, samplers = parse_openapi_for_jmeter(spec_data)
 
     # Base URL override if provided

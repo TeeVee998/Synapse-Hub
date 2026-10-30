@@ -18,6 +18,9 @@ description: "Manage browser authentication sessions, storageState, JWT tokens, 
    - Maintain distinct session fixtures for different privilege tiers (e.g. `admin_state.json`, `reviewer_state.json`, `viewer_state.json`).
 3. **Session Freshness & Auto-Refresh:**
    - Inspect token expiry timestamp (`exp` in JWT payload); auto-refresh via API endpoint if token lifetime has elapsed.
+4. **Security & Credential Hygiene:**
+   - Saved browser states contain live cookies, session tokens, and local storage values.
+   - **Mandatory:** Always add `.auth/` and `*storageState*.json` to your project's `.gitignore` to prevent committing live credentials to version control.
 
 ---
 

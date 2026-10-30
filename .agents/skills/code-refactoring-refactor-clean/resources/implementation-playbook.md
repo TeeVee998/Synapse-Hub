@@ -564,7 +564,7 @@ jobs:
 
 **Static Analysis Toolchain**
 
-```python
+```	oml
 # pyproject.toml
 [tool.ruff]
 line-length = 100
@@ -614,7 +614,7 @@ fail_under = 80
 
 **Automated Refactoring Suggestions**
 
-```python
+```yaml
 # Use Sourcery for automatic refactoring suggestions
 # sourcery.yaml
 rules:
@@ -622,7 +622,9 @@ rules:
   - id: merge-duplicate-blocks
   - id: use-named-expression
   - id: inline-immediately-returned-variable
+`
 
+`python
 # Example: Sourcery will suggest
 # BEFORE
 result = []
@@ -636,7 +638,7 @@ result = [item.name for item in items if item.is_active]
 
 **Code Quality Dashboard Configuration**
 
-```yaml
+```properties
 # sonar-project.properties
 sonar.projectKey=my-project
 sonar.sources=src
@@ -658,7 +660,7 @@ sonar.security.rating=A
 
 **Security-Focused Refactoring**
 
-```python
+```yaml
 # Use Semgrep for security-aware refactoring
 # .semgrep.yml
 rules:
@@ -815,12 +817,12 @@ Include specific optimizations:
 for item in items:
     for other in items:
         if item.id == other.id:
-            # process
+            pass  # process
 
 # After: O(n)
 item_map = {item.id: item for item in items}
 for item_id, item in item_map.items():
-    # process
+    pass  # process
 ```
 
 **Caching Strategy**
@@ -830,7 +832,7 @@ from functools import lru_cache
 @lru_cache(maxsize=128)
 def calculate_expensive_metric(data_id: str) -> float:
     # Expensive calculation cached
-    return result
+    return 0.0
 ```
 
 ### 12. Code Quality Checklist

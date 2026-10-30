@@ -36,6 +36,7 @@ Usage:
 import os
 import sys
 import json
+import re
 import uuid
 import csv
 import argparse
@@ -82,7 +83,7 @@ def build_test_script(
         "// Auto-generated Test Assertions by Synapse-Hub",
         f"// 1. Assert Status Code is {expected_status}",
         f"pm.test('Status code is {expected_status}', function () {{",
-        f"    pm.expect(pm.response.code).to.be.oneOf([{expected_status}, 200, 201]);",
+        f"    pm.expect(pm.response.code).to.eql({expected_status});",
         "});",
         "",
         f"// 2. Assert SLA Latency (< {max_time_ms}ms)",
@@ -280,13 +281,34 @@ def parse_openapi_spec(spec_data: Dict[str, Any], base_url_override: Optional[st
                         "options": {"raw": {"language": "json"}}
                     }
 
-            # URL decomposition
-            path_segments = [seg for seg in path.strip("/").split("/") if seg]
+            # URL decomposition and path parameterization
+            raw_path = path
+            path_variables = []
+            normalized_segments = []
+            for seg in path.strip("/").split("/"):
+                if not seg:
+                    continue
+                match = re.match(r"^\{([a-zA-Z0-9_-]+)\}$", seg)
+                if match:
+                    param_name = match.group(1)
+                    raw_path = raw_path.replace(f"{{{param_name}}}", f":{param_name}")
+                    normalized_segments.append(f":{param_name}")
+                    default_val = "{{lastCreatedId}}" if param_name.lower() in ("id", "entityid", "orderid") else f"{{{{{param_name}}}}}"
+                    path_variables.append({
+                        "key": param_name,
+                        "value": default_val,
+                        "description": f"URL Path variable {param_name}"
+                    })
+                else:
+                    normalized_segments.append(seg)
+
             url_obj = {
-                "raw": f"{{{{baseUrl}}}}{path}",
+                "raw": f"{{{{baseUrl}}}}{raw_path}",
                 "host": ["{{baseUrl}}"],
-                "path": path_segments
+                "path": normalized_segments
             }
+            if path_variables:
+                url_obj["variable"] = path_variables
             if query_params:
                 url_obj["query"] = query_params
 
@@ -451,10 +473,10 @@ def generate_postman_environment(name: str = "Enterprise-Staging-Env", base_url:
         "name": name,
         "values": [
             {"key": "baseUrl", "value": base_url, "enabled": True},
-            {"key": "bearerToken", "value": "", "enabled": True},
+            {"key": "bearerToken", "value": "", "type": "secret", "enabled": True},
             {"key": "lastCreatedId", "value": "1", "enabled": True},
             {"key": "adminUser", "value": "qa_admin@enterprise.local", "enabled": True},
-            {"key": "adminPass", "value": "SecretVault#2026", "enabled": True}
+            {"key": "adminPass", "value": "SecretVault#2026", "type": "secret", "enabled": True}
         ],
         "_postman_variable_scope": "environment"
     }

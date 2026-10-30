@@ -6,6 +6,9 @@ description: "Run dynamic security audits: OWASP Top 10, security headers, IDOR,
 # Security DAST Sentinel (Dynamic Application Security & OWASP Top 10)
 
 > **Purpose:** Automated Dynamic Application Security Testing (DAST) and defensive runtime verification across enterprise web applications and REST/GraphQL APIs. Bridges functional automated testing with OWASP Top 10 defensive compliance gates.
+>
+> [!IMPORTANT] Authorization & Scope of Engagement
+> Dynamic security testing and fuzzing must **ONLY** be conducted against environments, domains, and applications for which explicit written authorization and testing agreements are established. Never direct automated security payloads or fuzzers against third-party production infrastructure.
 
 ---
 
