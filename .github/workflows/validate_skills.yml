@@ -29,7 +29,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Verify 7 DoD Quality Gates
+      - name: Verify 9 DoD Quality Gates
         shell: bash
         run: |
           python tools/verify_all.py --mode hub
@@ -37,4 +37,9 @@ jobs:
       - name: Run Centralized Tooling Unit & Functional Tests
         shell: bash
         run: |
-          python -m unittest discover tests
+          python -m unittest discover tests -p "test_*.py"
+
+      - name: Verify Documentation & Tool References Integrity
+        shell: bash
+        run: |
+          python tools/lint_ai_docs.py

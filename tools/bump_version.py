@@ -167,6 +167,9 @@ def main():
     # 1. package.json
     update_json_root_version("package.json", new_ver, args.dry_run)
 
+    # 1b. plugin.json
+    update_json_root_version("plugin.json", new_ver, args.dry_run)
+
     # 2. pyproject.toml
     update_file("pyproject.toml", r'(version\s*=\s*")[^"]+(")', rf"\g<1>{new_ver}\g<2>", args.dry_run)
 

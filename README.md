@@ -4,7 +4,17 @@
 
 > **Bộ não trí tuệ dùng chung và mạng lưới kỹ năng tự hành, tăng cường năng lực cho các trợ lý AI (Google Antigravity, Cursor, Windsurf, Claude Code) trên mọi hệ sinh thái kiểm thử tự động.**  
 > **Tác giả:** Thế Vị ([@TeeVee998](https://github.com/TeeVee998))  
-> **Phiên bản Hub:** `v2.2.4` | **Quy mô:** 28 Kỹ năng chuẩn hóa, 6 Vai trò AI Swarm, 7 Quy tắc cốt lõi, 20+ Công cụ tự động.
+> **Phiên bản Hub:** `v2.2.4` | **Quy mô:** 28 Kỹ năng chuẩn hóa, 6 Vai trò AI Swarm, 7 Quy tắc cốt lõi, 50+ Công cụ tự động.
+
+---
+
+### 🚫 Phạm Vi Hoạt Động & Những Gì Dự Án KHÔNG Làm (Non-Goals)
+
+Để duy trì kiến trúc tinh gọn và chuyên sâu cho Quality Engineering, Synapse Hub xác định rõ ranh giới kiến trúc:
+- **KHÔNG phải là Test Runner thay thế:** Synapse Hub không tự phát minh test runner mới; dự án tận dụng và điều phối các runner tiêu chuẩn công nghiệp (Playwright, Pytest, Katalon/Gradle, Newman, JMeter).
+- **KHÔNG can thiệp mã nguồn ứng dụng (AUT Production Code):** Hub chỉ tập trung vào mã kiểm thử, Page Object, bộ lọc log, dữ liệu tổng hợp và cổng chất lượng.
+- **KHÔNG lưu trữ thông tin nhạy cảm tập trung:** Toàn bộ session, cookies, mật khẩu phải được quản trị qua biến môi trường hoặc file cục bộ được gitignore (`.auth/*.json`), không bao giờ đồng bộ lên remote.
+- **KHÔNG ép buộc công nghệ cố định:** Thiết kế theo mô hình tách rời (Decoupled Hub & Spoke), hỗ trợ linh hoạt đa ngôn ngữ (TypeScript, Python, Java, Groovy) qua Universal Intermediate Representation (IR).
 
 ---
 
@@ -58,13 +68,13 @@ flowchart TD
 
 #### 3. 📊 So Sánh Hiệu Năng Thực Tế:
 
-| Tiêu chí đánh giá | Cách làm thông thường (Naive AI Prompting) | Khi sử dụng Synapse Hub 🧠 |
-| :--- | :---: | :---: |
-| **Token tiêu thụ / mỗi lần fix lỗi** | 15.000 – 40.000 tokens *(đọc cả file lớn, dump cả log)* | **300 – 800 tokens (Tiết kiệm > 90%)** |
-| **Tỷ lệ Fake-Pass (Test pass ảo, 0 assert)** | 30% – 50% *(AI có xu hướng nuốt lỗi để báo PASS)* | **0% (Chặn đứng bởi Truth Anchor & 9 DoD Gates)** |
-| **Trí nhớ sửa lỗi xuyên phiên (Cross-Session)** | Quên sạch ngay khi mở tab chat mới | **Bền vững qua SQLite Central Cache (0 token)** |
-| **Hiện tượng quên ngữ cảnh (Context Rot)** | Xảy ra nhanh chóng sau 40k – 60k tokens | **Miễn nhiễm nhờ 3 tầng Progressive Disclosure** |
-| **Thời gian tự phục hồi lỗi (MTTR)** | 5 – 15 phút mò mẫm thử nghiệm | **< 1 giây (Tra cứu kinh nghiệm có sẵn)** |
+| Tiêu chí đánh giá | Cách làm thông thường (Naive AI Prompting) | Khi sử dụng Synapse Hub 🧠 | Phương pháp & Bằng chứng kiểm chứng |
+| :--- | :---: | :---: | :--- |
+| **Token tiêu thụ / mỗi lần fix lỗi** | 15.000 – 40.000 tokens *(đọc cả file lớn, dump cả log)* | **300 – 800 tokens** | Đo trên micro-turn fix locator: `tools/distill_log.py` giảm 95% log + `tools/repo_map.py` nén AST signatures < 600 tokens (chưa gồm ~7k token system prefix ban đầu). |
+| **Tỷ lệ Fake-Pass (Test pass ảo, 0 assert)** | 30% – 50% *(AI có xu hướng nuốt lỗi để báo PASS)* | **Chặn đứng ở Gates** | Gate 0 & Gate 7 (`tools/infer_linter.py`) quét AST bắt nuốt exception và script thiếu assert; Gate 8 (`tools/micro_mutator.py`) yêu cầu Mutation Score $\ge 80\%$. |
+| **Trí nhớ sửa lỗi xuyên phiên (Cross-Session)** | Quên sạch ngay khi mở tab chat mới | **Bền vững qua SQLite Central Cache** | Lưu và tra cứu giải pháp qua SQLite vector cosine tại `~/.agent_memory/global_cache.db` (lệnh: `python tools/cache_resolver.py query "<error>"`). |
+| **Hiện tượng quên ngữ cảnh (Context Rot)** | Xảy ra nhanh chóng sau 40k – 60k tokens | **Giảm thiểu rõ rệt** | Phân tầng thông tin 3 cấp: repo_map (Tier 1) ➔ dependency graph (Tier 2) ➔ micro-read 20-50 dòng (Tier 3). |
+| **Thời gian tự phục hồi lỗi (MTTR)** | 5 – 15 phút mò mẫm thử nghiệm | **Tức thì khi cache hit (< 1s)** | Khi lỗi đã có trong SQLite cache, `cache_resolver.py` giải quyết trong < 0.1s thay vì lặp prompt tìm kiếm. |
 
 *(Lưu ý: 300–800 token là chi phí ngữ cảnh động của từng lượt sửa lỗi vi mô (micro-turn payload) nhờ repo_map và distill_log; chưa tính chi phí nạp hệ thống/rules ban đầu của IDE ~7.000 tokens).*
 
@@ -307,6 +317,16 @@ Dự án được phân phối chính thức dưới giấy phép **[MIT License
 
 ---
 
+### 🚫 Project Scope & Explicit Non-Goals
+
+To maintain a lightweight and focused architecture for Quality Engineering, Synapse Hub defines clear boundaries:
+- **NOT an Alternative Test Runner:** Synapse Hub does not reinvent test runners; it orchestrates and supercharges industry-standard runners (Playwright, Pytest, Katalon/Gradle, Newman, JMeter).
+- **Zero Modifications to AUT Production Code:** Synapse Hub operates strictly on test code, page objects, log filters, synthetic test data, and quality gates.
+- **Zero Centralized Secret Storage:** All sessions, cookies, and tokens are stored in environment variables or gitignored local files (`.auth/*.json`), never committed to remote repositories.
+- **Framework & Vendor Agnostic:** Adheres to a decoupled Hub-and-Spoke topology, accommodating polyglot stacks (TypeScript, Python, Java, Groovy) via Universal Intermediate Representation (IR).
+
+---
+
 ## 🌟 1. Overview & Architectural Purpose
 
 **Synapse Hub** serves as a **Decoupled Shared Intelligence Core**, acting as an external neural brain completely isolated from target projects' codebases. It equips AI agents with specialized swarm roles, self-healing execution protocols, AST-level code intelligence, and strict Quality Gates—enabling zero-leakage, truth-anchored test automation across any polyglot codebase without polluting target repositories.
@@ -357,13 +377,13 @@ flowchart TD
 
 #### 3. 📊 Quantitative Performance Benchmark:
 
-| Evaluation Metric | Naive AI Coding Prompting | With Synapse Hub 🧠 |
-| :--- | :---: | :---: |
-| **Tokens Consumed per Bug Fix** | 15,000 – 40,000 tokens *(dumps entire classes & logs)* | **300 – 800 tokens (> 90% Savings)** |
-| **Fake-Pass Rate (0 asserts, false passes)** | 30% – 50% *(LLMs tend to relax asserts)* | **0% (Locked by Truth Anchor & 9 DoD Gates)** |
-| **Cross-Session Fix Memory** | 100% forgotten upon new chat session | **Persistent via SQLite Central Cache (0 token)** |
-| **Context Rot / Lost-in-the-Middle** | High degradation after 40k – 60k tokens | **Immune via 3-Tier Progressive Disclosure** |
-| **Mean Time-to-Heal (MTTR)** | 5 – 15 minutes of trial-and-error | **< 1 second (Direct cache resolution)** |
+| Evaluation Metric | Naive AI Coding Prompting | With Synapse Hub 🧠 | Empirical Verification Method |
+| :--- | :---: | :---: | :--- |
+| **Tokens Consumed per Bug Fix** | 15,000 – 40,000 tokens *(dumps entire classes & logs)* | **300 – 800 tokens** | Measured per micro-turn locator fix via `distill_log.py` (95% log compression) + `repo_map.py` (< 600 token signatures). Excludes ~7k tokens one-time system prompt prefix. |
+| **Fake-Pass Rate (0 asserts, false passes)** | 30% – 50% *(LLMs tend to relax asserts)* | **Enforced by Quality Gates** | Gate 0 & Gate 7 (`infer_linter.py`) block swallowed exceptions and missing asserts; Gate 8 (`micro_mutator.py`) enforces Mutation Score $\ge 80\%$. |
+| **Cross-Session Fix Memory** | 100% forgotten upon new chat session | **Persistent via SQLite Central Cache** | Persisted and queried offline via SQLite vector cosine in `~/.agent_memory/global_cache.db` (CLI: `python tools/cache_resolver.py query "<error>"`). |
+| **Context Rot / Lost-in-the-Middle** | High degradation after 40k – 60k tokens | **Significantly Mitigated** | 3-tier Progressive Disclosure: repo_map (Tier 1) ➔ dependency graph (Tier 2) ➔ micro-read 20-50 lines (Tier 3). |
+| **Mean Time-to-Heal (MTTR)** | 5 – 15 minutes of trial-and-error | **Sub-second on cache hits** | Pre-cached failure vectors resolve deterministically in < 0.1s without repetitive trial-and-error prompt iterations. |
 
 *(Note: 300–800 tokens represents the dynamic micro-turn execution payload achieved via repo_map and distill_log, excluding the one-time IDE system rules prefix overhead of ~7,000 tokens).*
 

@@ -69,7 +69,13 @@ Test automation scripts orchestrated through this Hub enforce strict Clean POM b
 
 ---
 
-## 4. Multi-Agent Swarm Collaboration Matrix
+## 5. Architectural Boundaries & Non-Goals
+
+To maintain a lightweight, deterministic, and highly portable architecture, Synapse Hub establishes explicit boundaries:
+- **No Proprietary Test Runner:** Does not implement a replacement runner engine. Bridges natively with standard runners (Playwright, Pytest, Katalon/Gradle, Newman, JMeter).
+- **Zero AUT Source Code Modifications:** Operates exclusively within test specifications, Page Object models, mock definitions, and verification gates.
+- **Decoupled Stateless Hub:** Never writes persistent user credentials or proprietary corporate data to git.
+- **Target Language Agnostic:** Leverages Universal Intermediate Representation (Universal IR) to bridge TypeScript, Python, Groovy, and Java seamlessly.
 
 The Hub equips 6 specialized subagents with scoped tool and skill permissions:
 

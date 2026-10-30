@@ -11,6 +11,7 @@ Ensures:
 
 import sys
 import os
+import shlex
 import subprocess
 
 # Enforce UTF-8 stdout encoding for Windows console compatibility
@@ -24,7 +25,9 @@ if hasattr(sys.stdout, 'reconfigure'):
 FORBIDDEN_PATHS = ["/Users/", "C:\\Workspace\\", "D:\\Workspace\\", "file:///c:", "file:///d:"]
 
 def run_cmd(cmd):
-    return subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
+    if isinstance(cmd, str):
+        cmd = shlex.split(cmd)
+    return subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
 def check_bom(files):
     bom_files = []

@@ -17,6 +17,7 @@ import os
 import re
 import sys
 import json
+import shlex
 import argparse
 import subprocess
 import tempfile
@@ -270,9 +271,9 @@ def evaluate_mutants_dynamically(file_path: str, code: str, mutants: List[Dict[s
                 f.write(mutated_code)
 
             try:
+                cmd_args = shlex.split(test_cmd, posix=sys.platform != "win32") if isinstance(test_cmd, str) else test_cmd
                 proc = subprocess.run(
-                    test_cmd,
-                    shell=True,
+                    cmd_args,
                     capture_output=True,
                     timeout=30,
                     text=True

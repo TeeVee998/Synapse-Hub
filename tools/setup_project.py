@@ -204,22 +204,27 @@ def install_git_pre_push_hook(target_dir):
     hook_snippet = f"""
 # --- Synapse-Hub Pre-Push Quality Gate (v{pkg_ver}) ---
 echo "\\n[AI-GUARD] Running Pre-Push Verification (Quality Gates DoD)..."
-if command -v npx >/dev/null 2>&1; then
-    npx synapse-hub@{pkg_ver} verify || npx synapse-hub verify
-elif [ -f "{verify_all_script}" ]; then
+# Prioritize local tool execution to run offline without network latency or registry dependency
+if [ -f "{verify_all_script}" ]; then
     python3 "{verify_all_script}" || python "{verify_all_script}"
+elif command -v agent-qa >/dev/null 2>&1; then
+    agent-qa verify
+elif command -v npx >/dev/null 2>&1; then
+    npx --no-install synapse-hub verify 2>/dev/null || npx synapse-hub@{pkg_ver} verify
 fi
 if [ $? -ne 0 ]; then
     echo "\\n[AI-GUARD - REJECTED] Git Push aborted: Quality Gates verification failed!"
-    echo "Please fix defects or run 'npx synapse-hub@{pkg_ver} verify' locally before pushing.\\n"
+    echo "Please fix defects or run 'python tools/verify_all.py' locally before pushing.\\n"
     exit 1
 fi
 
 echo "[AI-GUARD - PASSED] Quality Gates satisfied. Syncing project health report..."
-if command -v npx >/dev/null 2>&1; then
-    npx synapse-hub@{pkg_ver} analyze || npx synapse-hub analyze
-elif [ -f "{analyze_script}" ]; then
+if [ -f "{analyze_script}" ]; then
     python3 "{analyze_script}" || python "{analyze_script}"
+elif command -v agent-qa >/dev/null 2>&1; then
+    agent-qa analyze
+elif command -v npx >/dev/null 2>&1; then
+    npx --no-install synapse-hub analyze 2>/dev/null || npx synapse-hub@{pkg_ver} analyze
 fi
 echo "[AI-GUARD - READY] Pushing to remote...\\n"
 # --- End Synapse-Hub Quality Gate ---

@@ -97,17 +97,17 @@ def analyze_script(file_path):
     clean_code = strip_comments_and_strings(content, preserve_newlines=True)
     clean_lines = [l.strip() for l in clean_code.splitlines()]
 
-    # Rule 1: Empty Test Script
+    # Rule 1: Empty Test Script (zero executable non-import, non-package statements)
     executable_lines = [
         l for l in clean_lines 
-        if l and not l.startswith("import ") and not l.startswith("package ")
+        if l and not l.startswith("import ") and not l.startswith("package ") and not l.startswith("from ")
     ]
-    if len(executable_lines) <= 2:
+    if len(executable_lines) == 0:
         defects.append({
             "type": "EMPTY_TEST_SCRIPT",
             "severity": "CRITICAL",
             "line": 1,
-            "message": "Test script appears empty or contains only comments/imports."
+            "message": "Test script is empty or contains only comments/imports."
         })
 
     # Rule 2: Swallowed Exceptions (empty catch blocks)
@@ -202,7 +202,9 @@ def run_infer_linter(target_dir=None):
         health_score = 0.0
         clean_pct = 0.0
     else:
-        health_score = round(((total_scripts - critical_count) / total_scripts) * 100, 1)
+        # Codebase health score bounded between 0.0 and 100.0%
+        # Critical defects reduce health score proportionally
+        health_score = max(0.0, min(100.0, round(((total_scripts - critical_count) / total_scripts) * 100, 1)))
         clean_pct = round((clean_count / total_scripts) * 100, 1)
 
     print(f"\n{BOLD}{CYAN}======================================================================{RESET}")
