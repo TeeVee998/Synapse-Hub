@@ -1,7 +1,7 @@
 # Agent-Skills Architecture & Design Principles
 
 > **Scope:** Enterprise Multi-Agent QA Hub  
-> **Version:** `2.1.1` | **Status:** Active / Production Standard
+> **Version:** `2.2.0` | **Status:** Active / Production Standard
 
 ---
 

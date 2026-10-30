@@ -160,7 +160,7 @@ while (($line = $inputReader.ReadLine()) -ne $null) {
                 result = @{
                     protocolVersion = "2024-11-05"
                     capabilities = @{ tools = @{} }
-                    serverInfo = @{ name = "excel-qa-mcp-server"; version = "2.1.1" }
+                    serverInfo = @{ name = "excel-qa-mcp-server"; version = "2.2.0" }
                 }
             }
             [System.Console]::Out.WriteLine(($resp | ConvertTo-Json -Compress -Depth 10))
