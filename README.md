@@ -4,7 +4,7 @@
 
 > **Bộ não trí tuệ dùng chung và mạng lưới kỹ năng tự hành, tăng cường năng lực cho các trợ lý AI (Google Antigravity, Cursor, Windsurf, Claude Code) trên mọi hệ sinh thái kiểm thử tự động.**  
 > **Tác giả:** Thế Vị ([@TeeVee998](https://github.com/TeeVee998))  
-> **Phiên bản Hub:** `v2.3.0` | **Quy mô:** 28 Kỹ năng chuẩn hóa, 6 Vai trò AI Swarm, 7 Quy tắc cốt lõi, 50+ Công cụ tự động.
+> **Phiên bản Hub:** `v2.3.0` | **Quy mô:** 29 Kỹ năng chuẩn hóa, 7 Workflows thực chiến, 6 Vai trò AI Swarm, 10 Quy tắc cốt lõi, 50+ Công cụ tự động.
 
 ---
 
@@ -25,11 +25,12 @@
 ```mermaid
 flowchart TD
     subgraph Hub["🧠 Synapse Hub (Intelligence Core v2.3.0)"]
-        Skills[".agents/skills/ (28 Skills)"]
+        Skills[".agents/skills/ (29 Skills)"]
         Agents[".agents/agents/ (6 Specialized Roles)"]
-        Rules[".agents/rules/ (7 Core Rules)"]
-        Tools["tools/ (20+ Universal Python Tools)"]
-        Workflows[".agents/workflows/"]
+        Rules[".agents/rules/ (10 Core Rules)"]
+        Tools["tools/ (50+ Universal Python Tools)"]
+        Workflows[".agents/workflows/ (7 Workflows)"]
+        Practices["examples/practices/ (Corpus)"]
     end
 
     subgraph ChatSession["💬 AI Agent Workspace / Chat Session"]
@@ -178,7 +179,7 @@ Hub phân chia năng lực rõ ràng cho 6 vai trò Agent, mỗi Agent được 
 
 ---
 
-## 📦 4. Danh Mục 28 Kỹ Năng Chuẩn Hóa (.agents/skills/)
+## 📦 4. Danh Mục 29 Kỹ Năng Chuẩn Hóa (.agents/skills/)
 
 | STT | Tên Kỹ Năng (Skill) | Phạm Vi Hoạt Động Cốt Lõi |
 |:---:|---|---|
@@ -210,10 +211,11 @@ Hub phân chia năng lực rõ ràng cho 6 vai trò Agent, mỗi Agent được 
 | 26 | `wcag-audit-patterns` | Kiểm toán tiếp cận web WCAG 2.2 Level A/AA tự động qua AST và `@axe-core`. |
 | 27 | `web-vitals-and-performance-profiler` | Đo lường Core Web Vitals (LCP, CLS, TTFB) và giám sát API endpoint chậm qua CDP. |
 | 28 | `skillspector-security-guard` | Kiểm toán bảo mật AI Agent skills & MCP configs với 71 vector lỗ hổng (Prompt Injection, Data Exfiltration, Privilege Escalation) theo chuẩn NVIDIA SkillSpector. |
+| 29 | `rbt-manual-testing` | Quy trình 6 bước AI-RBT sinh Test Case thủ công, ma trận rủi ro $P \times I$, bảng Ambiguity Log, ma trận 12 cột, checklist 15 loại input field và kịch bản phi chức năng (Double-Submit, Race Conditions). |
 
 ---
 
-## 📜 5. Danh Mục 8 Quy Tắc Cốt Lõi (.agents/rules/)
+## 📜 5. Danh Mục 10 Quy Tắc Cốt Lõi (.agents/rules/)
 
 1. **`context-engineering.md`**: Giao thức lọc log thừa (Observation Masking), khai báo lười (Lazy Loading) và tối ưu hóa KV-Cache.
 2. **`git-push-protocol.md`**: Giao thức Git Push chuẩn hóa cho dự án mục tiêu (Clean SCM by Architecture, loại bỏ hoàn toàn nhu cầu dual-remote/smart-push nhờ tách repo độc lập).
@@ -223,14 +225,44 @@ Hub phân chia năng lực rõ ràng cho 6 vai trò Agent, mỗi Agent được 
 6. **`skill-precedence.md`**: Thứ tự ưu tiên kỹ năng cục bộ, chống xung đột trigger với plugin bên ngoài.
 7. **`systematic-debugging.md`**: Kỷ luật điều tra lỗi có căn cứ, cấm đoán mò và verify-first (9 Quality Gates DoD).
 8. **`author-integrity-guard.md`**: Bảo toàn thông báo bản quyền tác giả theo giấy phép MIT và phòng chống đạo văn.
+9. **`mobile_appium_rules.md`**: Quy tắc tự động hóa kiểm thử Native Mobile (Appium, Screen Object Model, chiến lược Locator tối ưu cho iOS/Android, smart wait và xử lý lifecycle).
+10. **`performance_testing_rules.md`**: Bất biến an toàn kiểm thử tải và hiệu năng (k6/JMeter/Locust, Approval Gate, Hard Caps, Kill-Switch `abortOnFail`, Open/Closed workload modeling, cô lập bên thứ 3 và Truth Anchor).
 
 ---
 
-## 🛠️ 6. Sổ Tay 50+ Công Cụ Tự Động Hóa Chuyên Biệt (tools/ & scripts/)
+## 📋 6. Hệ Thống 7 Workflows Thực Chiến (.agents/workflows/)
+
+Synapse Hub cung cấp 7 quy trình làm việc chuẩn hóa dưới dạng các câu lệnh trực quan (Slash Commands / Prompts):
+
+| Workflow | Mục Đích Nghiệp Vụ Cốt Lõi |
+| :--- | :--- |
+| **`generate_manual_testcases_rbt.md`** | Phân tích rủi ro $P \times I$, giải quyết câu hỏi mập mờ (Ambiguity Q&A), và sinh ma trận test case 12 cột. |
+| **`generate_testcases_from_requirements.md`** | Chuyển đổi trực tiếp tài liệu đặc tả (BRD, SRS, User Stories) thành bộ kiểm thử chấp nhận (Acceptance Tests). |
+| **`generate_cross_module_test_plan.md`** | Lập kế hoạch kiểm thử luồng nghiệp vụ E2E xuyên suốt nhiều module (Cart ➔ Checkout ➔ Payment ➔ Warehouse). |
+| **`generate_combinatorial_test_data.md`** | Sinh tập dữ liệu kiểm thử tổ hợp All-Pairs / Pairwise bao phủ tối đa trường hợp biên với số ca test tối thiểu. |
+| **`generate_requirements_from_website.md`** | Tự động thám sát Live Web bằng Playwright headless để trích xuất ngược đặc tả nghiệp vụ (Reverse-Engineering). |
+| **`analyze_requirement_document.md`** | Quét phát hiện mâu thuẫn logic, khoảng trống nghiệp vụ và các phát biểu mơ hồ trong tài liệu PRD. |
+| **`export_testcases_excel.md`** | Xuất bảng Test Case từ Markdown sang file Excel (.xlsx) chuẩn doanh nghiệp với màu sắc trực quan qua OpenPyXL. |
+
+---
+
+## 🧪 7. Kho Dữ Liệu Thực Hành Mẫu (examples/practices/)
+
+Tập hợp các tài liệu đặc tả và bộ test cases mẫu từ các hệ thống thực tế dùng làm điểm tựa chuẩn hóa (Golden Benchmarks) và học Few-Shot:
+
+- **`requirements/crm/`**: Đặc tả chức năng hệ thống CRM (Đăng nhập, Quản lý Khách hàng, Dự án, Hợp đồng, Công việc).
+- **`requirements/ecommerce/`**: Quy chuẩn quản lý Danh mục sản phẩm (Categories) và Thương hiệu (Brands).
+- **`requirements/jira/`**: Dữ liệu xuất mẫu từ Jira Kanban Epic/Stories (`KAN-1` đến `KAN-6`) kèm ảnh chụp UI mẫu.
+- **`testcases/crm/` & `testcases/api/`**: Bộ Test Case UI và REST API mẫu (User Management, Book Management) chuẩn AI-RBT.
+
+---
+
+## 🛠️ 8. Sổ Tay 50+ Công Cụ Tự Động Hóa Chuyên Biệt (tools/ & scripts/)
 
 Chi tiết đầy đủ xem tại [tools/TOOLS_RUNBOOK.md](tools/TOOLS_RUNBOOK.md):
 
 - `tools/verify_all.py`: Cổng thẩm định 9 Gates DoD (Gate 0–8: UTF-8, No XPaths, UniqueCode, Clean POM, AST Mutation).
+- `tools/md_to_xlsx.py` (`agent-qa export-excel`): Xuất bảng Test Case từ Markdown sang file Excel (.xlsx) chuyên nghiệp (định dạng header doanh nghiệp, frozen panes, auto-fit cột, huy hiệu màu P1-P4).
 - `tools/generate_jmx_plan.py`: Sinh kịch bản Apache JMeter 5.x (.jmx) đa giao thức (HTTP, JDBC, WS, gRPC, Kafka) kèm Traffic Shaping Pareto.
 - `tools/jtl_analyzer.py`: Phân tích kết quả JTL, kiểm soát SLA percentiles ($P_{90}, P_{95}, P_{99}$) và làm Quality Gate CI/CD.
 - `tools/telemetry_correlator.py`: Phân tích tương quan Pearson giữa Client Latency và Server APM (CPU, RAM, DB Pool).
@@ -254,16 +286,17 @@ Chi tiết đầy đủ xem tại [tools/TOOLS_RUNBOOK.md](tools/TOOLS_RUNBOOK.m
 - `tools/generate_tc_from_story.py`: Large Action Model parser sinh khung Clean POM từ User Story.
 - `tools/trace_data_flow.py`: Kiểm tra luồng dữ liệu kiểm thử, phát hiện rác dữ liệu DB (Orphan Data).
 - `scripts/install.ps1` & `scripts/setup.sh`: Script cài đặt 1-click tự động khởi tạo môi trường Hub.
-- `scripts/lint_skills.ps1`: Linter kiểm tra tính toàn vẹn 28 skills và metadata manifest.
+- `scripts/lint_skills.ps1`: Linter kiểm tra tính toàn vẹn 29 skills và metadata manifest.
 - `pyproject.toml` & `tools/cli.py`: Đóng gói chuẩn PEP 621 cho lệnh CLI toàn cầu `agent-qa`.
 
 ---
 
-## 📚 7. Tài Liệu Kỹ Thuật Mở Rộng & CLI Package (docs/)
+## 📚 9. Tài Liệu Kỹ Thuật Mở Rộng & CLI Package (docs/)
 
 1. **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**: Kiến trúc Hub/Spoke, mô hình 4 tầng kỹ năng, và ma trận phối hợp 6 Subagent Swarm.
 2. **[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)**: Quy chuẩn đóng góp, nguyên tắc sáng tạo skill mới và quy trình kiểm định toàn vẹn.
 3. **[docs/CLI_REFERENCE.md](docs/CLI_REFERENCE.md)**: Cẩm nang tra cứu toàn bộ tham số lệnh của công cụ dòng lệnh `agent-qa`.
+4. **[docs/TOKEN_QUOTA_PLAYBOOK.md](docs/TOKEN_QUOTA_PLAYBOOK.md)**: Chiến lược phân tầng mô hình (Claude Sonnet vs Gemini Pro vs Gemini Flash), tối ưu chi phí và điều hướng theo hạn mức API quota.
 
 ### Cài đặt nhanh CLI Package:
 ```bash
@@ -271,11 +304,12 @@ pip install -e .
 agent-qa --help
 agent-qa verify
 agent-qa lint
+agent-qa export-excel
 ```
 
 ---
 
-## 🤝 8. Nguồn Cảm Hứng & Lời Cảm Ơn (Acknowledgments & Inspirations)
+## 🤝 10. Nguồn Cảm Hứng & Lời Cảm Ơn (Acknowledgments & Inspirations)
 
 Dự án **Synapse Hub** được tổng hợp, kế thừa và phát triển dựa trên tinh thần mã nguồn mở và những ý tưởng đột phá từ các kho lưu trữ xuất sắc của cộng đồng kỹ nghệ phần mềm & AI:
 
@@ -294,7 +328,7 @@ Dự án **Synapse Hub** được tổng hợp, kế thừa và phát triển d�
 
 ---
 
-## 📄 9. Bản Quyền & Điều Khoản Sử Dụng (License & Attribution)
+## 📄 11. Bản Quyền & Điều Khoản Sử Dụng (License & Attribution)
 
 Dự án được phân phối chính thức dưới giấy phép **[MIT License](LICENSE)**.
 
@@ -313,7 +347,7 @@ Dự án được phân phối chính thức dưới giấy phép **[MIT License
 
 > **The shared intelligence core and autonomous skill hub empowering AI coding assistants (Google Antigravity / Cursor / Windsurf / Claude Code) across automated testing suites.**  
 > **Author:** Thế Vị ([@TeeVee998](https://github.com/TeeVee998))  
-> **Hub Version:** `v2.3.0` (Semantic Versioning) | **Integrity Index:** 28 Skills, 6 Agent Swarm Roles, 8 Core Rules, 50+ Specialized Python Tools, 9 Quality Gates.
+> **Hub Version:** `v2.3.0` (Semantic Versioning) | **Integrity Index:** 29 Skills, 7 Production Workflows, 6 Agent Swarm Roles, 10 Core Rules, 50+ Specialized Python Tools, 9 Quality Gates.
 
 ---
 
@@ -334,11 +368,12 @@ To maintain a lightweight and focused architecture for Quality Engineering, Syna
 ```mermaid
 flowchart TD
     subgraph Hub["🧠 Synapse Hub (Intelligence Core v2.3.0)"]
-        Skills[".agents/skills/ (28 Skills)"]
+        Skills[".agents/skills/ (29 Skills)"]
         Agents[".agents/agents/ (6 Specialized Roles)"]
-        Rules[".agents/rules/ (8 Core Rules)"]
+        Rules[".agents/rules/ (10 Core Rules)"]
         Tools["tools/ (50+ Universal Python Tools)"]
-        Workflows[".agents/workflows/"]
+        Workflows[".agents/workflows/ (7 Workflows)"]
+        Practices["examples/practices/ (Corpus)"]
     end
 
     subgraph ChatSession["💬 AI Agent Workspace / Chat Session"]
@@ -496,7 +531,7 @@ Synapse Hub clearly partitions capabilities across 6 specialized AI roles, pre-c
 
 ---
 
-## 📦 4. Standardized 28 Skills Catalog (.agents/skills/)
+## 📦 4. Standardized 29 Skills Catalog (.agents/skills/)
 
 | # | Skill Name | Core Operational Scope |
 |:---:|---|---|
@@ -528,10 +563,11 @@ Synapse Hub clearly partitions capabilities across 6 specialized AI roles, pre-c
 | 26 | `wcag-audit-patterns` | Automated WCAG 2.2 Level A/AA accessibility auditing via AST and `@axe-core`. |
 | 27 | `web-vitals-and-performance-profiler` | Core Web Vitals (LCP, CLS, TTFB) profiling and slow API endpoint detection via CDP. |
 | 28 | `skillspector-security-guard` | AI agent skill & MCP config security auditing against 71 vulnerability vectors (Prompt Injection, Data Exfiltration, Privilege Escalation) powered by NVIDIA SkillSpector spec. |
+| 29 | `rbt-manual-testing` | 6-stage Risk-Based Testing (AI-RBT) manual test case synthesis, $P \times I$ risk scoring, Ambiguity Q&A log, 12-column matrix, 15-field validation checklist, and non-functional resilience scenarios (Double-Submit, Race Conditions). |
 
 ---
 
-## 📜 5. 8 Core Rules Catalog (.agents/rules/)
+## 📜 5. 10 Core Rules Catalog (.agents/rules/)
 
 1. **`context-engineering.md`**: Observation masking, lazy progressive disclosure, and KV-cache optimization.
 2. **`git-push-protocol.md`**: Clean git push protocol (decoupled architecture guarantees zero AI leakage).
@@ -541,14 +577,44 @@ Synapse Hub clearly partitions capabilities across 6 specialized AI roles, pre-c
 6. **`skill-precedence.md`**: Tier-1 local skill precedence resolving external plugin collisions.
 7. **`systematic-debugging.md`**: Evidence-first debugging discipline; zero guessing; 9 Quality Gates DoD.
 8. **`author-integrity-guard.md`**: Mandatory MIT copyright notice preservation and anti-plagiarism guard.
+9. **`mobile_appium_rules.md`**: Native mobile automation rules (Appium, Screen Object Model, iOS/Android locator hierarchy, smart synchronization, app lifecycle handling).
+10. **`performance_testing_rules.md`**: Enterprise load & performance testing invariants (k6/JMeter/Locust, mandatory pre-flight approval, hard caps, `abortOnFail` kill-switch, open/closed workload modeling, third-party isolation, and Truth Anchor reporting).
 
 ---
 
-## 🛠️ 6. Automated Tools Runbook (50+ Specialized Python Tools)
+## 📋 6. 7 Production Workflows (.agents/workflows/)
+
+Synapse Hub equips agents with 7 standardized, slash-command-style workflows:
+
+| Workflow | Core Engineering Purpose |
+| :--- | :--- |
+| **`generate_manual_testcases_rbt.md`** | Comprehensive 6-stage AI-RBT manual test generation with $P \times I$ risk scoring and 12-column table output. |
+| **`generate_testcases_from_requirements.md`** | Direct compilation of requirement documents (SRS, PRD, User Stories) into acceptance test suites. |
+| **`generate_cross_module_test_plan.md`** | E2E integration test planning across interconnected modules (Cart ➔ Checkout ➔ Payment ➔ Warehouse). |
+| **`generate_combinatorial_test_data.md`** | All-Pairs / Pairwise test data generation optimizing boundary coverage with minimal test cases. |
+| **`generate_requirements_from_website.md`** | Autonomous reverse-engineering of functional specs from live web pages via headless Playwright probing. |
+| **`analyze_requirement_document.md`** | Static requirements linter surfacing logic contradictions, edge-case gaps, and ambiguity debt. |
+| **`export_testcases_excel.md`** | Automated conversion of Markdown test cases into professionally styled Excel spreadsheets (.xlsx) via OpenPyXL. |
+
+---
+
+## 🧪 7. Golden Practices & Benchmark Corpus (examples/practices/)
+
+Real-world domain specifications and benchmark test suites used for golden evaluations and offline few-shot learning:
+
+- **`requirements/crm/`**: Modular CRM functional specs (Authentication, Customers, Projects, Contracts, Tasks).
+- **`requirements/ecommerce/`**: E-Commerce Category and Brand management business rules.
+- **`requirements/jira/`**: Jira Kanban Epic & Story export samples (`KAN-1` through `KAN-6`) with UI reference mocks.
+- **`testcases/crm/` & `testcases/api/`**: Production-standard manual UI and REST API test suites (User & Book Management) in AI-RBT format.
+
+---
+
+## 🛠️ 8. Automated Tools Runbook (50+ Specialized Python Tools)
 
 For full details, refer to [tools/TOOLS_RUNBOOK.md](tools/TOOLS_RUNBOOK.md):
 
 - `tools/verify_all.py`: 9 Quality Gates DoD verification (Gate 0–8: UTF-8, No XPaths, UniqueCode, Clean POM, AST Mutation).
+- `tools/md_to_xlsx.py` (`agent-qa export-excel`): Converts Markdown test cases to styled corporate Excel workbooks (.xlsx) with frozen panes and priority badges.
 - `tools/generate_jmx_plan.py`: Multi-protocol Apache JMeter 5.x (.jmx) plan generator (HTTP, JDBC, WS, gRPC, Kafka) with Pareto traffic shaping.
 - `tools/jtl_analyzer.py`: JTL execution metrics analyzer, P95/P99 SLA gatekeeper, and CI/CD Quality Gate enforcer.
 - `tools/telemetry_correlator.py`: Full-stack Pearson correlation analyzer between client-side latency and server APM (CPU, RAM, DB Pool).
@@ -572,16 +638,17 @@ For full details, refer to [tools/TOOLS_RUNBOOK.md](tools/TOOLS_RUNBOOK.md):
 - `tools/generate_tc_from_story.py`: Large Action Model parser generating Clean POM skeletons from stories.
 - `tools/trace_data_flow.py`: Taint analysis tracking test data flow and preventing database orphan junk.
 - `scripts/install.ps1` & `scripts/setup.sh`: 1-click bootstrap scripts setting up the hub environment.
-- `scripts/lint_skills.ps1`: Linter verifying skill integrity and metadata manifest.
+- `scripts/lint_skills.ps1`: Linter verifying skill integrity across 29 skills and metadata manifest.
 - `pyproject.toml` & `tools/cli.py`: PEP 621 packaging for the global `agent-qa` CLI.
 
 ---
 
-## 📚 7. Extended Technical Documentation & CLI Package (docs/)
+## 📚 9. Extended Technical Documentation & CLI Package (docs/)
 
 1. **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**: Hub/Spoke architecture, 4-tier skill model, and 6-agent swarm coordination.
 2. **[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)**: Contribution standards, new skill authoring principles, and verification pipelines.
 3. **[docs/CLI_REFERENCE.md](docs/CLI_REFERENCE.md)**: Comprehensive command-line reference for the `agent-qa` CLI.
+4. **[docs/TOKEN_QUOTA_PLAYBOOK.md](docs/TOKEN_QUOTA_PLAYBOOK.md)**: Model tiering strategy (Claude Sonnet vs Gemini Pro vs Gemini Flash) and quota-conscious execution modes.
 
 ### Quick CLI Installation:
 ```bash
@@ -589,12 +656,13 @@ pip install -e .
 agent-qa --help
 agent-qa verify
 agent-qa lint
+agent-qa export-excel
 agent-qa skillspector
 ```
 
 ---
 
-## 🤝 8. Acknowledgments & Upstream Inspirations
+## 🤝 10. Acknowledgments & Upstream Inspirations
 
 **Synapse Hub** synthesizes, adapts, and builds upon groundbreaking methodologies and architectures from the global open-source and AI engineering community:
 
@@ -614,7 +682,7 @@ agent-qa skillspector
 
 ---
 
-## 📄 9. License & Author Attribution
+## 📄 11. License & Author Attribution
 
 This project is licensed under the **[MIT License](LICENSE)**.
 
