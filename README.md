@@ -71,7 +71,7 @@ flowchart TD
 ## 🚀 2. Hướng Dẫn Bắt Đầu & Tích Hợp (3 Cách Dùng)
 
 [![npm version](https://img.shields.io/npm/v/synapse-hub.svg?style=flat-square&color=blue)](https://www.npmjs.com/package/synapse-hub)
-[![npm downloads](https://img.shields.io/npm/dm/synapse-hub.svg?style=flat-square)](https://www.npmjs.com/package/synapse-hub)
+[![node version](https://img.shields.io/badge/node-%3E%3D16.0.0-brightgreen.svg?style=flat-square)](https://nodejs.org)
 [![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](https://github.com/TeeVee998/Synapse-Hub/blob/main/package.json)
 
 ---
@@ -354,7 +354,7 @@ flowchart TD
 ## 🚀 2. Getting Started & Integration (3 Approaches)
 
 [![npm version](https://img.shields.io/npm/v/synapse-hub.svg?style=flat-square&color=blue)](https://www.npmjs.com/package/synapse-hub)
-[![npm downloads](https://img.shields.io/npm/dm/synapse-hub.svg?style=flat-square)](https://www.npmjs.com/package/synapse-hub)
+[![node version](https://img.shields.io/badge/node-%3E%3D16.0.0-brightgreen.svg?style=flat-square)](https://nodejs.org)
 [![license](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](https://github.com/TeeVee998/Synapse-Hub/blob/main/package.json)
 
 ---
