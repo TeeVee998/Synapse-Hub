@@ -204,33 +204,38 @@ locust -f tests/load/locustfile.py --headless -u 100 -r 10 --run-time 5m \
        --exit-code-on-error 1
 ```
 
-### Autonomous Apache JMeter 360° Suite (Generation, Distributed Cluster & CI/CD Gate)
-Hub provides complete enterprise lifecycle automation for Apache JMeter 5.x via `generate_jmx_plan.py` and `jtl_analyzer.py`:
+### Autonomous Apache JMeter 360° Pinnacle Suite (Full-Stack & Multi-Protocol)
+Hub provides complete enterprise lifecycle automation for Apache JMeter 5.x via `generate_jmx_plan.py`, `jtl_analyzer.py`, and `telemetry_correlator.py`:
 
 ```bash
-# 1. Generate Full Enterprise Plan (Spike/Soak profile, CSV parameters, Transaction Controllers, JSR223 HMAC)
+# 1. Generate Full Enterprise Plan with Pareto Traffic Shaping (70/20/10) & Deep Correlation
 agent-qa generate-jmx --spec swagger.json -o perf_plan.jmx \
   --workload spike --vus 200 --duration 600 \
-  --csv-data users.csv --group-transactions --jsr223-hmac
+  --weighted-mix "70:Browse,20:Cart,10:Checkout" \
+  --csv-data users.csv --deep-correlation --jsr223-hmac
 
-# 2. Generate Plan with InfluxDB / Grafana Live Streaming
+# 2. Multi-Protocol Load Plans (WebSocket, gRPC, Kafka, JDBC)
+agent-qa generate-jmx --ws-sample -o websocket_plan.jmx      # Real-time WebSocket feed
+agent-qa generate-jmx --grpc-sample -o grpc_plan.jmx        # Microservices Unary RPC
+agent-qa generate-jmx --kafka-sample -o kafka_plan.jmx      # Event-driven message broker
+agent-qa generate-jmx --jdbc-sample -o jdbc_plan.jmx        # Direct Database SQL pool
+
+# 3. Live APM Telemetry & PerfMon Hardware Agent
 agent-qa generate-jmx --spec swagger.json -o perf_plan.jmx \
-  --influxdb-url http://influxdb:8086/write?db=jmeter
+  --influxdb-url http://influxdb:8086/write?db=jmeter \
+  --perfmon-server 192.168.1.50:4444
 
-# 3. Generate Database JDBC Benchmark Plan
-agent-qa generate-jmx --jdbc-sample -o jdbc_plan.jmx
-
-# 4. Execute Headless JMeter in CLI / CI Pipeline
-jmeter -n -t perf_plan.jmx -l results.jtl -e -o ./html_report
-
-# 5. Distributed Testing across Cluster (Master + 3 Slaves)
-# Templates located at: tools/templates/jmeter-distributed/
+# 4. Distributed Cluster Execution (Master + 3 Slaves)
 docker-compose -f tools/templates/jmeter-distributed/docker-compose.yml up -d
 jmeter -n -t perf_plan.jmx -R slave1,slave2,slave3 -l results.jtl
 
-# 6. CI/CD SLA Quality Gate Enforcement (Exit code 0 on Pass, 1 on Breach)
+# 5. CI/CD SLA Quality Gate Enforcement (Exit code 0 on Pass, 1 on Breach)
 agent-qa analyze-jtl results.jtl --sla-p95 500 --max-error-rate 1.0 \
   --markdown pr_perf_report.md --json metrics.json
+
+# 6. Full-Stack APM & Server Infrastructure RCA Correlator
+agent-qa correlate-telemetry --jtl results.jtl --server-metrics server_metrics.csv \
+  --markdown rca_report.md
 ```
 
 ---

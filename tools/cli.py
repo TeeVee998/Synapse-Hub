@@ -287,6 +287,12 @@ def cmd_analyze_jtl(args):
     sys.exit(jtl_main())
 
 
+def cmd_correlate_telemetry(args):
+    from telemetry_correlator import main as telem_main
+    sys.argv = [sys.argv[0]] + (sys.argv[2:] if len(sys.argv) > 2 else [])
+    sys.exit(telem_main())
+
+
 def cmd_update(args):
     import update_sentinel
     if getattr(args, "check", False):
@@ -449,6 +455,10 @@ def main():
     # analyze-jtl
     p_jtl = subparsers.add_parser("analyze-jtl", help="Analyze JMeter .jtl results, evaluate P90/P95/P99 SLA, and enforce CI/CD Quality Gate")
     p_jtl.set_defaults(func=cmd_analyze_jtl)
+
+    # correlate-telemetry
+    p_telemetry = subparsers.add_parser("correlate-telemetry", help="Correlate Client-Side JMeter latency with Server-Side APM CPU/RAM/DB telemetry")
+    p_telemetry.set_defaults(func=cmd_correlate_telemetry)
 
     # update
     p_update = subparsers.add_parser("update", help="1-Click update Synapse-Hub to latest version from GitHub/NPM")

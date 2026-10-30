@@ -365,6 +365,7 @@ def main():
     parser.add_argument("--max-error-rate", type=float, default=None, help="Maximum allowed error rate percentage (e.g. 1.0 = 1%).")
     parser.add_argument("--markdown", "-m", help="Output path for Markdown summary report.")
     parser.add_argument("--json", "-j", help="Output path for JSON summary metrics.")
+    parser.add_argument("--telemetry", help="Path to server telemetry CSV (timestamp, cpu_pct, memory_pct, db_pool_pct) for Full-Stack APM correlation.")
     parser.add_argument("--sample", action="store_true", help="Generate and analyze a mock JTL dataset for verification.")
 
     args = parser.parse_args()
@@ -421,11 +422,30 @@ def main():
         for v in violations:
             print(f"   🔴 {v}")
 
+    # Optional Telemetry Correlation
+    telemetry_analysis = None
+    if args.telemetry and os.path.exists(args.telemetry):
+        from telemetry_correlator import parse_jtl_time_series, parse_server_metrics, run_correlation_analysis
+        jtl_buckets = parse_jtl_time_series(args.jtl_file, bucket_sec=5)
+        server_series = parse_server_metrics(args.telemetry, bucket_sec=5)
+        telemetry_analysis = run_correlation_analysis(jtl_buckets, server_series)
+        print("\n" + "=" * 90)
+        print("  FULL-STACK APM & SERVER TELEMETRY CORRELATION (RCA)")
+        print("=" * 90)
+        for k, v in telemetry_analysis["correlations"].items():
+            print(f"  • {k.replace('_', ' ').title():<25} : {v:+0.3f}")
+        for c in telemetry_analysis["root_causes"]:
+            print(f"  [{c['severity']}] {c['component']}: {c['description']}")
+            print(f"    👉 Recommendation: {c['recommendation']}")
+
     # Export Markdown
     if args.markdown:
         md_content = generate_markdown_report(
             args.jtl_file, per_sampler_data, agg_data, passed, violations, vars(args)
         )
+        if telemetry_analysis:
+            from telemetry_correlator import format_rca_markdown
+            md_content += "\n\n" + format_rca_markdown(telemetry_analysis)
         os.makedirs(os.path.dirname(os.path.abspath(args.markdown)) or ".", exist_ok=True)
         with open(args.markdown, "w", encoding="utf-8") as f:
             f.write(md_content)
@@ -438,7 +458,8 @@ def main():
             "passed": passed,
             "violations": violations,
             "aggregate": agg_data,
-            "samplers": per_sampler_data
+            "samplers": per_sampler_data,
+            "telemetry_correlation": telemetry_analysis
         }
         os.makedirs(os.path.dirname(os.path.abspath(args.json)) or ".", exist_ok=True)
         with open(args.json, "w", encoding="utf-8") as f:
