@@ -1,0 +1,11 @@
+{
+  "policyName": "Enterprise-DoD-Gate-0-to-8",
+  "enforceGates": [
+    "Gate-0-Integrity",
+    "Gate-1-UTF8-NoBOM",
+    "Gate-3-CleanPOM",
+    "Gate-7-InferLinter",
+    "Gate-8-MicroMutator"
+  ],
+  "minMutationScore": 80.0
+}

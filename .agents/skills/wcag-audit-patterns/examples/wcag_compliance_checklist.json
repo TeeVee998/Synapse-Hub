@@ -1,0 +1,10 @@
+{
+  "conformanceLevel": "AA",
+  "criteria": [
+    "1.4.3 Contrast (Minimum)",
+    "2.1.1 Keyboard",
+    "2.4.7 Focus Visible",
+    "4.1.2 Name, Role, Value"
+  ],
+  "auditTool": "axe-core"
+}

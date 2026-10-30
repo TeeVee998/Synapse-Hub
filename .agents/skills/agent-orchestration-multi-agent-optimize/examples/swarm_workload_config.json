@@ -1,0 +1,12 @@
+{
+  "swarm": "LeadQAOrchestrator",
+  "subagents": [
+    "live-explorer",
+    "pom-crafter",
+    "test-runner",
+    "failure-analyst",
+    "quality-gatekeeper"
+  ],
+  "tokenBudgetPerAgent": 1200,
+  "concurrency": 3
+}

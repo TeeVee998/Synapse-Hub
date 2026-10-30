@@ -201,7 +201,8 @@ def gate_2_path_portability(repo_root, mode="AUTO"):
     }
     ignored_files = {
         ".project", ".classpath", ".DS_Store", "memory_cache.db",
-        "verify_all.py", "git_pre_commit_guard.py", "agent_canary.py", "repo_map.txt", "repo_map.json"
+        "verify_all.py", "git_pre_commit_guard.py", "agent_canary.py", "repo_map.txt", "repo_map.json",
+        "PROJECT_HEALTH_REPORT.md", "PROJECT_STATE.md"
     }
     violations = []
     for root, dirs, files in os.walk(repo_root):
@@ -491,23 +492,9 @@ def gate_8_micro_mutator(repo_root, mode="AUTO"):
     return True
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Enterprise DoD Verification Sentinel")
-    parser.add_argument("target", nargs="?", default=None,
-                        help="Target repository path to verify (defaults to auto-detection from CWD or Hub)")
-    parser.add_argument("--repo", "--path", dest="repo_path", default=None,
-                        help="Target repository path to verify")
-    parser.add_argument("--mode", choices=["auto", "hub", "target"], default="auto",
-                        help="Execution mode (auto-detect, hub, or target test project)")
-    args = parser.parse_args()
-
-    try:
-        repo_root = resolve_target_repo(cli_target=args.target, cli_repo=args.repo_path)
-    except FileNotFoundError as e:
-        print(f"[ERROR] {e}")
-        return 1
-
-    effective_mode = detect_repo_mode(repo_root) if args.mode == "auto" else args.mode.upper()
+def run_all_gates(repo_root, mode="AUTO"):
+    """Programmatic entrypoint to execute all 9 DoD Quality Gates."""
+    effective_mode = detect_repo_mode(repo_root) if mode.upper() == "AUTO" else mode.upper()
 
     print_header(f"ENTERPRISE AUTOMATION - ONE-COMMAND DoD VERIFICATION [{effective_mode} MODE]")
     print(f"Target Repository: {repo_root}")
@@ -542,6 +529,25 @@ def main():
         print("   Please review the errors above and resolve them before proceeding.")
         print("=" * 70 + "\n")
         return 1
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Enterprise DoD Verification Sentinel")
+    parser.add_argument("target", nargs="?", default=None,
+                        help="Target repository path to verify (defaults to auto-detection from CWD or Hub)")
+    parser.add_argument("--repo", "--path", dest="repo_path", default=None,
+                        help="Target repository path to verify")
+    parser.add_argument("--mode", choices=["auto", "hub", "target"], default="auto",
+                        help="Execution mode (auto-detect, hub, or target test project)")
+    args = parser.parse_args()
+
+    try:
+        repo_root = resolve_target_repo(cli_target=args.target, cli_repo=args.repo_path)
+    except FileNotFoundError as e:
+        print(f"[ERROR] {e}")
+        return 1
+
+    return run_all_gates(repo_root, mode=args.mode)
 
 
 if __name__ == "__main__":

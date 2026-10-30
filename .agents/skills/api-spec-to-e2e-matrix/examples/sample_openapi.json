@@ -1,0 +1,19 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Payment API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/payments": {
+      "post": {
+        "summary": "Create payment",
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    }
+  }
+}

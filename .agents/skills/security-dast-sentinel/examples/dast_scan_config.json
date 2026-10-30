@@ -1,0 +1,10 @@
+{
+  "targetUrl": "https://staging.internal.example.com",
+  "checks": [
+    "OWASP_TOP_10",
+    "HEADER_SECURITY",
+    "TOKEN_EXPOSURE",
+    "SQLI_PROBING"
+  ],
+  "failOnSeverity": "HIGH"
+}

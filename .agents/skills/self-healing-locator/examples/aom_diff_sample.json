@@ -1,0 +1,16 @@
+{
+  "brokenLocator": "#old-checkout-btn",
+  "historicalAttributes": {
+    "role": "button",
+    "text": "Confirm Order",
+    "testid": "checkout-submit"
+  },
+  "currentAOMSnapshot": [
+    {
+      "role": "button",
+      "name": "Confirm Order",
+      "testid": "checkout-submit-v2"
+    }
+  ],
+  "healedLocator": "button[data-testid='checkout-submit-v2']"
+}

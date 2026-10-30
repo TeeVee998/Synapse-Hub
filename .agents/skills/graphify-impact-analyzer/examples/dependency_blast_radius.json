@@ -1,0 +1,8 @@
+{
+  "modifiedFile": "src/pages/CheckoutPage.ts",
+  "impactedSuites": [
+    "tests/e2e/checkout.spec.ts",
+    "tests/e2e/payment.spec.ts"
+  ],
+  "blastRadiusScore": "LOW_ISOLATED"
+}

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="AuthenticationSuite" tests="1" failures="1">
+    <testcase name="testLoginFailure" classname="AuthTest">
+      <failure message="Timeout 30000ms exceeded waiting for locator('#submit-btn')" type="ElementNotFoundError"/>
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,6 @@
+{
+  "LCP_ms": 2500,
+  "CLS_score": 0.1,
+  "INP_ms": 200,
+  "networkThrottle": "Fast 3G"
+}

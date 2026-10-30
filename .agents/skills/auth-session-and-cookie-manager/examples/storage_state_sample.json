@@ -1,0 +1,11 @@
+{
+  "cookies": [
+    {
+      "name": "session_id",
+      "value": "sess_auto_998",
+      "domain": "example.com",
+      "path": "/"
+    }
+  ],
+  "origins": []
+}

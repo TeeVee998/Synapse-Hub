@@ -95,7 +95,7 @@ def detect_tech_stack(target_dir):
             "language": "Groovy",
             "page_dir": "Keywords/pages",
             "test_dir": "Scripts",
-            "run_cmd": "./tools/run_headless_kre.sh (or katalonc CLI)"
+            "run_cmd": "katalonc -noSplash -runMode=console"
         }
 
     # 2. Playwright check
@@ -143,7 +143,7 @@ def detect_tech_stack(target_dir):
     }
 
 
-def ensure_project_ai_guide(target_dir, stack_info):
+def ensure_project_ai_guide(target_dir, stack_info, profile="full"):
     """Generates PROJECT_AI_GUIDE.md tailored to the target project if missing."""
     guide_path = os.path.join(target_dir, "PROJECT_AI_GUIDE.md")
     if os.path.exists(guide_path):
@@ -166,6 +166,14 @@ def ensure_project_ai_guide(target_dir, stack_info):
     content = content.replace("src/pages/... or Keywords/pages/...", stack_info["page_dir"])
     content = content.replace("tests/e2e/... or Scripts/...", stack_info["test_dir"])
     content = content.replace("[e.g., npx playwright test --project=chromium --reporter=html,junit:results.xml]", stack_info["run_cmd"])
+
+    profile_line = f"- **Active Skills Profile:** `{profile.upper()}`"
+    if profile_line not in content:
+        lang_target = f"- **Script Language:** `{stack_info['language']}`"
+        if lang_target in content:
+            content = content.replace(lang_target, f"{lang_target}\n{profile_line}")
+        else:
+            content = content.replace("## 1. General System Under Test", f"## 1. General System Under Test\n{profile_line}")
 
     with open(guide_path, "w", encoding="utf-8") as f:
         f.write(content)
@@ -468,22 +476,38 @@ def uninstall_setup(target_repo: str) -> int:
     return 0
 
 
-def run_setup(target_repo, dry_run=False, profile="full"):
+def run_setup(target_repo, dry_run=False, profile="auto"):
     """Main execution entrypoint for automated project setup."""
     print(f"\n{BOLD}{CYAN}======================================================================{RESET}")
     print(f"{BOLD}{CYAN}      AUTONOMOUS ZERO-COMMAND PROJECT BOOTSTRAP (AI-READY SETUP)     {RESET}")
     print(f"{BOLD}{CYAN}======================================================================{RESET}")
     print(f"📁 Target Project  : {target_repo}")
-    print(f"🎯 Selected Profile: {BOLD}{profile.upper()}{RESET}")
-    if dry_run:
-        print(f"Operational Mode   : {YELLOW}DRY-RUN (Simulating without modifying files on disk){RESET}\n")
-    else:
-        print(f"Operational Mode   : APPLY CHANGES\n")
 
     # 1. Detect Stack
     stack_info = detect_tech_stack(target_repo)
     print(f"🔍 Detected Stack  : {BOLD}{stack_info['framework']}{RESET} ({stack_info['language']})")
     print(f"📂 Structure Scope : Pages: `{stack_info['page_dir']}` | Tests: `{stack_info['test_dir']}`\n")
+
+    # Resolve active profile
+    if profile == "auto":
+        fw = stack_info.get("framework", "").lower()
+        lang = stack_info.get("language", "").lower()
+        if "playwright" in fw:
+            profile = "playwright"
+        elif "pytest" in fw or "python" in lang:
+            profile = "pytest"
+        elif "cypress" in fw:
+            profile = "cypress"
+        elif "katalon" in fw:
+            profile = "katalon"
+        else:
+            profile = "full"
+
+    print(f"🎯 Selected Profile: {BOLD}{profile.upper()}{RESET}")
+    if dry_run:
+        print(f"Operational Mode   : {YELLOW}DRY-RUN (Simulating without modifying files on disk){RESET}\n")
+    else:
+        print(f"Operational Mode   : APPLY CHANGES\n")
 
     if dry_run:
         print(f"{YELLOW}[DRY-RUN PREVIEW]{RESET}")
@@ -497,7 +521,7 @@ def run_setup(target_repo, dry_run=False, profile="full"):
 
     # 2. Ensure PROJECT_AI_GUIDE.md & PROJECT_STATE.md
     print(f"{BOLD}[1/5] Checking Project AI Guide & State Anchor...{RESET}")
-    guide_created = ensure_project_ai_guide(target_repo, stack_info)
+    guide_created = ensure_project_ai_guide(target_repo, stack_info, profile=profile)
     project_state.init_state(target_repo)
 
     # 3. Deploy Universal AI Bridges (Cursor, Claude Code, GitHub Copilot, Windsurf)
@@ -528,6 +552,7 @@ def run_setup(target_repo, dry_run=False, profile="full"):
     print(f"{BOLD}{CYAN}            🎉 PROJECT IS NOW 100% AI-READY (LEVEL 5 SETUP)           {RESET}")
     print(f"{BOLD}{CYAN}======================================================================{RESET}")
     print(f"  Target Framework    : {stack_info['framework']}")
+    print(f"  Active Profile      : {profile.upper()}")
     print(f"  AI Project Guide    : {os.path.join(target_repo, 'PROJECT_AI_GUIDE.md')}")
     print(f"  Universal Bridges   : Cursor (.cursor/rules), Claude Code, Copilot, Windsurf")
     print(f"  Antigravity Plugin  : {'ACTIVE (~/.gemini/config/plugins/synapse-hub)' if plugin_injected else 'STANDALONE'}")
@@ -543,7 +568,12 @@ def main():
     parser = argparse.ArgumentParser(description="Autonomous Enterprise QA Project Setup")
     parser.add_argument("target", nargs="?", default=None, help="Target repository path to setup")
     parser.add_argument("--repo", "--path", dest="repo_path", default=None, help="Target repository path")
-    parser.add_argument("--profile", default="full", choices=["core", "web-e2e", "api-perf", "full"], help="Skills profile to install (core, web-e2e, api-perf, full)")
+    parser.add_argument(
+        "--profile",
+        default="auto",
+        choices=["auto", "core", "web-e2e", "api-perf", "full", "playwright", "pytest", "cypress", "katalon"],
+        help="Skills profile to install (auto, core, web-e2e, api-perf, full, playwright, pytest, cypress, katalon)"
+    )
     parser.add_argument("--dry-run", action="store_true", help="Simulate setup actions without modifying disk")
     parser.add_argument("--uninstall", action="store_true", help="Revert and remove files installed by setup_project")
     args = parser.parse_args()
