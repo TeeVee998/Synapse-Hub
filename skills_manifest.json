@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "name": "Enterprise Agent Skills Hub",
-  "version": "2.2.2",
-  "description": "Unified Catalog of 27 Specialized Skills for Autonomous AI Agents in Enterprise Software Quality Engineering, Performance, and Architecture.",
+  "version": "2.2.3",
+  "description": "Unified Catalog of 28 Specialized Skills for Autonomous AI Agents in Enterprise Software Quality Engineering, Performance, and Architecture.",
   "totalSkills": 28,
   "categories": {
     "context_and_optimization": [

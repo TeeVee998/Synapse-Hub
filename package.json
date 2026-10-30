@@ -1,6 +1,6 @@
 {
   "name": "synapse-hub",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "Enterprise AI Agent Intelligence Hub & Autonomous Skill Network",
   "publishConfig": {
     "access": "public"

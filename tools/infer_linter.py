@@ -154,21 +154,40 @@ def analyze_script(file_path):
 
 
 def run_infer_linter(target_dir=None):
-    """Scans all Groovy test scripts in target_dir or Scripts/."""
-    scan_dir = target_dir or SCRIPTS_DIR
-    if not os.path.exists(scan_dir):
-        script_files = []
-    elif os.path.isfile(scan_dir):
-        script_files = [scan_dir]
+    """Scans test scripts across Groovy, TypeScript, JavaScript, Python, and Java."""
+    EXTENSIONS = ("*.groovy", "*.ts", "*.js", "*.py", "*.java")
+
+    if target_dir:
+        if os.path.isfile(target_dir):
+            script_files = [target_dir]
+            scan_dir = os.path.dirname(target_dir)
+        elif os.path.isdir(target_dir):
+            scan_dir = target_dir
+            script_files = []
+            for ext in EXTENSIONS:
+                script_files.extend(glob.glob(os.path.join(scan_dir, "**", ext), recursive=True))
+        else:
+            scan_dir = target_dir
+            script_files = []
     else:
-        script_files = glob.glob(os.path.join(scan_dir, "**", "*.groovy"), recursive=True)
+        # Search candidate directories across test frameworks (Katalon, Playwright, Pytest, Cypress)
+        script_files = []
+        scan_dir = SCRIPTS_DIR
+        for cand in ["Scripts", "tests", "test", "e2e", "specs", "cypress"]:
+            cand_path = os.path.join(REPO_ROOT, cand)
+            if os.path.isdir(cand_path):
+                for ext in EXTENSIONS:
+                    script_files.extend(glob.glob(os.path.join(cand_path, "**", ext), recursive=True))
+                if script_files:
+                    scan_dir = cand_path
+                    break
 
     results = []
     critical_count = 0
     warning_count = 0
     clean_count = 0
 
-    for s in sorted(script_files):
+    for s in sorted(set(script_files)):
         res = analyze_script(s)
         results.append(res)
         crit = sum(1 for d in res["defects"] if d["severity"] == "CRITICAL")
@@ -179,17 +198,28 @@ def run_infer_linter(target_dir=None):
             clean_count += 1
 
     total_scripts = len(script_files)
-    health_score = 100.0 if total_scripts == 0 else (((total_scripts - critical_count) / total_scripts) * 100)
-    clean_pct = (clean_count / total_scripts * 100) if total_scripts > 0 else 100.0
+    if total_scripts == 0:
+        health_score = 0.0
+        clean_pct = 0.0
+    else:
+        health_score = round(((total_scripts - critical_count) / total_scripts) * 100, 1)
+        clean_pct = round((clean_count / total_scripts) * 100, 1)
 
     print(f"\n{BOLD}{CYAN}======================================================================{RESET}")
     print(f"{BOLD}{CYAN}    ENTERPRISE STATIC DEFECT & FAKE-PASS SENTINEL (Meta Infer-Style)        {RESET}")
     print(f"{BOLD}{CYAN}======================================================================{RESET}")
-    print(f"  Target Scope            : {total_scripts} Groovy Test Scripts in {os.path.basename(scan_dir)}/")
-    print(f"  Critical Defects        : {RED if critical_count > 0 else GREEN}{critical_count}{RESET} (Swallowed exceptions, empty scripts)")
-    print(f"  Warnings / Suggestions  : {YELLOW if warning_count > 0 else GREEN}{warning_count}{RESET} (Missing explicit asserts, excessive delays)")
-    print(f"  Clean Scripts           : {GREEN}{clean_count}/{total_scripts} ({clean_pct:.1f}%){RESET}")
-    print(f"  Codebase Health Score   : {GREEN if health_score == 100 else YELLOW}{health_score:.1f}%{RESET}")
+    if total_scripts == 0:
+        print(f"  Target Scope            : 0 Test Scripts discovered in {os.path.basename(scan_dir)}/ (No tests found)")
+        print(f"  Critical Defects        : {GREEN}0{RESET}")
+        print(f"  Warnings / Suggestions  : {GREEN}0{RESET}")
+        print(f"  Clean Scripts           : 0/0 (N/A)")
+        print(f"  Codebase Health Score   : {YELLOW}N/A (0 test scripts discovered){RESET}")
+    else:
+        print(f"  Target Scope            : {total_scripts} Test Scripts in {os.path.basename(scan_dir)}/ (Polyglot)")
+        print(f"  Critical Defects        : {RED if critical_count > 0 else GREEN}{critical_count}{RESET} (Swallowed exceptions, empty scripts)")
+        print(f"  Warnings / Suggestions  : {YELLOW if warning_count > 0 else GREEN}{warning_count}{RESET} (Missing explicit asserts, excessive delays)")
+        print(f"  Clean Scripts           : {GREEN}{clean_count}/{total_scripts} ({clean_pct:.1f}%){RESET}")
+        print(f"  Codebase Health Score   : {GREEN if health_score == 100 else YELLOW}{health_score:.1f}%{RESET}")
     print(f"{BOLD}{CYAN}======================================================================{RESET}\n")
 
     # Print defect breakdown if any

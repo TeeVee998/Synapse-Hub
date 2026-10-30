@@ -58,6 +58,7 @@ def assert_integrity_or_raise(repo_root: Optional[str] = None) -> bool:
     """
     Enforces author integrity and cryptographic provenance.
     If tampered with, immediately halts execution by raising a RuntimeError.
+    Under MIT License, the original copyright notice in LICENSE is mandatory.
     """
     if not verify_author_fingerprint():
         raise RuntimeError(
@@ -65,12 +66,17 @@ def assert_integrity_or_raise(repo_root: Optional[str] = None) -> bool:
             "Synapse Hub requires original author attribution ('Thế Vị @TeeVee998') to execute."
         )
     valid, violations = verify_author_attribution(repo_root)
-    if not valid:
-        err_msg = "🛑 CRITICAL INTEGRITY VIOLATION: Author attribution altered or removed.\n"
-        for v in violations:
+    license_violations = [v for v in violations if "LICENSE" in v]
+    if license_violations:
+        err_msg = "🛑 CRITICAL INTEGRITY VIOLATION: Mandatory MIT copyright notice missing or altered.\n"
+        for v in license_violations:
             err_msg += f"  • {v}\n"
-        err_msg += "Under MIT License, original author attribution to 'Thế Vị (@TeeVee998)' must be preserved."
+        err_msg += "Under the MIT License, original author attribution to 'Thế Vị (@TeeVee998)' must be preserved in LICENSE."
         raise RuntimeError(err_msg)
+    elif not valid:
+        # Non-fatal warning for peripheral files (README/package.json) to allow flexible downstream fork usage
+        for v in violations:
+            print(f"[WARN] Attribution Notice: {v}", file=sys.stderr)
     return True
 
 

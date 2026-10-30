@@ -1,7 +1,7 @@
 # Agent-Skills Architecture & Design Principles
 
 > **Scope:** Enterprise Multi-Agent QA Hub  
-> **Version:** `2.2.2` | **Status:** Active / Production Standard
+> **Version:** `2.2.3` | **Status:** Active / Production Standard
 
 ---
 
@@ -80,4 +80,4 @@ The Hub equips 6 specialized subagents with scoped tool and skill permissions:
 | **`live-explorer`** | Live DOM & AOM exploration (<200ms) | `playwright-live-interaction`, `self-healing-locator`, `visual-regression-sentinel`, `api-network-mocking-interception` | `browser_helpers.js`, `e2e_flow_prober.ps1`, `safety_firewall.py` |
 | **`test-runner`** | Headless CLI test execution & CI | `katalon-cli-runner`, `e2e-testing-patterns`, `flaky-test-sentinel-and-quarantine`, `backend-load-and-stress-patterns`, `github-actions-templates` | `matrix_sharder.py`, `distill_log.py`, `pinpoint_failure.py`, `flaky_detector.py` |
 | **`failure-analyst`**| Visual & XML error autopsy | `failure-autopsy-and-healing`, `self-healing-locator`, `file-and-report-validator` | `auto_heal.py`, `heal_pr_automator.py`, `pinpoint_failure.py`, `cache_resolver.py` |
-| **`quality-gatekeeper`**| 8 Gates DoD & Fake-Pass Sentinel | `antigravity-test-sentinel`, `code-refactoring-refactor-clean`, `wcag-audit-patterns`, `web-vitals-and-performance-profiler`, `security-dast-sentinel` | `verify_all.py`, `infer_linter.py`, `micro_mutator.py`, `trace_data_flow.py` |
+| **`quality-gatekeeper`**| 9 Gates DoD & Fake-Pass Sentinel | `antigravity-test-sentinel`, `code-refactoring-refactor-clean`, `wcag-audit-patterns`, `web-vitals-and-performance-profiler`, `security-dast-sentinel` | `verify_all.py`, `infer_linter.py`, `micro_mutator.py`, `trace_data_flow.py` |

@@ -4,7 +4,7 @@
 
 > **Bộ não trí tuệ dùng chung và mạng lưới kỹ năng tự hành, tăng cường năng lực cho các trợ lý AI (Google Antigravity, Cursor, Windsurf, Claude Code) trên mọi hệ sinh thái kiểm thử tự động.**  
 > **Tác giả:** Thế Vị ([@TeeVee998](https://github.com/TeeVee998))  
-> **Phiên bản Hub:** `v2.2.2` | **Quy mô:** 28 Kỹ năng chuẩn hóa, 6 Vai trò AI Swarm, 7 Quy tắc cốt lõi, 20+ Công cụ tự động.
+> **Phiên bản Hub:** `v2.2.3` | **Quy mô:** 28 Kỹ năng chuẩn hóa, 6 Vai trò AI Swarm, 7 Quy tắc cốt lõi, 20+ Công cụ tự động.
 
 ---
 
@@ -14,7 +14,7 @@
 
 ```mermaid
 flowchart TD
-    subgraph Hub["🧠 Synapse Hub (Intelligence Core v2.2.2)"]
+    subgraph Hub["🧠 Synapse Hub (Intelligence Core v2.2.3)"]
         Skills[".agents/skills/ (28 Skills)"]
         Agents[".agents/agents/ (6 Specialized Roles)"]
         Rules[".agents/rules/ (7 Core Rules)"]
@@ -61,7 +61,7 @@ flowchart TD
 | Tiêu chí đánh giá | Cách làm thông thường (Naive AI Prompting) | Khi sử dụng Synapse Hub 🧠 |
 | :--- | :---: | :---: |
 | **Token tiêu thụ / mỗi lần fix lỗi** | 15.000 – 40.000 tokens *(đọc cả file lớn, dump cả log)* | **300 – 800 tokens (Tiết kiệm > 90%)** |
-| **Tỷ lệ Fake-Pass (Test pass ảo, 0 assert)** | 30% – 50% *(AI có xu hướng nuốt lỗi để báo PASS)* | **0% (Chặn đứng bởi Truth Anchor & 8 DoD Gates)** |
+| **Tỷ lệ Fake-Pass (Test pass ảo, 0 assert)** | 30% – 50% *(AI có xu hướng nuốt lỗi để báo PASS)* | **0% (Chặn đứng bởi Truth Anchor & 9 DoD Gates)** |
 | **Trí nhớ sửa lỗi xuyên phiên (Cross-Session)** | Quên sạch ngay khi mở tab chat mới | **Bền vững qua SQLite Central Cache (0 token)** |
 | **Hiện tượng quên ngữ cảnh (Context Rot)** | Xảy ra nhanh chóng sau 40k – 60k tokens | **Miễn nhiễm nhờ 3 tầng Progressive Disclosure** |
 | **Thời gian tự phục hồi lỗi (MTTR)** | 5 – 15 phút mò mẫm thử nghiệm | **< 1 giây (Tra cứu kinh nghiệm có sẵn)** |
@@ -90,7 +90,7 @@ npx synapse-hub setup
    - 🤖 **Claude Code:** `CLAUDE.md` (Hướng dẫn quy chuẩn QA, commands và Clean POM)
    - 🐙 **GitHub Copilot:** `.github/copilot-instructions.md` (Chỉ dẫn hệ thống cho VS Code / JetBrains Copilot)
    - 🏄 **Windsurf (Cascade):** `.windsurfrules` (Nguyên tắc kiểm thử bắt buộc)
-   *(Mọi thành viên dù dùng Antigravity, Cursor, Claude Code, Copilot hay Windsurf đều chung 1 chuẩn Clean POM, 1 nguyên tắc Truth Anchor chống pass ảo, và 8 Cổng Kiểm Định DoD!)*
+   *(Mọi thành viên dù dùng Antigravity, Cursor, Claude Code, Copilot hay Windsurf đều chung 1 chuẩn Clean POM, 1 nguyên tắc Truth Anchor chống pass ảo, và 9 Cổng Kiểm Định DoD (Gate 0–8)!)*
 3. 🔍 **Nhận diện Framework:** Tự động phát hiện Playwright TypeScript/JS, Katalon Studio Groovy, Cypress, hoặc Pytest.
 4. 📋 **Sinh Hướng Dẫn Nghiệp Vụ:** Tạo file `PROJECT_AI_GUIDE.md` ngay trong dự án của bạn để AI hiểu sâu kiến trúc và quy chuẩn code.
 5. 🛡️ **Cài Đặt Cổng Gác Git (Pre-Push Hook):** Tự cài `.git/hooks/pre-push` gọi `npx synapse-hub verify` để chặn đứng mã lỗi và lộ mật khẩu trước khi push.
@@ -99,7 +99,7 @@ npx synapse-hub setup
 
 Sau đó, bạn có thể thực thi kiểm định bất cứ lúc nào:
 ```bash
-# Kiểm định 8 Cổng Chất Lượng (DoD Quality Gates)
+# Kiểm định 9 Cổng Chất Lượng (DoD Quality Gates Gate 0–8)
 npx synapse-hub verify
 
 # Đánh giá sức khỏe toàn diện dự án (5-in-1 Project Health Report)
@@ -162,7 +162,7 @@ Hub phân chia năng lực rõ ràng cho 6 vai trò Agent, mỗi Agent được 
 | **`pom-crafter`** | Kỹ sư Clean POM, kiểm tra API drift, sinh test từ User Story. | `clean-pom-crafter`, `lam-script-generator`, `synthetic-test-data-generator`, `api-spec-to-e2e-matrix`, `file-and-report-validator`, `db-state-verifier-and-seeder` | `tools/generate_tc_from_story.py`, `tools/generate_api_matrix.py`, `tools/api_drift_sentinel.py`, `tools/repo_map.py` |
 | **`test-runner`** | Quản lý chạy test headless CLI, chia tải thời gian chạy trên CI. | `katalon-cli-runner`, `e2e-testing-patterns`, `bats-testing-patterns`, `auth-session-and-cookie-manager`, `flaky-test-sentinel-and-quarantine` | `tools/matrix_sharder.py`, `tools/distill_log.py`, `tools/pinpoint_failure.py`, `tools/flaky_detector.py` |
 | **`failure-analyst`**| Tự động chẩn đoán lỗi, tính điểm tin cậy & tự tạo PR đối soát. | `failure-autopsy-and-healing`, `self-healing-locator`, `file-and-report-validator` | `tools/auto_heal.py`, `tools/heal_pr_automator.py`, `tools/pinpoint_failure.py`, `tools/cache_resolver.py` |
-| **`quality-gatekeeper`**| Gác cổng chất lượng 7 Gates DoD, quét Fake-Pass, bơm mutant. | `antigravity-test-sentinel`, `code-refactoring-refactor-clean`, `wcag-audit-patterns`, `web-vitals-and-performance-profiler`, `db-state-verifier-and-seeder`, `security-dast-sentinel`, `skillspector-security-guard` | `tools/verify_all.py`, `tools/infer_linter.py`, `tools/micro_mutator.py`, `tools/trace_data_flow.py`, `tools/wcag_audit.py`, `tools/lint_ai_docs.py`, `tools/skillspector.py` |
+| **`quality-gatekeeper`**| Gác cổng chất lượng 9 Gates DoD (Gate 0–8), quét Fake-Pass, bơm mutant. | `antigravity-test-sentinel`, `code-refactoring-refactor-clean`, `wcag-audit-patterns`, `web-vitals-and-performance-profiler`, `db-state-verifier-and-seeder`, `security-dast-sentinel`, `skillspector-security-guard` | `tools/verify_all.py`, `tools/infer_linter.py`, `tools/micro_mutator.py`, `tools/trace_data_flow.py`, `tools/wcag_audit.py`, `tools/lint_ai_docs.py`, `tools/skillspector.py` |
 
 ---
 
@@ -201,7 +201,7 @@ Hub phân chia năng lực rõ ràng cho 6 vai trò Agent, mỗi Agent được 
 
 ---
 
-## 📜 5. Danh Mục 7 Quy Tắc Cốt Lõi (.agents/rules/)
+## 📜 5. Danh Mục 8 Quy Tắc Cốt Lõi (.agents/rules/)
 
 1. **`context-engineering.md`**: Giao thức lọc log thừa (Observation Masking), khai báo lười (Lazy Loading) và tối ưu hóa KV-Cache.
 2. **`git-push-protocol.md`**: Giao thức Git Push chuẩn hóa cho dự án mục tiêu (Clean SCM by Architecture, loại bỏ hoàn toàn nhu cầu dual-remote/smart-push nhờ tách repo độc lập).
@@ -209,15 +209,16 @@ Hub phân chia năng lực rõ ràng cho 6 vai trò Agent, mỗi Agent được 
 4. **`lessons-learned.md`**: Danh sách bài học kinh nghiệm và anti-patterns (giới hạn cứng < 40 dòng).
 5. **`mandatory-playwright-live.md`**: Quy chuẩn chạy headless Full HD 1920x1080 và khảo sát live DOM trước khi codify.
 6. **`skill-precedence.md`**: Thứ tự ưu tiên kỹ năng cục bộ, chống xung đột trigger với plugin bên ngoài.
-7. **`systematic-debugging.md`**: Kỷ luật điều tra lỗi có căn cứ, cấm đoán mò và verify-first (7 Quality Gates).
+7. **`systematic-debugging.md`**: Kỷ luật điều tra lỗi có căn cứ, cấm đoán mò và verify-first (9 Quality Gates DoD).
+8. **`author-integrity-guard.md`**: Bảo toàn thông báo bản quyền tác giả theo giấy phép MIT và phòng chống đạo văn.
 
 ---
 
-## 🛠️ 6. Sổ Tay Công Cụ Tự Động Hóa (tools/ & scripts/)
+## 🛠️ 6. Sổ Tay 50+ Công Cụ Tự Động Hóa Chuyên Biệt (tools/ & scripts/)
 
 Chi tiết đầy đủ xem tại [tools/TOOLS_RUNBOOK.md](tools/TOOLS_RUNBOOK.md):
 
-- `tools/verify_all.py`: Cổng thẩm định 8 Gates DoD (UTF-8, No XPaths, UniqueCode, Clean POM, AST Mutation).
+- `tools/verify_all.py`: Cổng thẩm định 9 Gates DoD (Gate 0–8: UTF-8, No XPaths, UniqueCode, Clean POM, AST Mutation).
 - `tools/generate_jmx_plan.py`: Sinh kịch bản Apache JMeter 5.x (.jmx) đa giao thức (HTTP, JDBC, WS, gRPC, Kafka) kèm Traffic Shaping Pareto.
 - `tools/jtl_analyzer.py`: Phân tích kết quả JTL, kiểm soát SLA percentiles ($P_{90}, P_{95}, P_{99}$) và làm Quality Gate CI/CD.
 - `tools/telemetry_correlator.py`: Phân tích tương quan Pearson giữa Client Latency và Server APM (CPU, RAM, DB Pool).
@@ -288,9 +289,9 @@ Dự án được phân phối chính thức dưới giấy phép **[MIT License
 **Quyền sở hữu tác giả & Xuất xứ (Provenance):**
 - **Tác giả & Nhà sáng lập:** Thế Vị ([@TeeVee998](https://github.com/TeeVee998))
 - **Mã nguồn gốc:** [https://github.com/TeeVee998/Synapse-Hub](https://github.com/TeeVee998/Synapse-Hub)
-- **Bản quyền:** Copyright © 2026 Thế Vị (@TeeVee998). All rights reserved.
+- **Bản quyền:** Copyright © 2026 Thế Vị (@TeeVee998). Phân phối theo giấy phép MIT.
 
-> ⚖️ **Quy định bản quyền quốc tế & MIT:** Bạn được toàn quyền sử dụng, sửa đổi, tích hợp và phân phối lại mã nguồn này cho bất kỳ mục đích cá nhân hay thương mại nào, **VỚI ĐIỀU KIỆN** thông báo bản quyền gốc ghi nhận tác giả **Thế Vị (@TeeVee998)** cùng liên kết mã nguồn gốc phải được giữ nguyên vẹn trong toàn bộ bản sao hoặc các phần phái sinh quan trọng của phần mềm. Mọi hành vi xóa bỏ tên tác giả khỏi dự án đều cấu thành hành vi vi phạm điều khoản giấy phép MIT.
+> ⚖️ **Điều khoản phân phối theo giấy phép MIT:** Bạn được toàn quyền sử dụng, sao chép, sửa đổi, hợp nhất, xuất bản và phân phối mã nguồn này cho bất kỳ mục đích cá nhân hay thương mại nào, **VỚI ĐIỀU KIỆN** thông báo bản quyền gốc ghi nhận tác giả **Thế Vị (@TeeVee998)** cùng điều khoản cấp phép này phải được giữ nguyên vẹn trong toàn bộ bản sao hoặc các phần quan trọng của phần mềm.
 
 ---
 
@@ -300,7 +301,7 @@ Dự án được phân phối chính thức dưới giấy phép **[MIT License
 
 > **The shared intelligence core and autonomous skill hub empowering AI coding assistants (Google Antigravity / Cursor / Windsurf / Claude Code) across automated testing suites.**  
 > **Author:** Thế Vị ([@TeeVee998](https://github.com/TeeVee998))  
-> **Hub Version:** `v2.2.2` (Semantic Versioning) | **Integrity Index:** 28 Skills, 6 Agent Swarm Roles, 7 Core Rules, 20+ Python Tools.
+> **Hub Version:** `v2.2.3` (Semantic Versioning) | **Integrity Index:** 28 Skills, 6 Agent Swarm Roles, 8 Core Rules, 50+ Specialized Python Tools, 9 Quality Gates.
 
 ---
 
@@ -310,11 +311,11 @@ Dự án được phân phối chính thức dưới giấy phép **[MIT License
 
 ```mermaid
 flowchart TD
-    subgraph Hub["🧠 Synapse Hub (Intelligence Core v2.2.2)"]
+    subgraph Hub["🧠 Synapse Hub (Intelligence Core v2.2.3)"]
         Skills[".agents/skills/ (28 Skills)"]
         Agents[".agents/agents/ (6 Specialized Roles)"]
-        Rules[".agents/rules/ (7 Core Rules)"]
-        Tools["tools/ (20+ Universal Python Tools)"]
+        Rules[".agents/rules/ (8 Core Rules)"]
+        Tools["tools/ (50+ Universal Python Tools)"]
         Workflows[".agents/workflows/"]
     end
 
@@ -357,7 +358,7 @@ flowchart TD
 | Evaluation Metric | Naive AI Coding Prompting | With Synapse Hub 🧠 |
 | :--- | :---: | :---: |
 | **Tokens Consumed per Bug Fix** | 15,000 – 40,000 tokens *(dumps entire classes & logs)* | **300 – 800 tokens (> 90% Savings)** |
-| **Fake-Pass Rate (0 asserts, false passes)** | 30% – 50% *(LLMs tend to relax asserts)* | **0% (Locked by Truth Anchor & 8 DoD Gates)** |
+| **Fake-Pass Rate (0 asserts, false passes)** | 30% – 50% *(LLMs tend to relax asserts)* | **0% (Locked by Truth Anchor & 9 DoD Gates)** |
 | **Cross-Session Fix Memory** | 100% forgotten upon new chat session | **Persistent via SQLite Central Cache (0 token)** |
 | **Context Rot / Lost-in-the-Middle** | High degradation after 40k – 60k tokens | **Immune via 3-Tier Progressive Disclosure** |
 | **Mean Time-to-Heal (MTTR)** | 5 – 15 minutes of trial-and-error | **< 1 second (Direct cache resolution)** |
@@ -386,7 +387,7 @@ npx synapse-hub setup
    - 🤖 **Claude Code:** `CLAUDE.md`
    - 🐙 **GitHub Copilot:** `.github/copilot-instructions.md`
    - 🏄 **Windsurf (Cascade):** `.windsurfrules`
-   *(Empowers team members across Antigravity, Cursor, Claude Code, Copilot, or Windsurf to enforce the exact same Clean POM architecture, Truth Anchor, and 8 Quality Gates DoD!)*
+   *(Empowers team members across Antigravity, Cursor, Claude Code, Copilot, or Windsurf to enforce the exact same Clean POM architecture, Truth Anchor, and 9 Quality Gates DoD (Gate 0–8)!)*
 3. 🔍 **Tech Stack Detection:** Auto-detects Playwright TypeScript/JS, Katalon Groovy, Cypress, or Pytest.
 4. 📋 **Project AI Guide Synthesis:** Generates `PROJECT_AI_GUIDE.md` so AI assistants strictly adhere to project workflows.
 5. 🛡️ **Zero-Leakage Git Pre-Push Hook:** Installs `.git/hooks/pre-push` invoking `npx synapse-hub verify` before any git push.
@@ -395,7 +396,7 @@ npx synapse-hub setup
 
 Run verification anytime:
 ```bash
-# Run 8 Quality Gates DoD Verification
+# Run 9 Quality Gates DoD Verification (Gate 0–8)
 npx synapse-hub verify
 
 # Comprehensive 5-in-1 Project Health Audit
@@ -467,7 +468,7 @@ Synapse Hub clearly partitions capabilities across 6 specialized AI roles, pre-c
 | **`pom-crafter`** | Clean POM engineer, API drift detection, User Story to test generation. | `clean-pom-crafter`, `lam-script-generator`, `synthetic-test-data-generator`, `api-spec-to-e2e-matrix`, `file-and-report-validator`, `db-state-verifier-and-seeder` | `tools/generate_tc_from_story.py`, `tools/generate_api_matrix.py`, `tools/api_drift_sentinel.py`, `tools/repo_map.py` |
 | **`test-runner`** | Headless CLI suite manager, CI parallel sharding and log distillation. | `katalon-cli-runner`, `e2e-testing-patterns`, `bats-testing-patterns`, `auth-session-and-cookie-manager`, `flaky-test-sentinel-and-quarantine` | `tools/matrix_sharder.py`, `tools/distill_log.py`, `tools/pinpoint_failure.py`, `tools/flaky_detector.py` |
 | **`failure-analyst`**| Automated closed-loop failure triage, MTTR scoring, self-healing PR drafting. | `failure-autopsy-and-healing`, `self-healing-locator`, `file-and-report-validator` | `tools/auto_heal.py`, `tools/heal_pr_automator.py`, `tools/pinpoint_failure.py`, `tools/cache_resolver.py` |
-| **`quality-gatekeeper`**| Enforces 8 Quality Gates DoD, scans fake passes, runs AST mutation testing. | `antigravity-test-sentinel`, `code-refactoring-refactor-clean`, `wcag-audit-patterns`, `web-vitals-and-performance-profiler`, `db-state-verifier-and-seeder`, `security-dast-sentinel`, `skillspector-security-guard` | `tools/verify_all.py`, `tools/infer_linter.py`, `tools/micro_mutator.py`, `tools/trace_data_flow.py`, `tools/wcag_audit.py`, `tools/lint_ai_docs.py`, `tools/skillspector.py` |
+| **`quality-gatekeeper`**| Enforces 9 Quality Gates DoD (Gate 0–8), scans fake passes, runs AST mutation testing. | `antigravity-test-sentinel`, `code-refactoring-refactor-clean`, `wcag-audit-patterns`, `web-vitals-and-performance-profiler`, `db-state-verifier-and-seeder`, `security-dast-sentinel`, `skillspector-security-guard` | `tools/verify_all.py`, `tools/infer_linter.py`, `tools/micro_mutator.py`, `tools/trace_data_flow.py`, `tools/wcag_audit.py`, `tools/lint_ai_docs.py`, `tools/skillspector.py` |
 
 ---
 
@@ -506,7 +507,7 @@ Synapse Hub clearly partitions capabilities across 6 specialized AI roles, pre-c
 
 ---
 
-## 📜 5. 7 Core Rules Catalog (.agents/rules/)
+## 📜 5. 8 Core Rules Catalog (.agents/rules/)
 
 1. **`context-engineering.md`**: Observation masking, lazy progressive disclosure, and KV-cache optimization.
 2. **`git-push-protocol.md`**: Clean git push protocol (decoupled architecture guarantees zero AI leakage).
@@ -514,15 +515,16 @@ Synapse Hub clearly partitions capabilities across 6 specialized AI roles, pre-c
 4. **`lessons-learned.md`**: Episodic anti-pattern blacklist (strictly capped under 40 lines).
 5. **`mandatory-playwright-live.md`**: Mandatory headless Full HD 1920x1080 and live DOM probing before codifying.
 6. **`skill-precedence.md`**: Tier-1 local skill precedence resolving external plugin collisions.
-7. **`systematic-debugging.md`**: Evidence-first debugging discipline; zero guessing; 8 Quality Gates DoD.
+7. **`systematic-debugging.md`**: Evidence-first debugging discipline; zero guessing; 9 Quality Gates DoD.
+8. **`author-integrity-guard.md`**: Mandatory MIT copyright notice preservation and anti-plagiarism guard.
 
 ---
 
-## 🛠️ 6. Automated Tools Runbook (tools/ & scripts/)
+## 🛠️ 6. Automated Tools Runbook (50+ Specialized Python Tools)
 
 For full details, refer to [tools/TOOLS_RUNBOOK.md](tools/TOOLS_RUNBOOK.md):
 
-- `tools/verify_all.py`: 8 Quality Gates DoD verification (UTF-8, No XPaths, UniqueCode, Clean POM, AST Mutation).
+- `tools/verify_all.py`: 9 Quality Gates DoD verification (Gate 0–8: UTF-8, No XPaths, UniqueCode, Clean POM, AST Mutation).
 - `tools/generate_jmx_plan.py`: Multi-protocol Apache JMeter 5.x (.jmx) plan generator (HTTP, JDBC, WS, gRPC, Kafka) with Pareto traffic shaping.
 - `tools/jtl_analyzer.py`: JTL execution metrics analyzer, P95/P99 SLA gatekeeper, and CI/CD Quality Gate enforcer.
 - `tools/telemetry_correlator.py`: Full-stack Pearson correlation analyzer between client-side latency and server APM (CPU, RAM, DB Pool).
@@ -595,8 +597,8 @@ This project is licensed under the **[MIT License](LICENSE)**.
 **Provenance & Copyright Notice:**
 - **Author & Founder:** Thế Vị ([@TeeVee998](https://github.com/TeeVee998))
 - **Original Repository:** [https://github.com/TeeVee998/Synapse-Hub](https://github.com/TeeVee998/Synapse-Hub)
-- **Copyright:** Copyright © 2026 Thế Vị (@TeeVee998). All rights reserved.
+- **Copyright:** Copyright (c) 2026 Thế Vị (@TeeVee998). Distributed under the MIT License.
 
-> ⚖️ **Mandatory Attribution Condition:** Under the terms of the MIT License, you are granted permission to use, modify, merge, publish, and distribute this software freely, **PROVIDED** that the original copyright notice crediting **Thế Vị (@TeeVee998)** and repository provenance link are preserved in all copies or substantial portions of the Software. Stripping author attribution is a violation of international copyright treaties and MIT License conditions.
+> ⚖️ **MIT License Attribution Requirement:** Under the terms of the MIT License, you are granted permission to use, copy, modify, merge, publish, and distribute this software freely, **PROVIDED** that the original copyright notice crediting **Thế Vị (@TeeVee998)** and this permission notice are included in all copies or substantial portions of the Software.
 
 

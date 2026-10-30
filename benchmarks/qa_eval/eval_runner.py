@@ -97,38 +97,43 @@ class BenchmarkEvaluator:
             dom = failure_vector.get("dom_snapshot", "")
             healed = expected.get("healed_locator", "")
 
-            # Verify that healed locator exists in DOM snapshot
-            testid_match = re.search(r"data-testid=['\"]([^'\"]+)['\"]", dom)
-            role_match = re.search(r"role=['\"]([^'\"]+)['\"]", dom)
-            id_match = re.search(r"id=['\"]([^'\"]+)['\"]", dom)
+            # Verify that healed locator targets an actual element attribute or selector in DOM snapshot
+            attr_values = re.findall(r"""['"]([^'"]+)['"]""", healed)
+            plain_tokens = [tok.strip("#.[]:= ") for tok in re.split(r'[\s\[\]=:"\']+', healed) if len(tok.strip("#.[]:= ")) > 2]
+            matches_dom = (healed in dom) or any(val in dom for val in attr_values if len(val) > 2) or any(tok in dom for tok in plain_tokens)
 
-            if healed:
+            if healed and matches_dom:
                 resolved = True
-                resolution_notes = f"Healed selector '{broken_loc}' -> '{healed}' via {expected.get('strategy')}"
-            tokens_used = 180 + (40 if difficulty == "MEDIUM" else 80)
+                resolution_notes = f"Healed selector '{broken_loc}' -> '{healed}' verified against DOM snapshot via {expected.get('strategy')}"
+            else:
+                resolved = False
+                resolution_notes = f"FAILED: Healed selector '{healed}' does not match any element in DOM snapshot."
+            tokens_used = max(50, (len(dom) + len(broken_loc) + len(healed)) // 4)
 
         elif category == "api_contract_drift":
             # Strategy: Resilient payload lookup / status code range
             healed_assertion = expected.get("healed_assertion") or expected.get("healed_code", "")
-            resolved = bool(healed_assertion)
+            has_assertion = bool(re.search(r'\b(assert|expect|status|statusCode|jsonPath|verify|Bearer|headers|Authorization)\b', healed_assertion, re.IGNORECASE))
+            resolved = bool(healed_assertion and has_assertion)
             resolution_notes = f"Updated assertion contract: {healed_assertion}"
-            tokens_used = 140 + (30 if difficulty == "MEDIUM" else 60)
+            tokens_used = max(50, (len(json.dumps(failure_vector)) + len(healed_assertion)) // 4)
 
         elif category == "timing_and_race":
             # Strategy: Smart wait / overlay bypass
             healed_code = expected.get("healed_code", "")
-            # Check that static sleep is removed and dynamic smart wait is introduced
-            has_smart_wait = any(w in healed_code for w in ("waitForSelector", "waitForResponse", "clickJS", "scrollIntoView"))
-            resolved = has_smart_wait
+            has_smart_wait = any(w in healed_code for w in ("waitForSelector", "waitForResponse", "clickJS", "scrollIntoView", "waitForElement"))
+            no_hard_sleep = "Thread.sleep" not in healed_code
+            resolved = has_smart_wait and no_hard_sleep
             resolution_notes = f"Replaced brittle timing with dynamic smart barrier: {expected.get('strategy')}"
-            tokens_used = 190 + (50 if difficulty == "HARD" else 20)
+            tokens_used = max(50, (len(json.dumps(failure_vector)) + len(healed_code)) // 4)
 
         elif category == "stale_and_mutation":
             # Strategy: Dynamic locator re-query / mount synchronization / locale-agnostic attributes
             healed_code = expected.get("healed_code") or expected.get("healed_locator", "")
-            resolved = bool(healed_code)
+            has_recovery = any(kw in healed_code for kw in ("retry", "waitFor", "refetch", "locator", "clickJS", "stale", "data-", "aria-"))
+            resolved = bool(healed_code and has_recovery)
             resolution_notes = f"Eliminated stale element trap: {expected.get('strategy')}"
-            tokens_used = 210 + (40 if difficulty == "HARD" else 15)
+            tokens_used = max(50, (len(json.dumps(failure_vector)) + len(healed_code)) // 4)
 
         elif category == "fake_pass_tautology":
             # Strategy: Mutation testing and assertion injection
@@ -142,11 +147,9 @@ class BenchmarkEvaluator:
 
             resolved = mutation_score >= 80.0
             resolution_notes = f"Injected robust assertion (Mutation Score: {mutation_score}%): {expected.get('strategy')}"
-            tokens_used = 160 + (30 if difficulty == "MEDIUM" else 10)
+            tokens_used = max(50, (len(json.dumps(failure_vector)) + len(healed_code)) // 4)
 
         elapsed_sec = round(time.perf_counter() - start_time, 4)
-        # Add slight realistic micro-processing delta (< 0.05s) for deterministic benchmarking
-        elapsed_sec = max(elapsed_sec, 0.015)
 
         # 2. Check Action Safety Firewall compliance
         safety_cleared = True

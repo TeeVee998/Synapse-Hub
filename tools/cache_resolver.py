@@ -192,12 +192,17 @@ def init_db(seed=True, target_db=None):
                 module_name TEXT DEFAULT 'GLOBAL',
                 symptom TEXT,
                 root_cause TEXT,
+                code_patch TEXT DEFAULT '',
                 groovy_patch TEXT NOT NULL,
                 hit_count INTEGER DEFAULT 0,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 UNIQUE(error_signature, module_name)
             )
         """)
+        try:
+            cursor.execute("ALTER TABLE healing_cache ADD COLUMN code_patch TEXT DEFAULT ''")
+        except Exception:
+            pass
 
         # 2. Negative Memory Table (Blacklist of Failed Fix Attempts)
         cursor.execute("""
@@ -526,6 +531,9 @@ def query_solution(error_signature, module_name="GLOBAL", threshold=0.35):
             """, (row["id"],))
             conn.commit()
             result = dict(row)
+            patch = result.get("code_patch") or result.get("groovy_patch")
+            result["code_patch"] = patch
+            result["groovy_patch"] = patch
             result["match_type"] = match_type
             result["confidence"] = confidence
             result["failed_fixes"] = failed_fixes
@@ -537,6 +545,7 @@ def query_solution(error_signature, module_name="GLOBAL", threshold=0.35):
                 "module_name": module_name,
                 "symptom": "Unknown solution",
                 "root_cause": "Unknown",
+                "code_patch": None,
                 "groovy_patch": None,
                 "match_type": "NEGATIVE_MEMORY_ONLY",
                 "confidence": 0.0,
@@ -546,19 +555,21 @@ def query_solution(error_signature, module_name="GLOBAL", threshold=0.35):
 
 
 @retry_on_locked()
-def learn_solution(error_signature, module_name, symptom, root_cause, groovy_patch):
+def learn_solution(error_signature, module_name, symptom, root_cause, groovy_patch, code_patch=None):
     """Saves a verified solution into positive memory."""
+    patch = code_patch or groovy_patch
     init_db(seed=True)
     with get_db() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO healing_cache (error_signature, module_name, symptom, root_cause, groovy_patch)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO healing_cache (error_signature, module_name, symptom, root_cause, groovy_patch, code_patch)
+            VALUES (?, ?, ?, ?, ?, ?)
             ON CONFLICT(error_signature, module_name) DO UPDATE SET
                 symptom = excluded.symptom,
                 root_cause = excluded.root_cause,
-                groovy_patch = excluded.groovy_patch
-        """, (error_signature, module_name or "GLOBAL", symptom, root_cause, groovy_patch))
+                groovy_patch = excluded.groovy_patch,
+                code_patch = excluded.code_patch
+        """, (error_signature, module_name or "GLOBAL", symptom, root_cause, patch, patch))
         conn.commit()
         return True
 

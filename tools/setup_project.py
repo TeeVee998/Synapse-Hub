@@ -175,7 +175,10 @@ def ensure_project_ai_guide(target_dir, stack_info):
 
 
 def install_git_pre_push_hook(target_dir):
-    """Installs an automated pre-push hook into target project's .git repository."""
+    """
+    Installs or appends an automated pre-push hook into target project's .git repository.
+    Safely backs up any existing pre-push hook (e.g. Husky, Lefthook) to prevent side-effects.
+    """
     git_dir = os.path.join(target_dir, ".git")
     if not os.path.isdir(git_dir):
         print("  [SKIP] Not a Git repository root (.git folder not found). Skipped Git Hook installation.")
@@ -185,37 +188,64 @@ def install_git_pre_push_hook(target_dir):
     os.makedirs(hooks_dir, exist_ok=True)
     hook_file = os.path.join(hooks_dir, "pre-push")
 
+    # Resolve pinned package version
+    manifest_file = os.path.join(HUB_ROOT, "skills_manifest.json")
+    pkg_ver = "2.2.2"
+    if os.path.exists(manifest_file):
+        try:
+            with open(manifest_file, "r", encoding="utf-8") as f:
+                pkg_ver = json.load(f).get("version", pkg_ver)
+        except Exception:
+            pass
+
     verify_all_script = os.path.join(SCRIPT_DIR, "verify_all.py").replace("\\", "/")
     analyze_script = os.path.join(SCRIPT_DIR, "analyze_project.py").replace("\\", "/")
 
-    hook_content = f"""#!/bin/sh
-# Automated Zero-Leakage Pre-Push Hook (Installed by Synapse-Hub)
-# Enforces 8 Quality Gates DoD and syncs project intelligence before pushing.
-
-echo "\\n[AI-GUARD] Running Pre-Push Verification (8 Quality Gates DoD)..."
+    hook_snippet = f"""
+# --- Synapse-Hub Pre-Push Quality Gate (v{pkg_ver}) ---
+echo "\\n[AI-GUARD] Running Pre-Push Verification (Quality Gates DoD)..."
 if command -v npx >/dev/null 2>&1; then
-    npx synapse-hub verify
+    npx synapse-hub@{pkg_ver} verify || npx synapse-hub verify
 elif [ -f "{verify_all_script}" ]; then
     python3 "{verify_all_script}" || python "{verify_all_script}"
 fi
 if [ $? -ne 0 ]; then
     echo "\\n[AI-GUARD - REJECTED] Git Push aborted: Quality Gates verification failed!"
-    echo "Please fix defects or run 'npx synapse-hub verify' locally before pushing.\\n"
+    echo "Please fix defects or run 'npx synapse-hub@{pkg_ver} verify' locally before pushing.\\n"
     exit 1
 fi
 
-echo "[AI-GUARD - PASSED] 8 Quality Gates satisfied. Syncing project health report..."
+echo "[AI-GUARD - PASSED] Quality Gates satisfied. Syncing project health report..."
 if command -v npx >/dev/null 2>&1; then
-    npx synapse-hub analyze
+    npx synapse-hub@{pkg_ver} analyze || npx synapse-hub analyze
 elif [ -f "{analyze_script}" ]; then
     python3 "{analyze_script}" || python "{analyze_script}"
 fi
 echo "[AI-GUARD - READY] Pushing to remote...\\n"
-exit 0
+# --- End Synapse-Hub Quality Gate ---
 """
+
     try:
+        if os.path.exists(hook_file):
+            with open(hook_file, "r", encoding="utf-8", errors="ignore") as f:
+                existing_content = f.read()
+
+            if "Synapse-Hub" in existing_content or "synapse-hub" in existing_content:
+                print(f"  {CYAN}[SKIP] Pre-Push Git Hook already present:{RESET} {hook_file}")
+                return True
+
+            # Safely backup existing hook (e.g. Husky, Lefthook)
+            backup_file = f"{hook_file}.backup"
+            shutil.copy2(hook_file, backup_file)
+            print(f"  {YELLOW}[BACKUP] Existing pre-push hook backed up to:{RESET} {backup_file}")
+
+            # Append non-destructively
+            final_content = existing_content.rstrip() + "\n" + hook_snippet
+        else:
+            final_content = "#!/bin/sh\n" + hook_snippet
+
         with open(hook_file, "w", encoding="utf-8", newline="\n") as f:
-            f.write(hook_content)
+            f.write(final_content)
 
         # Attempt to make executable on Unix-like environments
         try:
@@ -223,7 +253,7 @@ exit 0
         except Exception:
             pass
 
-        print(f"  {GREEN}[OK] Installed automated Pre-Push Git Hook:{RESET} {hook_file}")
+        print(f"  {GREEN}[OK] Configured automated Pre-Push Git Hook:{RESET} {hook_file} (pinned to v{pkg_ver})")
         return True
     except Exception as e:
         print(f"  ⚠️ Could not install Git hook: {e}")
