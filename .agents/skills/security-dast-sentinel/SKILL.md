@@ -1,6 +1,6 @@
 ---
 name: security-dast-sentinel
-description: Dynamic Application Security Testing (DAST) and OWASP Top 10 automated verification for web apps and APIs. Audits security response headers (CSP, HSTS, X-Frame-Options), detects sensitive data leaks (PII, tokens, internal stacktraces), asserts BOLA/IDOR authorization boundaries via role token swapping, and validates CORS configurations.
+description: "Run dynamic security audits: OWASP Top 10, security headers, IDOR, and token leakage."
 ---
 
 # Security DAST Sentinel (Dynamic Application Security & OWASP Top 10)

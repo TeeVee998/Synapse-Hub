@@ -1,8 +1,6 @@
 ---
 name: graphify-impact-analyzer
-description: >-
-  AST Knowledge Graph exploration, Architecture Navigation, and Zero-Waste Test Impact Analysis
-  across multi-module test cases using Graphify and tools/test_impact.py.
+description: "Analyze code change blast radius and scope impacted test cases via AST."
 ---
 
 # Graphify Impact Analyzer — AST Knowledge Graph Navigation & Zero-Waste Impact Analysis

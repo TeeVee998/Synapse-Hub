@@ -1,9 +1,6 @@
 ---
 name: clean-pom-crafter
-description: >-
-  Standardized Clean Page Object Model (POM) development and Flat Architecture enforcement across enterprise automation test suites.
-  Ensures 100% UTF-8 No BOM, zero hardcoded XPaths in scripts, dynamic test data generation via uniqueCode,
-  and standardized two-phase search, edit, calendar, multiselect, and deletion behaviors.
+description: "Build and refactor Clean POM Page Classes adhering to Flat Architecture standards."
 ---
 
 # Clean POM Crafter — Enterprise Clean POM Architecture Standards

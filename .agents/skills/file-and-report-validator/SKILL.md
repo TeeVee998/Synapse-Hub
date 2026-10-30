@@ -1,6 +1,6 @@
 ---
 name: file-and-report-validator
-description: Validate uploaded and downloaded enterprise files (Excel .xlsx/.xls, CSV, PDF) for correct schemas, row counts, tabular data integrity, and PDF text/layout. Use on-demand when testing export/import workflows.
+description: "Validate downloaded and uploaded files (Excel, CSV, PDF) schemas and tabular integrity."
 ---
 
 # File & Report Validator Skill

@@ -1,7 +1,6 @@
 ---
 name: lam-script-generator
-description: >-
-  Large Action Model (LAM) script generator inspired by LaVague. Transforms natural language user stories and acceptance criteria into 100% Clean POM automation scripts with zero token replayability.
+description: "Transform user stories and acceptance criteria into Clean POM automation scripts."
 ---
 
 # LAM Script Generator — Large Action Model for Test Automation

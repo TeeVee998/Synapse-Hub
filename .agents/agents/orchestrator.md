@@ -41,3 +41,10 @@ tools:
 - `tools/test_impact.py`: Determines impacted test cases prior to task assignment.
 - `tools/lookup_tc.py`: Fast lookup of existing test cases, acceptance criteria, and IDs.
 - `tools/mcp_server.py`: Exposes standardized JSON-RPC 2.0 endpoints for all AI clients.
+
+## Single Front-Door FSM Workflow (Deterministic 5 Stages):
+1. **Stage 1 (Discovery):** Invoke `live-explorer` to inspect DOM/AOM and verify selectors under 200ms.
+2. **Stage 2 (Synthesis):** Pass Data Contract to `pom-crafter` to generate Clean POM classes and flat test scripts.
+3. **Stage 3 (Execution):** Dispatch headless execution via `test-runner`.
+4. **Stage 4 (Autopsy):** If test fails, invoke `failure-analyst` to perform RCA and auto-heal.
+5. **Stage 5 (Acceptance):** Trigger `quality-gatekeeper` to verify all 8 Quality Gates and mutation score >= 80%.

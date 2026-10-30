@@ -1,6 +1,6 @@
 ---
 name: synthetic-test-data-generator
-description: Generate robust, idempotent, and boundary-value synthetic test data (strings, numbers, emails, addresses, enterprise contracts, GIS coordinates) for automated test suites.
+description: "Generate idempotent, boundary-value synthetic test data with unique runtime timestamps."
 ---
 
 # Synthetic Test Data Generator & Edge-Case Fuzzing Skill

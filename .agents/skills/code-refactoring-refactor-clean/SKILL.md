@@ -1,6 +1,6 @@
 ---
 name: code-refactoring-refactor-clean
-description: "Master code refactoring and technical debt remediation. Enforces clean code principles, SOLID patterns, code smell elimination, dead code cleanup, and measurable debt reduction."
+description: "Eliminate technical debt and refactor code using SOLID and Clean Code patterns."
 ---
 
 # Refactor, Clean Code & Technical Debt Remediation

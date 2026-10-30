@@ -1,6 +1,6 @@
 ---
 name: token-and-context-optimizer
-description: Context engineering and token optimization skill for Antigravity, enforcing sparse context retrieval, log distillation, prevention of context degradation (Lost-in-the-Middle, attention sinks), and off-context memory scratchpad protocol.
+description: "Optimize prompt context, distill verbose logs, and prevent context rot in Antigravity."
 ---
 
 # Token & Context Optimizer — Antigravity Engineering Standard

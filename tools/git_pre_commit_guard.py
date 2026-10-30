@@ -13,6 +13,14 @@ import sys
 import os
 import subprocess
 
+# Enforce UTF-8 stdout encoding for Windows console compatibility
+if hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
 FORBIDDEN_PATHS = ["/Users/", "C:\\Workspace\\", "D:\\Workspace\\", "file:///c:", "file:///d:"]
 
 def run_cmd(cmd):
@@ -134,6 +142,19 @@ def main():
         sys.exit(0)
 
     errors_found = False
+
+    # 0. Hub Pollution Guard (When committing inside Synapse-Hub)
+    is_hub = os.path.exists("skills_manifest.json") and os.path.isdir(".agents")
+    if is_hub:
+        forbidden_hub_prefixes = ("Scripts/", "Keywords/", "Object Repository/", "Test Suites/", "Data Files/", "Include/")
+        polluting_files = [f for f in staged_files if any(f.startswith(p) for p in forbidden_hub_prefixes)]
+        if polluting_files:
+            print("❌ [PRE-COMMIT BLOCKED] Target project business test files detected in Synapse-Hub:")
+            for pf in polluting_files:
+                print(f"   - {pf}")
+            print("\n🚨 CWD CONFUSION GUARD: You are attempting to commit target project code into Synapse-Hub!")
+            print("   Please unstage these files ('git reset HEAD') and commit them inside your target project workspace.")
+            errors_found = True
 
     # 1. BOM Check
     target_exts = (".groovy", ".tc", ".ts", ".glbl", ".md", ".py", ".json", ".ps1")

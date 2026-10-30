@@ -1,0 +1,16 @@
+# Synapse-Hub Enterprise QA Quality Gate Snippet for GitLab CI
+# Include this job in your target project's .gitlab-ci.yml
+
+stages:
+  - test
+
+synapse-qa-gate:
+  stage: test
+  image: node:20-bookworm
+  before_script:
+    - apt-get update && apt-get install -y python3 python3-pip
+  script:
+    - npx synapse-hub verify
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

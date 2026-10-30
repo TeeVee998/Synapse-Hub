@@ -1,8 +1,6 @@
 ---
 name: failure-autopsy-and-healing
-description: >-
-  Automated failure triage, visual error autopsy from Screenshots/FAILED_*.png and Allure reports,
-  cross-platform JUnit XML parsing, and in-place Page Class code healing across automated test suites.
+description: "Triage test failures from JUnit XML/screenshots and heal broken Page Class locators."
 ---
 
 # Failure Autopsy & Auto-Healing (Diagnostic & Self-Healing Engine)

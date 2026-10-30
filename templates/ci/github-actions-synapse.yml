@@ -1,0 +1,28 @@
+name: Synapse QA Quality Gate
+
+on:
+  push:
+    branches: [ main, develop, master ]
+  pull_request:
+    branches: [ main, develop, master ]
+
+jobs:
+  quality-gate:
+    name: 8 Quality Gates DoD Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Project Source
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js (NPX Runner)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Python Environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run Synapse-Hub Quality Gates
+        run: npx synapse-hub verify

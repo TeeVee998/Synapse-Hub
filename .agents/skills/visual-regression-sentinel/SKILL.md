@@ -1,6 +1,6 @@
 ---
 name: visual-regression-sentinel
-description: Pixel-level and perceptual visual regression testing with dynamic masking, layout shift detection, and threshold-based visual assertions.
+description: "Run pixel and layout shift visual regression checks with anti-flake masking."
 ---
 
 # Visual Regression Sentinel Skill

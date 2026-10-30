@@ -1,6 +1,6 @@
 ---
 name: backend-load-and-stress-patterns
-description: Enterprise backend load, stress, and endurance test orchestration using k6 and Locust. Directs AI agents in modeling concurrent Virtual Users (VUs), establishing SLA threshold assertions (P95/P99 latency, throughput/RPS, error rate < 0.1%), executing stress break-point tests, and soak/endurance validation.
+description: "Orchestrate k6 and Locust backend load, stress, and SLA endurance test suites."
 ---
 
 # Backend Load & Stress Testing Patterns (k6 & Locust Orchestrator)

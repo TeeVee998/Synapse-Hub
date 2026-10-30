@@ -91,6 +91,42 @@ This repository defines specialized multi-agent profiles (configured in `.agents
 6. **Quality Gatekeeper & Sentinel (`quality-gatekeeper`):**
    - Enforces 8 Quality Gates (`verify_all.py`), scans fake passes (`infer_linter.py`), injects AST micro-mutants (`micro_mutator.py` requiring >= 80% mutation score), audits visual regression masks (`smart_visual_masker.py`), and checks DB leaks (`trace_data_flow.py`).
 
+### 4.1 SINGLE FRONT-DOOR PROTOCOL & DETERMINISTIC FSM WORKFLOW
+
+> **Decision Paralysis Prevention Invariant:**  
+> All incoming tasks enter exclusively through the **Single Front-Door (`orchestrator`)**.  
+> Subagents operate in a strictly sequential 5-Stage Finite State Machine (FSM). Out-of-order execution or ambiguous dispatch is prohibited.
+
+```mermaid
+flowchart TD
+    User([User / System Task]) --> Orchestrator["<b>Lead QA Orchestrator</b><br/><i>Single Front-Door Entrypoint</i>"]
+    
+    subgraph FSM["5-Stage Gatekeeper Execution Pipeline (FSM)"]
+        Stage1["<b>Stage 1: Discovery</b><br/>• Subagent: live-explorer<br/>• Probe DOM/AOM under 200ms<br/>• Emit Data Contract JSON"]
+        Stage2["<b>Stage 2: Code Synthesis</b><br/>• Subagent: pom-crafter<br/>• Clean POM + Flat Architecture<br/>• Zero XPaths in scripts"]
+        Stage3["<b>Stage 3: Headless Execution</b><br/>• Subagent: test-runner<br/>• Run headless CLI + distill logs<br/>• Output Pass/Fail status"]
+        Stage4["<b>Stage 4: Failure Autopsy & Healing</b><br/>• Subagent: failure-analyst<br/>• Activated ONLY if Stage 3 Fails<br/>• In-place healing via JUnit XML/Screenshot"]
+        Stage5["<b>Stage 5: Final Acceptance (DoD)</b><br/>• Subagent: quality-gatekeeper<br/>• 8 Quality Gates + Mutation Score >= 80%<br/>• Task Done"]
+        
+        Stage1 --> Stage2 --> Stage3
+        Stage3 -->|Pass| Stage5
+        Stage3 -->|Fail| Stage4
+        Stage4 -->|Healed| Stage3
+    end
+
+    Orchestrator --> Stage1
+```
+
+#### Deterministic Intent-to-Tool Matrix (Zero-Ambiguity Dispatch)
+
+| Specific User / System Intent | Designated Subagent | Situational Tool |
+| :--- | :--- | :--- |
+| **Inspect live DOM / probe selectors** | `live-explorer` | `tools/browser_helpers.js`, `tools/safety_firewall.py` |
+| **Author Page Classes or test scripts** | `pom-crafter` | `tools/repo_map.py`, `tools/universal_ir.py` |
+| **Execute headless suites / CI runs** | `test-runner` | `tools/distill_log.py`, `tools/matrix_sharder.py` |
+| **Triage failed test runs / RCA** | `failure-analyst` | `tools/pinpoint_failure.py`, `tools/auto_heal.py` |
+| **Enforce Quality Gates before commit** | `quality-gatekeeper` | `tools/verify_all.py`, `tools/micro_mutator.py` |
+
 ---
 
 ## 5. CENTRALIZED TOOLS RUNBOOK

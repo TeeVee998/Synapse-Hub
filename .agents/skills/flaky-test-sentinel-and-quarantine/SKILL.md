@@ -1,6 +1,6 @@
 ---
 name: flaky-test-sentinel-and-quarantine
-description: Enterprise flaky test detection, scoring, and automated quarantine governance. Detects non-deterministic test behavior via multi-run repetition (e.g., 5 iterations), computes flakiness index, isolates unstable tests from blocking CI/CD merges via quarantine tagging (@quarantine / @flaky), and tracks MTBF until remediation.
+description: "Detect non-deterministic flaky tests, calculate flakiness scores, and manage quarantine."
 ---
 
 # Flaky Test Sentinel & Quarantine Protocol

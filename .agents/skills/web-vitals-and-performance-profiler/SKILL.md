@@ -1,6 +1,6 @@
 ---
 name: web-vitals-and-performance-profiler
-description: Profile Core Web Vitals (LCP, CLS, INP/FID, TTFB) and measure page load budgets via Chrome DevTools Protocol (CDP). Use on-demand when auditing UI performance or detecting slow API endpoints.
+description: "Measure Core Web Vitals (LCP, CLS, INP) and network waterfalls via CDP."
 ---
 
 # Web Vitals & Performance Profiler Skill

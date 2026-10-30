@@ -1,6 +1,6 @@
 ---
 name: e2e-testing-patterns
-description: Master architectural and organizational patterns for multi-browser E2E testing (Playwright, Cypress) focusing on test suite structure, parallel sharding, and retry governance.
+description: "Design robust multi-browser E2E test architectures, parallel sharding, and retry governance."
 ---
 
 # E2E Testing Architectural Patterns

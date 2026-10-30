@@ -54,17 +54,29 @@ def resolve_target_repo(cli_target=None, cli_repo=None):
         resolved = os.path.abspath(chosen)
         if not os.path.exists(resolved):
             raise FileNotFoundError(f"Target repository path not found: {resolved}")
+        if resolved.lower() == HUB_ROOT.lower():
+            print(f"{RED}{BOLD}X [CWD CONFUSION GUARD] Target repository cannot be Synapse-Hub itself!{RESET}")
+            print("  Synapse-Hub is the centralized skill hub, not an automation target project.")
+            print("   Please specify a target project: python tools/setup_project.py --target /path/to/target-project")
+            sys.exit(1)
         return resolved
 
     env_dir = os.environ.get("TARGET_PROJECT_DIR")
     if env_dir and os.path.exists(env_dir):
-        return os.path.abspath(env_dir)
+        resolved_env = os.path.abspath(env_dir)
+        if resolved_env.lower() == HUB_ROOT.lower():
+            print(f"{RED}{BOLD}X [CWD CONFUSION GUARD] TARGET_PROJECT_DIR points to Synapse-Hub itself!{RESET}")
+            sys.exit(1)
+        return resolved_env
 
     cwd = os.path.abspath(os.getcwd())
     if cwd.lower() != HUB_ROOT.lower():
         return cwd
 
-    return HUB_ROOT
+    print(f"{RED}{BOLD}X [CWD CONFUSION GUARD] Current working directory is Synapse-Hub!{RESET}")
+    print("  You must run setup inside your target project folder or supply --target:")
+    print("   python tools/setup_project.py --target <path_to_target_project>")
+    sys.exit(1)
 
 
 def detect_tech_stack(target_dir):

@@ -1,6 +1,6 @@
 ---
 name: wcag-audit-patterns
-description: Conduct WCAG 2.2 accessibility audits (Level A/AA) with automated AST analysis, keyboard trap verification, ARIA role assertions, and tools/wcag_audit.py.
+description: "Audit WCAG 2.2 accessibility (A/AA), keyboard navigation, and ARIA roles."
 ---
 
 # WCAG 2.2 Accessibility Audit Patterns

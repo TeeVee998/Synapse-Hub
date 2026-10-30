@@ -1,7 +1,6 @@
 ---
 name: antigravity-test-sentinel
-description: >-
-  Verification-first sentinel for test automation in Antigravity. Strictly locks task completion until test runner commands (verify_all.py, KRE CLI, Playwright) return exit code 0. Forbids declaring completion on unverified code.
+description: "Enforce verification-first discipline: blocks task completion until tests and quality gates pass."
 ---
 
 # Antigravity Test Sentinel — Verification-First Gatekeeper

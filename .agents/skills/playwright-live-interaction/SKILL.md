@@ -1,9 +1,6 @@
 ---
 name: playwright-live-interaction
-description: >-
-  Fast live web interaction and interactive debugging via Playwright MCP.
-  Use for rapid feedback, testing selectors, verifying Angular/PrimeNG components,
-  and executing test actions across enterprise web test suites without restarting Katalon/Selenium.
+description: "Probe live web DOM/AOM and verify selectors under 200ms using headless Playwright."
 ---
 
 # Playwright Live Interaction & Fast Debugging Handbook (Enterprise Web & Clean POM)

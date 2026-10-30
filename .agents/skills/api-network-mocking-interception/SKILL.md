@@ -1,6 +1,6 @@
 ---
 name: api-network-mocking-interception
-description: Runtime HTTP/GraphQL request interception, route stubbing (page.route), and chaos network resilience testing (latency, 502/503/504 faults, offline, circuit breaker) during UI execution.
+description: "Intercept HTTP/GraphQL traffic, stub routes, and simulate chaos network failures."
 ---
 
 # API Network Mocking, Interception & Resilience Skill

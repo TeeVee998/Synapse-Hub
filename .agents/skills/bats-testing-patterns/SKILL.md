@@ -1,6 +1,6 @@
 ---
 name: bats-testing-patterns
-description: Master Bash Automated Testing System (Bats) for testing bash/sh scripts, CI/CD pipelines, exit codes, and mock CLI execution.
+description: "Test bash/sh scripts, CLI tools, and CI/CD pipelines with Bats."
 ---
 
 # Bats Testing Patterns (Bash Automated Testing System)

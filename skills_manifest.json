@@ -47,7 +47,7 @@
       "name": "Agent Orchestration Multi-Agent Optimize",
       "category": "context_and_optimization",
       "path": ".agents/skills/agent-orchestration-multi-agent-optimize/SKILL.md",
-      "summary": "Optimize multi-agent systems with coordinated profiling, workload distribution, and cost-aware orchestration.",
+      "summary": "Profile, benchmark, and orchestrate multi-agent test workloads and token throughput.",
       "version": "2.0.0"
     },
     {
@@ -55,7 +55,7 @@
       "name": "Antigravity Test Sentinel",
       "category": "verification_and_resilience",
       "path": ".agents/skills/antigravity-test-sentinel/SKILL.md",
-      "summary": "Verification-first sentinel locking task completion until runner commands return exit code 0.",
+      "summary": "Enforce verification-first discipline: blocks task completion until tests and quality gates pass.",
       "version": "2.0.0"
     },
     {
@@ -63,7 +63,7 @@
       "name": "API Network Mocking & Interception",
       "category": "verification_and_resilience",
       "path": ".agents/skills/api-network-mocking-interception/SKILL.md",
-      "summary": "Intercept, stub, and mock HTTP/GraphQL network traffic, and verify chaos network resilience during E2E test runs.",
+      "summary": "Intercept HTTP/GraphQL traffic, stub routes, and simulate chaos network failures.",
       "version": "2.0.0"
     },
     {
@@ -71,7 +71,7 @@
       "name": "API Spec to E2E Matrix",
       "category": "architecture_and_analysis",
       "path": ".agents/skills/api-spec-to-e2e-matrix/SKILL.md",
-      "summary": "Transforms OpenAPI/Swagger specifications and schemas into positive, boundary, and negative test matrices.",
+      "summary": "Generate automated positive, boundary, and negative test matrices from OpenAPI specifications.",
       "version": "2.0.0"
     },
     {
@@ -79,7 +79,7 @@
       "name": "Architecture Decision Records",
       "category": "architecture_and_analysis",
       "path": ".agents/skills/architecture-decision-records/SKILL.md",
-      "summary": "Write and maintain Architecture Decision Records (ADRs) following engineering standards.",
+      "summary": "Record, structure, and maintain technical Architecture Decision Records (ADRs).",
       "version": "2.0.0"
     },
     {
@@ -87,7 +87,7 @@
       "name": "Auth Session and Cookie Manager",
       "category": "test_automation_and_execution",
       "path": ".agents/skills/auth-session-and-cookie-manager/SKILL.md",
-      "summary": "Manage browser authentication sessions, JWT tokens, and storageState for zero-second logins on-demand.",
+      "summary": "Manage browser authentication sessions, storageState, JWT tokens, and multi-role state.",
       "version": "2.0.0"
     },
     {
@@ -96,14 +96,15 @@
       "description": "Enterprise backend load, stress, and endurance test orchestration using k6 and Locust. Directs AI agents in modeling concurrent Virtual Users (VUs), establishing SLA threshold assertions (P95/P99 latency, throughput/RPS, error rate < 0.1%), executing stress break-point tests, and soak/endurance validation.",
       "category": "test_automation_and_execution",
       "path": ".agents/skills/backend-load-and-stress-patterns/SKILL.md",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "summary": "Orchestrate k6 and Locust backend load, stress, and SLA endurance test suites."
     },
     {
       "id": "bats-testing-patterns",
       "name": "Bats Testing Patterns",
       "category": "test_automation_and_execution",
       "path": ".agents/skills/bats-testing-patterns/SKILL.md",
-      "summary": "Master Bash Automated Testing System (Bats) for shell scripts and CI/CD pipelines.",
+      "summary": "Test bash/sh scripts, CLI tools, and CI/CD pipelines with Bats.",
       "version": "2.0.0"
     },
     {
@@ -111,7 +112,7 @@
       "name": "Clean POM Crafter",
       "category": "test_automation_and_execution",
       "path": ".agents/skills/clean-pom-crafter/SKILL.md",
-      "summary": "Standardized Clean Page Object Model development and Flat Architecture enforcement.",
+      "summary": "Build and refactor Clean POM Page Classes adhering to Flat Architecture standards.",
       "version": "2.0.0"
     },
     {
@@ -119,7 +120,7 @@
       "name": "Code Refactoring Refactor Clean",
       "category": "architecture_and_analysis",
       "path": ".agents/skills/code-refactoring-refactor-clean/SKILL.md",
-      "summary": "Master code refactoring, SOLID patterns, code smell elimination, and technical debt reduction.",
+      "summary": "Eliminate technical debt and refactor code using SOLID and Clean Code patterns.",
       "version": "2.0.0"
     },
     {
@@ -127,7 +128,7 @@
       "name": "Database State Verifier and Seeder",
       "category": "verification_and_resilience",
       "path": ".agents/skills/db-state-verifier-and-seeder/SKILL.md",
-      "summary": "Verify database records, seed isolated test fixtures, and assert mutations (SQL/NoSQL) on-demand.",
+      "summary": "Seed isolated test fixtures and assert database mutations across SQL and NoSQL.",
       "version": "2.0.0"
     },
     {
@@ -135,7 +136,7 @@
       "name": "E2E Testing Patterns",
       "category": "test_automation_and_execution",
       "path": ".agents/skills/e2e-testing-patterns/SKILL.md",
-      "summary": "Master end-to-end testing with Playwright and Cypress to build fast and reliable test suites.",
+      "summary": "Design robust multi-browser E2E test architectures, parallel sharding, and retry governance.",
       "version": "2.0.0"
     },
     {
@@ -143,7 +144,7 @@
       "name": "Failure Autopsy and Healing",
       "category": "verification_and_resilience",
       "path": ".agents/skills/failure-autopsy-and-healing/SKILL.md",
-      "summary": "Automated failure triage, visual error autopsy from screenshots and Allure reports, and in-place code healing.",
+      "summary": "Triage test failures from JUnit XML/screenshots and heal broken Page Class locators.",
       "version": "2.0.0"
     },
     {
@@ -151,7 +152,7 @@
       "name": "File and Report Validator",
       "category": "verification_and_resilience",
       "path": ".agents/skills/file-and-report-validator/SKILL.md",
-      "summary": "Validate uploaded and exported files (Excel .xlsx, CSV, PDF) for correct schemas and data integrity on-demand.",
+      "summary": "Validate downloaded and uploaded files (Excel, CSV, PDF) schemas and tabular integrity.",
       "version": "2.0.0"
     },
     {
@@ -160,14 +161,15 @@
       "description": "Enterprise flaky test detection, scoring, and automated quarantine governance. Detects non-deterministic test behavior via multi-run repetition (e.g., 5 iterations), computes flakiness index, isolates unstable tests from blocking CI/CD merges via quarantine tagging (@quarantine / @flaky), and tracks MTBF until remediation.",
       "category": "verification_and_resilience",
       "path": ".agents/skills/flaky-test-sentinel-and-quarantine/SKILL.md",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "summary": "Detect non-deterministic flaky tests, calculate flakiness scores, and manage quarantine."
     },
     {
       "id": "github-actions-templates",
       "name": "GitHub Actions Templates",
       "category": "architecture_and_analysis",
       "path": ".agents/skills/github-actions-templates/SKILL.md",
-      "summary": "Production-ready GitHub Actions workflows for automated testing, building, and deploying.",
+      "summary": "Create production-ready GitHub Actions workflows for automated test suites and CI/CD.",
       "version": "2.0.0"
     },
     {
@@ -175,7 +177,7 @@
       "name": "Graphify Impact Analyzer",
       "category": "architecture_and_analysis",
       "path": ".agents/skills/graphify-impact-analyzer/SKILL.md",
-      "summary": "AST Knowledge Graph exploration, navigation, and zero-waste test impact analysis.",
+      "summary": "Analyze code change blast radius and scope impacted test cases via AST.",
       "version": "2.0.0"
     },
     {
@@ -183,7 +185,7 @@
       "name": "Katalon CLI Runner",
       "category": "test_automation_and_execution",
       "path": ".agents/skills/katalon-cli-runner/SKILL.md",
-      "summary": "Adaptive test execution manager supporting licensed KRE CLI and headless automation runs.",
+      "summary": "Execute headless Katalon and Gradle test runners with automatic driver cleanup.",
       "version": "2.0.0"
     },
     {
@@ -191,7 +193,7 @@
       "name": "LAM Script Generator",
       "category": "test_automation_and_execution",
       "path": ".agents/skills/lam-script-generator/SKILL.md",
-      "summary": "Large Action Model (LAM) script generator transforming user stories into Clean POM scripts.",
+      "summary": "Transform user stories and acceptance criteria into Clean POM automation scripts.",
       "version": "2.0.0"
     },
     {
@@ -199,7 +201,7 @@
       "name": "Playwright Live Interaction",
       "category": "test_automation_and_execution",
       "path": ".agents/skills/playwright-live-interaction/SKILL.md",
-      "summary": "Fast live web interaction and interactive DOM/AOM probing via Playwright MCP.",
+      "summary": "Probe live web DOM/AOM and verify selectors under 200ms using headless Playwright.",
       "version": "2.0.0"
     },
     {
@@ -208,14 +210,15 @@
       "description": "Dynamic Application Security Testing (DAST) and OWASP Top 10 automated verification for web apps and APIs. Audits security response headers (CSP, HSTS, X-Frame-Options), detects sensitive data leaks (PII, tokens, internal stacktraces), asserts BOLA/IDOR authorization boundaries via role token swapping, and validates CORS configurations.",
       "category": "verification_and_resilience",
       "path": ".agents/skills/security-dast-sentinel/SKILL.md",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "summary": "Run dynamic security audits: OWASP Top 10, security headers, IDOR, and token leakage."
     },
     {
       "id": "self-healing-locator",
       "name": "Self Healing Locator",
       "category": "verification_and_resilience",
       "path": ".agents/skills/self-healing-locator/SKILL.md",
-      "summary": "Token-efficient self-healing locator skill using Accessibility Tree (AOM) and semantic DOM diffing.",
+      "summary": "Heal broken locators using semantic AOM diffing with Role, Label, and TestId hierarchy.",
       "version": "2.0.0"
     },
     {
@@ -223,7 +226,7 @@
       "name": "Synthetic Test Data Generator",
       "category": "verification_and_resilience",
       "path": ".agents/skills/synthetic-test-data-generator/SKILL.md",
-      "summary": "Generate robust, idempotent, and boundary-value synthetic test data for automated test suites.",
+      "summary": "Generate idempotent, boundary-value synthetic test data with unique runtime timestamps.",
       "version": "2.0.0"
     },
     {
@@ -231,7 +234,7 @@
       "name": "Token and Context Optimizer",
       "category": "context_and_optimization",
       "path": ".agents/skills/token-and-context-optimizer/SKILL.md",
-      "summary": "Sparse context retrieval, terminal log distillation, context degradation prevention, and file-backed memory scratchpad.",
+      "summary": "Optimize prompt context, distill verbose logs, and prevent context rot in Antigravity.",
       "version": "2.0.0"
     },
     {
@@ -239,7 +242,7 @@
       "name": "Visual Regression Sentinel",
       "category": "verification_and_resilience",
       "path": ".agents/skills/visual-regression-sentinel/SKILL.md",
-      "summary": "Pixel-level and perceptual visual regression testing with dynamic masking and layout shift detection.",
+      "summary": "Run pixel and layout shift visual regression checks with anti-flake masking.",
       "version": "2.0.0"
     },
     {
@@ -247,7 +250,7 @@
       "name": "WCAG Audit Patterns",
       "category": "architecture_and_analysis",
       "path": ".agents/skills/wcag-audit-patterns/SKILL.md",
-      "summary": "Conduct WCAG 2.2 accessibility audits with automated testing and remediation guidance.",
+      "summary": "Audit WCAG 2.2 accessibility (A/AA), keyboard navigation, and ARIA roles.",
       "version": "2.0.0"
     },
     {
@@ -255,7 +258,7 @@
       "name": "Web Vitals and Performance Profiler",
       "category": "architecture_and_analysis",
       "path": ".agents/skills/web-vitals-and-performance-profiler/SKILL.md",
-      "summary": "Profile Core Web Vitals (LCP, CLS, INP/FID, TTFB) and detect slow APIs via CDP on-demand.",
+      "summary": "Measure Core Web Vitals (LCP, CLS, INP) and network waterfalls via CDP.",
       "version": "2.0.0"
     }
   ]

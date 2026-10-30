@@ -1,6 +1,6 @@
 ---
 name: db-state-verifier-and-seeder
-description: Verify database records, seed isolated test fixtures, and assert database mutations across SQL (PostgreSQL, MySQL, Oracle) and NoSQL (MongoDB, Redis). Use on-demand when testing backend state mutations or DB consistency.
+description: "Seed isolated test fixtures and assert database mutations across SQL and NoSQL."
 ---
 
 # Database State Verifier & Seeder Skill

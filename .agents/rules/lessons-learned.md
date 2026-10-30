@@ -17,6 +17,7 @@ description: Critical anti-patterns, past mistakes, and strict avoidance rules (
 | **5** | **Flaky timing on CI/CD** | `Thread.sleep` failed under variable network lag. | Replace 100% with Smart Wait: Angular `isStable()` and CDP `Network Idle 0`. |
 | **6** | **DB polluted with test junk** | Created entities without executing deletion. | Every data creation test case **must** execute idempotent teardown cleanup. |
 | **7** | **Graphify/CLI ran on Skill Hub instead of target project** | Defaulted to `CWD = Agent Skill` without checking Active Workspaces. | **Agent Skill folder = read-only hub, NEVER a CLI target.** Always identify the real target project from `Active Workspaces` (the non-hub workspace). If multiple project workspaces exist, ask the user. All outputs (graphify-out/, reports) must land inside the target project folder. |
+| **8** | **Target test code pollution on Hub** | Created/committed target tests inside Hub repo. | **Synapse-Hub is strictly read-only for business automation tests.** All page classes, specs, and test cases must reside in the target project workspace. Pre-commit guard rejects business code in Hub. |
 
 ### Memory Management & Consolidation Protocol:
 - **Max capacity:** 8 active rules in prompt hot memory.

@@ -1,6 +1,6 @@
 ---
 name: katalon-cli-runner
-description: Adaptive CLI execution manager for Katalon / Gradle headless test runners, supporting licensing fallback, zombie driver termination, and Allure report compilation. Use specifically when running enterprise Groovy/Katalon test suites.
+description: "Execute headless Katalon and Gradle test runners with automatic driver cleanup."
 ---
 
 # Katalon CLI & Enterprise Runner — Dual-Mode Execution Management
