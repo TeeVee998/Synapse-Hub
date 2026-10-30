@@ -42,6 +42,7 @@ EXCLUDE_DIRS = {
     "agent_qa.egg-info",
     "archive",
     "reports",
+    "graphify-out",
 }
 
 EXCLUDE_EXTS = {

@@ -24,9 +24,10 @@ class TestSkillsExamplesCompleteness(unittest.TestCase):
             self.manifest = json.load(f)
         self.declared_skills = [s["id"] for s in self.manifest.get("skills", [])]
 
-    def test_all_28_skills_have_examples_directory(self):
+    def test_all_declared_skills_have_examples_directory(self):
         """Assert that every skill in manifest contains examples/ with valid files."""
-        self.assertEqual(len(self.declared_skills), 28, "Manifest must declare exactly 28 skills")
+        expected_total = self.manifest.get("totalSkills", 29)
+        self.assertEqual(len(self.declared_skills), expected_total, f"Manifest must declare exactly {expected_total} skills")
 
         missing_examples = []
         for skill_id in self.declared_skills:
