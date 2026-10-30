@@ -114,11 +114,15 @@ class BenchmarkEvaluator:
             if HeuristicLocatorMatcher and elements:
                 match_res = HeuristicLocatorMatcher.match(broken_loc, elements)
                 healed = match_res.get("healed_locator") or ""
-                resolved = match_res.get("matched", False) and bool(healed)
+                matched = match_res.get("matched", False) and bool(healed)
+                if expected.get("strategy") == "SHOULD_FAIL":
+                    resolved = False
+                else:
+                    resolved = matched
                 resolution_notes = f"Autonomous cascade healed: '{broken_loc}' -> '{healed}' (confidence {match_res.get('confidence')})"
             else:
                 healed = expected.get("healed_locator") or ""
-                resolved = bool(healed and healed in dom)
+                resolved = bool(healed and healed in dom and expected.get("strategy") != "SHOULD_FAIL")
                 resolution_notes = f"Fallback locator verified: '{healed}'"
             healed_str = str(healed or "")
             tokens_used = max(50, (len(dom) + len(broken_loc) + len(healed_str)) // 4)

@@ -3,237 +3,62 @@ name: agent-orchestration-multi-agent-optimize
 description: "Profile, benchmark, and orchestrate multi-agent test workloads and token throughput."
 ---
 
-# Multi-Agent Optimization Toolkit
+# Multi-Agent Optimization & Orchestration Skill
 
-## Use this skill when
+> **Target:** Optimize multi-agent test workloads, reduce context overhead, streamline agent handoffs, and monitor token consumption across autonomous test swarms.
 
-- Improving multi-agent coordination, throughput, or latency
-- Profiling agent workflows to identify bottlenecks
-- Designing orchestration strategies for complex workflows
-- Optimizing cost, context usage, or tool efficiency
+---
 
-## Do not use this skill when
+## 1. When to Use
 
-- You only need to tune a single agent prompt
-- There are no measurable metrics or evaluation data
-- The task is unrelated to multi-agent orchestration
+- Managing multi-agent coordination, test suite sharding, and throughput.
+- Profiling sub-agent task decomposition to eliminate redundant execution.
+- Implementing dynamic model tiering (fast models for search, deep models for healing).
+- Budgeting context tokens across collaborative agent swarms.
 
-## Instructions
+---
 
-1. Establish baseline metrics and target performance goals.
-2. Profile agent workloads and identify coordination bottlenecks.
-3. Apply orchestration changes and cost controls incrementally.
-4. Validate improvements with repeatable tests and rollbacks.
+## 2. Core Orchestration Principles
 
-## Safety
+1. **Single Front-Door Protocol:**
+   - All inbound tasks route through `orchestrator` to prevent split-brain execution.
+2. **Context Isolation (`Workspace: 'share'`):**
+   - Subagents run in isolated workspaces to avoid git index collisions and context pollution.
+3. **Observation Distillation:**
+   - Subagents return only 3-5 line summaries and pointers to logs on disk, never dumping thousands of stdout lines into the parent context.
+4. **Dynamic Model Routing:**
+   - Use lighter models (`flash`, `flash_lite`) for element exploration and log filtering.
+   - Use deeper models (`inherit`, `pro`) for root-cause synthesis and AST mutation testing.
 
-- Avoid deploying orchestration changes without regression testing.
-- Roll out changes gradually to prevent system-wide regressions.
+---
 
-## Role: AI-Powered Multi-Agent Performance Engineering Specialist
-
-### Context
-
-The Multi-Agent Optimization Tool is an advanced AI-driven framework designed to holistically improve system performance through intelligent, coordinated agent-based optimization. Leveraging cutting-edge AI orchestration techniques, this tool provides a comprehensive approach to performance engineering across multiple domains.
-
-### Core Capabilities
-
-- Intelligent multi-agent coordination
-- Performance profiling and bottleneck identification
-- Adaptive optimization strategies
-- Cross-domain performance optimization
-- Cost and efficiency tracking
-
-## Arguments Handling
-
-The tool processes optimization arguments with flexible input parameters:
-
-- `$TARGET`: Primary system/application to optimize
-- `$PERFORMANCE_GOALS`: Specific performance metrics and objectives
-- `$OPTIMIZATION_SCOPE`: Depth of optimization (quick-win, comprehensive)
-- `$BUDGET_CONSTRAINTS`: Cost and resource limitations
-- `$QUALITY_METRICS`: Performance quality thresholds
-
-## 1. Multi-Agent Performance Profiling
-
-### Profiling Strategy
-
-- Distributed performance monitoring across system layers
-- Real-time metrics collection and analysis
-- Continuous performance signature tracking
-
-#### Profiling Agents
-
-1. **Database Performance Agent**
-   - Query execution time analysis
-   - Index utilization tracking
-   - Resource consumption monitoring
-
-2. **Application Performance Agent**
-   - CPU and memory profiling
-   - Algorithmic complexity assessment
-   - Concurrency and async operation analysis
-
-3. **Frontend Performance Agent**
-   - Rendering performance metrics
-   - Network request optimization
-   - Core Web Vitals monitoring
-
-### Profiling Code Example
+## 3. Workload Sharding & Matrix Execution
 
 ```python
-def multi_agent_profiler(target_system):
-    agents = [
-        DatabasePerformanceAgent(target_system),
-        ApplicationPerformanceAgent(target_system),
-        FrontendPerformanceAgent(target_system)
-    ]
-
-    performance_profile = {}
-    for agent in agents:
-        performance_profile[agent.__class__.__name__] = agent.profile()
-
-    return aggregate_performance_metrics(performance_profile)
+# Multi-agent workload partition example
+def shard_test_workload(suite_files: list, max_agents: int = 4) -> list:
+    """Partitions test cases across parallel subagents to minimize total execution wall-clock time."""
+    shards = [[] for _ in range(max_agents)]
+    for idx, test_file in enumerate(suite_files):
+        shards[idx % max_agents].append(test_file)
+    return [s for s in shards if s]
 ```
 
-## 2. Context Window Optimization
+---
 
-### Optimization Techniques
+## 4. Token & Latency Governance
 
-- Intelligent context compression
-- Semantic relevance filtering
-- Dynamic context window resizing
-- Token budget management
+| Optimization Layer | Baseline (Naive) | Optimized (Synapse Swarm) | Savings |
+| :--- | :--- | :--- | :--- |
+| **CLI Log Output** | Dump 3,000 lines | `tools/distill_log.py` (< 50 tokens) | **95%** |
+| **Codebase Reading** | Read whole classes | `tools/repo_map.txt` (< 600 tokens) | **90%** |
+| **Failure Resolution**| Multiple prompt loops | SQLite cache lookup (< 0.1s) | **> 90%** |
+| **DOM Inspection** | Raw HTML DOM | Compact AOM (< 500 tokens) | **90%** |
 
-### Context Compression Algorithm
+---
 
-```python
-def compress_context(context, max_tokens=4000):
-    # Semantic compression using embedding-based truncation
-    compressed_context = semantic_truncate(
-        context,
-        max_tokens=max_tokens,
-        importance_threshold=0.7
-    )
-    return compressed_context
-```
+## 5. Verification & Safety Guidelines
 
-## 3. Agent Coordination Efficiency
-
-### Coordination Principles
-
-- Parallel execution design
-- Minimal inter-agent communication overhead
-- Dynamic workload distribution
-- Fault-tolerant agent interactions
-
-### Orchestration Framework
-
-```python
-class MultiAgentOrchestrator:
-    def __init__(self, agents):
-        self.agents = agents
-        self.execution_queue = PriorityQueue()
-        self.performance_tracker = PerformanceTracker()
-
-    def optimize(self, target_system):
-        # Parallel agent execution with coordinated optimization
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            futures = {
-                executor.submit(agent.optimize, target_system): agent
-                for agent in self.agents
-            }
-
-            for future in concurrent.futures.as_completed(futures):
-                agent = futures[future]
-                result = future.result()
-                self.performance_tracker.log(agent, result)
-```
-
-## 4. Parallel Execution Optimization
-
-### Key Strategies
-
-- Asynchronous agent processing
-- Workload partitioning
-- Dynamic resource allocation
-- Minimal blocking operations
-
-## 5. Cost Optimization Strategies
-
-### LLM Cost Management
-
-- Token usage tracking
-- Adaptive model selection
-- Caching and result reuse
-- Efficient prompt engineering
-
-### Cost Tracking Example
-
-```python
-class CostOptimizer:
-    def __init__(self):
-        self.token_budget = 100000  # Monthly budget
-        self.token_usage = 0
-        self.model_costs = {  # USD per 1K input tokens
-            'gpt-5': 0.03,
-            'claude-sonnet-4-6': 0.003,
-            'claude-haiku-4-5': 0.001
-        }
-
-    def select_optimal_model(self, complexity):
-        # Dynamic model selection based on task complexity and budget
-        pass
-```
-
-## 6. Latency Reduction Techniques
-
-### Performance Acceleration
-
-- Predictive caching
-- Pre-warming agent contexts
-- Intelligent result memoization
-- Reduced round-trip communication
-
-## 7. Quality vs Speed Tradeoffs
-
-### Optimization Spectrum
-
-- Performance thresholds
-- Acceptable degradation margins
-- Quality-aware optimization
-- Intelligent compromise selection
-
-## 8. Monitoring and Continuous Improvement
-
-### Observability Framework
-
-- Real-time performance dashboards
-- Automated optimization feedback loops
-- Machine learning-driven improvement
-- Adaptive optimization strategies
-
-## Reference Workflows
-
-### Workflow 1: E-Commerce Platform Optimization
-
-1. Initial performance profiling
-2. Agent-based optimization
-3. Cost and performance tracking
-4. Continuous improvement cycle
-
-### Workflow 2: Enterprise API Performance Enhancement
-
-1. Comprehensive system analysis
-2. Multi-layered agent optimization
-3. Iterative performance refinement
-4. Cost-efficient scaling strategy
-
-## Key Considerations
-
-- Always measure before and after optimization
-- Maintain system stability during optimization
-- Balance performance gains with resource consumption
-- Implement gradual, reversible changes
-
-Target Optimization: $ARGUMENTS
+- Always establish baseline metrics before applying workflow changes.
+- Ensure subagent dynamic test data uses unique runtime IDs (`AUTO_<timestamp>_<agentId>`).
+- Enforce automated teardown for all creation actions dispatched by subagents.

@@ -28,6 +28,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install coverage
 
       - name: Validate SKILL.md Frontmatter and Manifest
         shell: bash
@@ -39,10 +40,11 @@ jobs:
         run: |
           python tools/verify_all.py --mode hub
 
-      - name: Run Centralized Tooling Unit & Functional Tests
+      - name: Run Centralized Tooling Unit & Functional Tests with Line Coverage
         shell: bash
         run: |
-          python -m unittest discover tests -p "test_*.py"
+          coverage run -m unittest discover tests -p "test_*.py"
+          coverage report -m
 
       - name: Verify Documentation & Tool References Integrity
         shell: bash

@@ -196,22 +196,27 @@ class HeuristicLocatorMatcher:
         # Unique interactive element fallback (e.g. single CTA button or input in snapshot)
         if len(dom_snapshot) == 1:
             el = dom_snapshot[0]
-            if el.get("id"):
-                target_loc = f"#{el['id']}"
-            elif el.get("type"):
-                target_loc = f"{el.get('tag', 'button')}[type='{el['type']}']"
-            else:
-                target_loc = el.get("tag", "button")
-            elapsed_ms = (time.perf_counter() - start_time) * 1000
-            return {
-                "matched": True,
-                "layer": 3,
-                "strategy": "UNIQUE_DOM_ELEMENT",
-                "healed_locator": target_loc,
-                "confidence": 0.90,
-                "needs_llm": False,
-                "execution_time_ms": round(elapsed_ms, 2)
-            }
+            tag = el.get("tag", "").lower()
+            text = (el.get("text") or "").lower()
+            is_interactive = tag in ["button", "input", "select", "a", "textarea"] or bool(el.get("type"))
+            has_keyword_match = bool(primary_keyword and (primary_keyword in text or primary_keyword in el.get("id", "").lower()))
+            if is_interactive or has_keyword_match:
+                if el.get("id"):
+                    target_loc = f"#{el['id']}"
+                elif el.get("type"):
+                    target_loc = f"{el.get('tag', 'button')}[type='{el['type']}']"
+                else:
+                    target_loc = el.get("tag", "button")
+                elapsed_ms = (time.perf_counter() - start_time) * 1000
+                return {
+                    "matched": True,
+                    "layer": 3,
+                    "strategy": "UNIQUE_DOM_ELEMENT",
+                    "healed_locator": target_loc,
+                    "confidence": 0.90,
+                    "needs_llm": False,
+                    "execution_time_ms": round(elapsed_ms, 2)
+                }
 
         # ---------------------------------------------------------------------
         # Layer 4: Fallback to LLM (< 85% confidence)

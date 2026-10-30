@@ -27,3 +27,14 @@ agent-qa = "tools.cli:main"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["tools*"]
+
+[tool.coverage.run]
+source = ["tools"]
+omit = [
+    "tools/templates/*",
+    "tests/*",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
