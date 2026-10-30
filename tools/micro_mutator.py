@@ -263,8 +263,14 @@ def evaluate_mutants_dynamically(file_path: str, code: str, mutants: List[Dict[s
 
     killed_count = 0
     abs_path = os.path.abspath(file_path)
+    backup_path = abs_path + ".synapse_mutator_bak"
 
+    # F3 Safety Discipline: Create a dedicated atomic backup file
+    # and guarantee recovery via try/finally and os.replace
     try:
+        with open(backup_path, "w", encoding="utf-8") as bf:
+            bf.write(code)
+
         for m in mutants:
             mutated_code = m["mutated_code"]
             with open(abs_path, "w", encoding="utf-8") as f:
@@ -293,8 +299,19 @@ def evaluate_mutants_dynamically(file_path: str, code: str, mutants: List[Dict[s
                 m["status"] = "SURVIVED"
                 m["reason"] = f"Test execution error: {e}"
     finally:
-        with open(abs_path, "w", encoding="utf-8") as f:
-            f.write(code)
+        # Atomic restore guaranteed from backup file
+        if os.path.exists(backup_path):
+            with open(backup_path, "r", encoding="utf-8") as bf:
+                clean_content = bf.read()
+            with open(abs_path, "w", encoding="utf-8") as f:
+                f.write(clean_content)
+            try:
+                os.remove(backup_path)
+            except Exception:
+                pass
+        else:
+            with open(abs_path, "w", encoding="utf-8") as f:
+                f.write(code)
 
     score = evaluate_mutation_score(killed_count, len(mutants))
     return mutants, score

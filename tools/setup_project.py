@@ -410,17 +410,88 @@ def install_universal_ai_bridges(target_dir):
     return True
 
 
-def run_setup(target_repo):
+def uninstall_setup(target_repo: str) -> int:
+    """Safely reverts and removes files installed by setup_project in the target repo."""
+    print(f"\n{BOLD}{YELLOW}======================================================================{RESET}")
+    print(f"{BOLD}{YELLOW}          SYNAPSE HUB — REVERT & UNINSTALL SETUP                      {RESET}")
+    print(f"{BOLD}{YELLOW}======================================================================{RESET}")
+    print(f"Target Repository: {target_repo}")
+
+    reverted_items = 0
+
+    # 1. Remove PROJECT_AI_GUIDE.md
+    guide_file = os.path.join(target_repo, "PROJECT_AI_GUIDE.md")
+    if os.path.exists(guide_file):
+        os.remove(guide_file)
+        print(f"  {GREEN}[REMOVED]{RESET} {guide_file}")
+        reverted_items += 1
+
+    # 2. Restore/Remove Git Pre-Push Hook
+    hook_file = os.path.join(target_repo, ".git", "hooks", "pre-push")
+    backup_file = os.path.join(target_repo, ".git", "hooks", "pre-push.bak")
+    if os.path.exists(backup_file):
+        if os.path.exists(hook_file):
+            os.remove(hook_file)
+        shutil.move(backup_file, hook_file)
+        print(f"  {GREEN}[RESTORED]{RESET} Restored original pre-push hook from backup")
+        reverted_items += 1
+    elif os.path.exists(hook_file):
+        with open(hook_file, "r", encoding="utf-8", errors="ignore") as f:
+            content = f.read()
+        if "Synapse-Hub" in content or "synapse-hub" in content:
+            os.remove(hook_file)
+            print(f"  {GREEN}[REMOVED]{RESET} Cleaned Synapse-Hub pre-push hook")
+            reverted_items += 1
+
+    # 3. Remove Cursor rule
+    cursor_rule = os.path.join(target_repo, ".cursor", "rules", "synapse-qa.mdc")
+    if os.path.exists(cursor_rule):
+        os.remove(cursor_rule)
+        print(f"  {GREEN}[REMOVED]{RESET} {cursor_rule}")
+        reverted_items += 1
+
+    # 4. Remove Copilot instruction
+    copilot_file = os.path.join(target_repo, ".github", "copilot-instructions.md")
+    if os.path.exists(copilot_file):
+        os.remove(copilot_file)
+        print(f"  {GREEN}[REMOVED]{RESET} {copilot_file}")
+        reverted_items += 1
+
+    # 5. Remove Windsurf rules
+    windsurf_file = os.path.join(target_repo, ".windsurfrules")
+    if os.path.exists(windsurf_file):
+        os.remove(windsurf_file)
+        print(f"  {GREEN}[REMOVED]{RESET} {windsurf_file}")
+        reverted_items += 1
+
+    print(f"\n{GREEN}✅ Uninstall complete! Cleaned {reverted_items} configuration files/hooks.{RESET}\n")
+    return 0
+
+
+def run_setup(target_repo, dry_run=False):
     """Main execution entrypoint for automated project setup."""
     print(f"\n{BOLD}{CYAN}======================================================================{RESET}")
     print(f"{BOLD}{CYAN}      AUTONOMOUS ZERO-COMMAND PROJECT BOOTSTRAP (AI-READY SETUP)     {RESET}")
     print(f"{BOLD}{CYAN}======================================================================{RESET}")
     print(f"📁 Target Project  : {target_repo}")
+    if dry_run:
+        print(f"Operational Mode   : {YELLOW}DRY-RUN (Simulating without modifying files on disk){RESET}\n")
+    else:
+        print(f"Operational Mode   : APPLY CHANGES\n")
 
     # 1. Detect Stack
     stack_info = detect_tech_stack(target_repo)
     print(f"🔍 Detected Stack  : {BOLD}{stack_info['framework']}{RESET} ({stack_info['language']})")
     print(f"📂 Structure Scope : Pages: `{stack_info['page_dir']}` | Tests: `{stack_info['test_dir']}`\n")
+
+    if dry_run:
+        print(f"{YELLOW}[DRY-RUN PREVIEW]{RESET}")
+        print(f"  • Would generate: {os.path.join(target_repo, 'PROJECT_AI_GUIDE.md')}")
+        print(f"  • Would deploy AI bridges: .cursor/rules/synapse-qa.mdc, .github/copilot-instructions.md, .windsurfrules")
+        print(f"  • Would install pre-push hook: {os.path.join(target_repo, '.git', 'hooks', 'pre-push')}")
+        print(f"  • Would initialize: Central Agent Memory (~/.agent_memory/global_cache.db)")
+        print(f"\n{GREEN}✅ Dry-run completed successfully. Zero changes written to disk.{RESET}\n")
+        return 0
 
     # 2. Ensure PROJECT_AI_GUIDE.md & PROJECT_STATE.md
     print(f"{BOLD}[1/5] Checking Project AI Guide & State Anchor...{RESET}")
@@ -470,6 +541,8 @@ def main():
     parser = argparse.ArgumentParser(description="Autonomous Enterprise QA Project Setup")
     parser.add_argument("target", nargs="?", default=None, help="Target repository path to setup")
     parser.add_argument("--repo", "--path", dest="repo_path", default=None, help="Target repository path")
+    parser.add_argument("--dry-run", action="store_true", help="Simulate setup actions without modifying disk")
+    parser.add_argument("--uninstall", action="store_true", help="Revert and remove files installed by setup_project")
     args = parser.parse_args()
 
     try:
@@ -478,7 +551,10 @@ def main():
         print(f"❌ Error: {e}")
         return 1
 
-    return run_setup(target_repo)
+    if args.uninstall:
+        return uninstall_setup(target_repo)
+
+    return run_setup(target_repo, dry_run=args.dry_run)
 
 
 if __name__ == "__main__":

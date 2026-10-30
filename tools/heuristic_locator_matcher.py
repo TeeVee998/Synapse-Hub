@@ -99,26 +99,32 @@ class HeuristicLocatorMatcher:
             }
 
         for el in dom_snapshot:
-            # Check test-id
-            if el.get("data-testid") and el["data-testid"].lower() in broken_locator.lower():
+            # Check test-id (exact or semantic substring match)
+            testid = el.get("data-testid") or el.get("test-id")
+            if testid:
+                clean_broken = re.sub(r'[^a-zA-Z0-9]', '', broken_locator.lower())
+                clean_testid = re.sub(r'[^a-zA-Z0-9]', '', testid.lower())
+                if clean_broken in clean_testid or clean_testid in clean_broken or primary_keyword in testid.lower():
+                    elapsed_ms = (time.perf_counter() - start_time) * 1000
+                    return {
+                        "matched": True,
+                        "layer": 1,
+                        "strategy": "EXACT_TESTID_ATTRIBUTE",
+                        "healed_locator": f"[data-testid='{testid}']",
+                        "confidence": 0.98,
+                        "needs_llm": False,
+                        "execution_time_ms": round(elapsed_ms, 2)
+                    }
+            # Check aria-label or data-action match
+            aria = el.get("aria-label") or el.get("data-action")
+            if aria and (aria.lower() == primary_keyword or primary_keyword in aria.lower()):
                 elapsed_ms = (time.perf_counter() - start_time) * 1000
-                return {
-                    "matched": True,
-                    "layer": 1,
-                    "strategy": "EXACT_TESTID_ATTRIBUTE",
-                    "healed_locator": f"[data-testid='{el['data-testid']}']",
-                    "confidence": 0.98,
-                    "needs_llm": False,
-                    "execution_time_ms": round(elapsed_ms, 2)
-                }
-            # Check aria-label exact match
-            if el.get("aria-label") and el["aria-label"].lower() == primary_keyword:
-                elapsed_ms = (time.perf_counter() - start_time) * 1000
+                tag_prefix = el.get("tag", "button")
                 return {
                     "matched": True,
                     "layer": 1,
                     "strategy": "EXACT_ARIA_LABEL",
-                    "healed_locator": f"[aria-label='{el['aria-label']}']",
+                    "healed_locator": f"{tag_prefix}[aria-label='{el.get('aria-label', aria)}']",
                     "confidence": 0.96,
                     "needs_llm": False,
                     "execution_time_ms": round(elapsed_ms, 2)
@@ -164,7 +170,7 @@ class HeuristicLocatorMatcher:
                 }
 
         # ---------------------------------------------------------------------
-        # Layer 3: Spatial Anchor Proximity Heuristic (10ms)
+        # Layer 3: Spatial Anchor Proximity & Unique Semantic Tag Fallback
         # ---------------------------------------------------------------------
         if spatial_anchor:
             # Find element immediately adjacent/inside the anchor container
@@ -186,6 +192,26 @@ class HeuristicLocatorMatcher:
                         }
                 if el.get("id") == spatial_anchor.replace("#", "") or el.get("selector") == spatial_anchor:
                     anchor_found = True
+
+        # Unique interactive element fallback (e.g. single CTA button or input in snapshot)
+        if len(dom_snapshot) == 1:
+            el = dom_snapshot[0]
+            if el.get("id"):
+                target_loc = f"#{el['id']}"
+            elif el.get("type"):
+                target_loc = f"{el.get('tag', 'button')}[type='{el['type']}']"
+            else:
+                target_loc = el.get("tag", "button")
+            elapsed_ms = (time.perf_counter() - start_time) * 1000
+            return {
+                "matched": True,
+                "layer": 3,
+                "strategy": "UNIQUE_DOM_ELEMENT",
+                "healed_locator": target_loc,
+                "confidence": 0.90,
+                "needs_llm": False,
+                "execution_time_ms": round(elapsed_ms, 2)
+            }
 
         # ---------------------------------------------------------------------
         # Layer 4: Fallback to LLM (< 85% confidence)

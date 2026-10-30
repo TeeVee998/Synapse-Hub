@@ -46,8 +46,25 @@ ASSERTION_PATTERN = re.compile(
     r'\b(verify[A-Za-z0-9_]*|assert[A-Za-z0-9_]*|waitForToast|checkStatus|assertEquals|assertTrue|assertFalse|assertThat|expect|ensure[A-Z][A-Za-z0-9_]*Exists)\b'
 )
 
+# Rule L1 & L5: Empty catch / swallowed exceptions across JS/TS/Groovy/Java and Python
 EMPTY_CATCH_PATTERN = re.compile(
-    r'catch\s*\([^\)]*\)\s*\{\s*\}',
+    r'(?:catch\s*(?:\([^\)]*\))?\s*\{\s*\}|\bexcept(?:\s+[^:]*)?:\s*(?:pass|\.\.\.)\b)',
+    re.MULTILINE
+)
+
+# Rule L3: Tautological assertions (e.g. expect(true).toBe(true), assert True, assert true, assert 1 == 1)
+TAUTOLOGY_PATTERN = re.compile(
+    r'(?:expect\s*\(\s*(?:true|1)\s*\)\s*\.\s*(?:toBe|toEqual)\s*\(\s*(?:true|1)\s*\)'
+    r'|\bassert\s+(?:True|true|1\s*==\s*1)\b'
+    r'|assertEquals\s*\(\s*(?:true|1)\s*,\s*(?:true|1)\s*\)'
+    r'|assertTrue\s*\(\s*(?:true|1)\s*\))',
+    re.IGNORECASE
+)
+
+# Rule L4: Unawaited Playwright assertions in JS/TS (e.g. expect(locator).toBeVisible() without await)
+# Matches lines containing expect(...).to... where await does not precede expect
+UNAWAITED_EXPECT_PATTERN = re.compile(
+    r'(?<!\bawait\s)(?<!\breturn\s)\bexpect\s*\([^;\n]+\)\s*\.\s*(?:toBeVisible|toBeHidden|toHaveText|toHaveValue|toHaveCount|toBeEnabled|toBeDisabled|toBeChecked)\s*\(',
     re.MULTILINE
 )
 
@@ -133,17 +150,49 @@ def analyze_script(file_path):
                     "message": f"Static sleep of {delay_val}ms found. Replace with dynamic Smart Wait (waitForElement/networkidle)."
                 })
 
-    # Rule 4: Fake-Pass / Missing Assertions (verified against code tokens only)
-    has_assert = bool(ASSERTION_PATTERN.search(clean_code))
+    # Rule 4 (L3): Tautological Assertions (Fake-Pass: expect(true).toBe(true), assert True, etc.)
+    for idx, line in enumerate(clean_code.splitlines(), 1):
+        if TAUTOLOGY_PATTERN.search(line):
+            defects.append({
+                "type": "TAUTOLOGICAL_ASSERTION",
+                "severity": "CRITICAL",
+                "line": idx,
+                "message": f"Tautological assertion detected ('{line.strip()}'). Test assertion always evaluates to True without testing system state."
+            })
+
+    # Rule 5 (L4): Unawaited Playwright Assertions in JS/TS
+    if file_path.endswith((".ts", ".js")):
+        for match in UNAWAITED_EXPECT_PATTERN.finditer(clean_code):
+            line_no = clean_code[:match.start()].count("\n") + 1
+            line_text = clean_code.splitlines()[line_no - 1].strip() if line_no <= len(clean_code.splitlines()) else ""
+            defects.append({
+                "type": "UNAWAITED_ASYNC_ASSERTION",
+                "severity": "CRITICAL",
+                "line": line_no,
+                "message": f"Unawaited async Playwright assertion detected: '{line_text}'. Without 'await', assertion returns a Pending Promise that never validates."
+            })
+
+    # Rule 6 (L2 & L6): Missing Assertions / Fake-Pass
+    # Has interactions or is a dedicated test file without any assertions
+    has_assert = bool(ASSERTION_PATTERN.search(clean_code)) and not bool(TAUTOLOGY_PATTERN.search(clean_code))
     has_interactions = any(
-        kw in clean_code for kw in ["click", "select", "save", "delete", "create", "search", "navigate", "open", "fill"]
+        kw in clean_code for kw in ["click", "select", "save", "delete", "create", "search", "navigate", "open", "fill", "goto", "post", "get"]
     )
+    is_test_file = any(t in os.path.basename(file_path).lower() for t in ["test", "spec", "tc-", "tc_"])
+
     if has_interactions and not has_assert:
         defects.append({
             "type": "FAKE_PASS_NO_ASSERTION",
             "severity": "WARNING",
             "line": 1,
             "message": "Script performs AUT mutations/interactions but contains zero verification/assertion statements."
+        })
+    elif is_test_file and not has_assert and not has_interactions and len(executable_lines) > 0:
+        defects.append({
+            "type": "NO_ASSERTION_IN_TEST",
+            "severity": "WARNING",
+            "line": 1,
+            "message": "Test case file contains executable logic but has no verification or assertion statements."
         })
 
     return {
