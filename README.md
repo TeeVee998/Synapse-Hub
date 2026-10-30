@@ -65,8 +65,8 @@ flowchart TD
 ```
 
 ### 🧠 Trụ cột 1: Tư Duy Chiều Sâu (System-2 Reasoning & Chống Pass Ảo)
-- **Xóa bỏ chế độ "Autocomplete vô thức":** Buộc AI đi qua chu trình 4 bước: *Trích xuất bất biến $\rightarrow$ Giả định phản nghiệm $\rightarrow$ Tự phản biện $\rightarrow$ Sinh mã phòng vệ*.
-- **Tự đối kháng Red-Team vs Blue-Team:** Tiêm đột biến AST (`tools/micro_mutator.py`) vào kịch bản test; bắt buộc **Điểm đột biến (Mutation Score) $\ge 80\%$** mới cho phép nghiệm thu task.
+- **Xóa bỏ chế độ "Autocomplete vô thức":** Buộc AI đi qua chu trình 4 bước: *Trích xuất bất biến ➔ Giả định phản nghiệm ➔ Tự phản biện ➔ Sinh mã phòng vệ*.
+- **Tự đối kháng Red-Team vs Blue-Team:** Tiêm đột biến AST (`tools/micro_mutator.py`) vào kịch bản test; bắt buộc **Điểm đột biến (Mutation Score) ≥ 80%** mới cho phép nghiệm thu task.
 
 ### ⚡ Trụ cột 2: Tiết Kiệm Token Triệt Để (Cắt Giảm 85% – 95% Chi Phí Context)
 - **Lọc 95% Log thừa:** `tools/distill_log.py` nén 3.000 dòng log CLI/Gradle chỉ còn ~10 dòng chứa stacktrace cốt lõi (< 50 tokens).
@@ -78,7 +78,7 @@ flowchart TD
 | Tiêu chí đánh giá | Cách làm thông thường (Naive Prompting) | Khi sử dụng Synapse Hub 🧠 | Phương pháp kiểm chứng |
 | :--- | :---: | :---: | :--- |
 | **Token tiêu thụ / lần fix bug** | 15.000 – 40.000 tokens | **300 – 800 tokens** | Đo trên micro-turn fix locator qua `distill_log.py` + `repo_map.py`. |
-| **Tỷ lệ Fake-Pass (pass ảo)** | 30% – 50% | **0% (Bị chặn đứng)** | Gate 0 & 7 (`infer_linter.py`) + Gate 8 Mutation Score $\ge 80\%$. |
+| **Tỷ lệ Fake-Pass (pass ảo)** | 30% – 50% | **0% (Bị chặn đứng)** | Gate 0 & 7 (`infer_linter.py`) + Gate 8 Mutation Score ≥ 80%. |
 | **Bộ nhớ sửa lỗi liên phiên** | Mất sạch khi mở chat mới | **Bền vững qua SQLite Cache** | Lưu ngoại tuyến tại `~/.agent_memory/global_cache.db`. |
 | **Thời gian tự sửa lỗi (MTTR)** | 5 – 15 phút thử sai | **< 1s khi cache-hit** | Truy xuất giải pháp có sẵn trong < 0.1s. |
 
@@ -132,7 +132,7 @@ flowchart TD
 | 26 | `wcag-audit-patterns` | Kiểm toán tiếp cận web WCAG 2.2 Level A/AA tự động qua AST và `@axe-core`. |
 | 27 | `web-vitals-and-performance-profiler` | Đo lường Core Web Vitals (LCP, CLS, TTFB) và giám sát API endpoint chậm qua CDP. |
 | 28 | `skillspector-security-guard` | Kiểm toán bảo mật AI Agent skills & MCP configs với 71 vector lỗ hổng (Prompt Injection, Data Exfiltration, Privilege Escalation) theo chuẩn NVIDIA SkillSpector. |
-| 29 | `rbt-manual-testing` | Quy trình 6 bước AI-RBT sinh Test Case thủ công, ma trận rủi ro $P \times I$, bảng Ambiguity Log, ma trận 12 cột, checklist 15 loại input field và kịch bản phi chức năng (Double-Submit, Race Conditions). |
+| 29 | `rbt-manual-testing` | Quy trình 6 bước AI-RBT sinh Test Case thủ công, ma trận rủi ro P × I, bảng Ambiguity Log, ma trận 12 cột, checklist 15 loại input field và kịch bản phi chức năng (Double-Submit, Race Conditions). |
 
 </details>
 
@@ -141,7 +141,7 @@ flowchart TD
 
 | Workflow | Mục Đích Nghiệp Vụ Cốt Lõi |
 | :--- | :--- |
-| **`generate_manual_testcases_rbt.md`** | Phân tích rủi ro $P \times I$, giải quyết câu hỏi mập mờ (Ambiguity Q&A), và sinh ma trận test case 12 cột. |
+| **`generate_manual_testcases_rbt.md`** | Phân tích rủi ro P × I, giải quyết câu hỏi mập mờ (Ambiguity Q&A), và sinh ma trận test case 12 cột. |
 | **`generate_testcases_from_requirements.md`** | Chuyển đổi trực tiếp tài liệu đặc tả (BRD, SRS, User Stories) thành bộ kiểm thử chấp nhận (Acceptance Tests). |
 | **`generate_cross_module_test_plan.md`** | Lập kế hoạch kiểm thử luồng nghiệp vụ E2E xuyên suốt nhiều module (Cart ➔ Checkout ➔ Payment ➔ Warehouse). |
 | **`generate_combinatorial_test_data.md`** | Sinh tập dữ liệu kiểm thử tổ hợp All-Pairs / Pairwise bao phủ tối đa trường hợp biên với số ca test tối thiểu. |
@@ -175,7 +175,7 @@ Chi tiết đầy đủ xem tại [tools/TOOLS_RUNBOOK.md](tools/TOOLS_RUNBOOK.m
 - `tools/verify_all.py`: Cổng thẩm định 9 Gates DoD (Gate 0–8: UTF-8, No XPaths, UniqueCode, Clean POM, AST Mutation).
 - `tools/md_to_xlsx.py` (`agent-qa export-excel`): Xuất bảng Test Case từ Markdown sang file Excel (.xlsx) chuyên nghiệp (định dạng header doanh nghiệp, frozen panes, auto-fit cột, huy hiệu màu P1-P4).
 - `tools/generate_jmx_plan.py`: Sinh kịch bản Apache JMeter 5.x (.jmx) đa giao thức (HTTP, JDBC, WS, gRPC, Kafka) kèm Traffic Shaping Pareto.
-- `tools/jtl_analyzer.py`: Phân tích kết quả JTL, kiểm soát SLA percentiles ($P_{90}, P_{95}, P_{99}$) và làm Quality Gate CI/CD.
+- `tools/jtl_analyzer.py`: Phân tích kết quả JTL, kiểm soát SLA percentiles (P90, P95, P99) và làm Quality Gate CI/CD.
 - `tools/telemetry_correlator.py`: Phân tích tương quan Pearson giữa Client Latency và Server APM (CPU, RAM, DB Pool).
 - `tools/export_postman_collection.py`: Xuất Postman Collection v2.1 với AJV JSON Schema, DDT, và Zero-Input synthesis.
 - `tools/newman_analyzer.py`: Phân tích kết quả Newman, triage lỗi assertion và làm Quality Gate cho API.

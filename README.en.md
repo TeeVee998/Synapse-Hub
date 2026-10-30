@@ -61,8 +61,8 @@ flowchart TD
 ```
 
 ### 1. 🧠 System-2 Reasoning & Cognitive Forcing
-- **Eliminates Unconscious Autocomplete:** Forces AI through a 4-step thinking protocol: *Invariant Extraction $\rightarrow$ Popper Falsification $\rightarrow$ Self-Debate $\rightarrow$ Defensive Synthesis*.
-- **Red-Team vs Blue-Team Mutation Testing:** Injects AST micro-mutants (`tools/micro_mutator.py`), rejecting test suites with **Mutation Score $< 80\%$**.
+- **Eliminates Unconscious Autocomplete:** Forces AI through a 4-step thinking protocol: *Invariant Extraction ➔ Popper Falsification ➔ Self-Debate ➔ Defensive Synthesis*.
+- **Red-Team vs Blue-Team Mutation Testing:** Injects AST micro-mutants (`tools/micro_mutator.py`), rejecting test suites with **Mutation Score < 80%**.
 
 ### 2. ⚡ Radical Token Optimization (85% – 95% Context Savings)
 - **95% Log Distillation:** `tools/distill_log.py` compresses 3,000 noise lines to ~10 actionable exception lines (< 50 tokens).
@@ -72,7 +72,7 @@ flowchart TD
 | Metric | Naive AI Coding | With Synapse Hub 🧠 | Verification Proof |
 | :--- | :---: | :---: | :--- |
 | **Token Cost / Bug Fix** | 15k – 40k tokens | **300 – 800 tokens** | Micro-turn payload via `distill_log.py` + `repo_map.py`. |
-| **Fake-Pass Rate** | 30% – 50% | **0% (Blocked)** | Gate 0 & 7 (`infer_linter.py`) + Gate 8 Mutation Score $\ge 80\%$. |
+| **Fake-Pass Rate** | 30% – 50% | **0% (Blocked)** | Gate 0 & 7 (`infer_linter.py`) + Gate 8 Mutation Score ≥ 80%. |
 | **Cross-Session Fix Memory** | Forgotten immediately | **Persistent in SQLite** | Offline cosine cache in `~/.agent_memory/global_cache.db`. |
 | **Mean Time-to-Heal (MTTR)** | 5 – 15 minutes | **< 1s on cache hits** | Pre-cached resolutions resolve in 0.1s. |
 
@@ -126,7 +126,7 @@ flowchart TD
 | 26 | `wcag-audit-patterns` | Automated WCAG 2.2 Level A/AA accessibility auditing via AST and `@axe-core`. |
 | 27 | `web-vitals-and-performance-profiler` | Core Web Vitals (LCP, CLS, TTFB) profiling and slow API endpoint detection via CDP. |
 | 28 | `skillspector-security-guard` | AI agent skill & MCP config security auditing against 71 vulnerability vectors (Prompt Injection, Data Exfiltration, Privilege Escalation) powered by NVIDIA SkillSpector spec. |
-| 29 | `rbt-manual-testing` | 6-stage Risk-Based Testing (AI-RBT) manual test case synthesis, $P \times I$ risk scoring, Ambiguity Q&A log, 12-column matrix, 15-field validation checklist, and non-functional resilience scenarios (Double-Submit, Race Conditions). |
+| 29 | `rbt-manual-testing` | 6-stage Risk-Based Testing (AI-RBT) manual test case synthesis, P × I risk scoring, Ambiguity Q&A log, 12-column matrix, 15-field validation checklist, and non-functional resilience scenarios (Double-Submit, Race Conditions). |
 
 </details>
 
@@ -135,7 +135,7 @@ flowchart TD
 
 | Workflow | Core Engineering Purpose |
 | :--- | :--- |
-| **`generate_manual_testcases_rbt.md`** | Comprehensive 6-stage AI-RBT manual test generation with $P \times I$ risk scoring and 12-column table output. |
+| **`generate_manual_testcases_rbt.md`** | Comprehensive 6-stage AI-RBT manual test generation with P × I risk scoring and 12-column table output. |
 | **`generate_testcases_from_requirements.md`** | Direct compilation of requirement documents (SRS, PRD, User Stories) into acceptance test suites. |
 | **`generate_cross_module_test_plan.md`** | E2E integration test planning across interconnected modules (Cart ➔ Checkout ➔ Payment ➔ Warehouse). |
 | **`generate_combinatorial_test_data.md`** | All-Pairs / Pairwise test data generation optimizing boundary coverage with minimal test cases. |
