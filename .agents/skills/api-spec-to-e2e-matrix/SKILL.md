@@ -67,6 +67,14 @@ python tools/generate_api_matrix.py --spec path/to/openapi.json --format md -o d
 # 2. Generate JSON matrix for programmatic ingestion
 python tools/generate_api_matrix.py --spec path/to/openapi.json --format json -o tools/api_matrix.json
 
-# 3. Export directly to Postman Collection v2.1.0 with auto-assertions
-python tools/export_postman_collection.py --spec path/to/openapi.json -o postman_collection.json --env-output postman_env.json
+# 3. Export directly to Postman Collection v2.1.0 with AJV JSON Schema & DDT
+python tools/export_postman_collection.py --spec path/to/openapi.json -o postman_collection.json --env-output postman_env.json --ddt-output test_data.csv
+
+# 4. Zero-Input Autonomous Synthesis (No input file provided!)
+agent-qa export-postman --domain banking -o banking_col.json --env-output env.json --ddt-output ddt.csv
+agent-qa export-postman --domain ecommerce -o ecom_col.json
+
+# 5. Execute Newman & Enforce CI/CD Quality Gate
+newman run postman_collection.json -e postman_env.json -d test_data.csv -r cli,json --reporter-json-export report.json
+agent-qa analyze-newman report.json --max-failures 0 --sla-avg 500 --markdown pr_report.md
 ```

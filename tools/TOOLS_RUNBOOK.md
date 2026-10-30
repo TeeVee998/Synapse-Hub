@@ -35,6 +35,7 @@
 | **Generating test scripts from Natural Language Story** | `tools/generate_tc_from_story.py`| `python tools/generate_tc_from_story.py "<story>"` |
 | **Generating E2E matrix from OpenAPI/Swagger** | `tools/generate_api_matrix.py` | `python tools/generate_api_matrix.py --spec <swagger.json>` |
 | **Exporting API tests to Postman Collection v2.1** | `tools/export_postman_collection.py` | `agent-qa export-postman --spec <swagger.json> -o col.json` |
+| **Analyzing Newman Results & CI/CD Gatekeeper** | `tools/newman_analyzer.py` | `agent-qa analyze-newman report.json --max-failures 0` |
 | **Generating JMeter Performance Test Plan (.jmx)** | `tools/generate_jmx_plan.py` | `agent-qa generate-jmx --spec <swagger.json> --vus 100 -o plan.jmx` |
 | **Analyzing JMeter JTL & Enforcing CI/CD SLA Gate** | `tools/jtl_analyzer.py` | `agent-qa analyze-jtl results.jtl --sla-p95 500 --max-error-rate 1.0` |
 | **Full-Stack APM & Server Telemetry RCA Correlator** | `tools/telemetry_correlator.py` | `agent-qa correlate-telemetry --jtl results.jtl --server-metrics srv.csv` |
@@ -54,6 +55,7 @@
 | **Lookup XPath Locator in cached memory** | `tools/lookup_xpath.py` | `python tools/lookup_xpath.py "<keyword>"` |
 | **Lookup Test Case metadata** | `tools/lookup_tc.py` | `python tools/lookup_tc.py "<keyword_or_id>"` |
 | **Linting Markdown documentation quality** | `tools/lint_ai_docs.py` | `python tools/lint_ai_docs.py` |
+| **Auditing AI Agent Skills & MCP Security** | `tools/skillspector.py` | `python tools/skillspector.py [path]` (or `agent-qa skillspector [path]` / `npx synapse-hub skillspector`) |
 | **Upstream Version Check & 1-Click Self-Update** | `tools/update_sentinel.py` | `python tools/update_sentinel.py --check / --update` (or `agent-qa update` / `npx synapse-hub update`) |
 
 ---
@@ -337,17 +339,18 @@ agent-qa update
 ---
 
 ### 21. `tools/export_postman_collection.py`
-- **Purpose:** Enterprise OpenAPI/Swagger & HAR to Postman Collection v2.1.0 Exporter. Generates fully structured Postman collections with dynamic pre-request scripts, SLA latency tests, response code assertions, and autonomous bearer token / created entity ID extraction for Newman and CI/CD pipelines.
+- **Purpose:** Enterprise OpenAPI/Swagger, HAR & Zero-Input Domain Postman Collection v2.1.0 Exporter (Postman Pinnacle Suite). Generates fully structured Postman collections with dynamic pre-request scripts, SLA latency tests, response code assertions, autonomous token/entity chaining, native **AJV JSON Schema Validation**, companion **Data-Driven Testing (DDT) CSV matrix**, and **Autonomous Zero-Input Domain Synthesis** (`--domain [ecommerce|banking|saas]`).
 - **CLI Syntax:**
   ```bash
-  # Ingest OpenAPI spec and export Postman collection + companion environment
+  # 1. Ingest OpenAPI spec and export Postman collection + environment + AJV Schema asserts
   agent-qa export-postman --spec swagger.json -o collection.json --env-output env.json
 
-  # Replay production HAR traffic as Postman requests
-  agent-qa export-postman --har session.har -o har_collection.json
+  # 2. Autonomous Zero-Input Synthesis (No file provided! Synthesizes complete Banking/Ecom suite)
+  agent-qa export-postman --domain banking -o banking_col.json --env-output env.json --ddt-output ddt_data.csv
+  agent-qa export-postman --domain ecommerce -o ecom_col.json --ddt-output ecom_data.csv
 
-  # Generate sample collection from built-in enterprise schema
-  agent-qa export-postman --sample -o sample_collection.json
+  # 3. Replay production HAR traffic as Postman requests
+  agent-qa export-postman --har session.har -o har_collection.json
   ```
 
 ---
@@ -403,4 +406,56 @@ agent-qa update
   # Dry-run sample correlation verification
   agent-qa correlate-telemetry --sample
   ```
+
+---
+
+### 25. `tools/skillspector.py` (AI Agent Skill & MCP Security Sentinel)
+- **Purpose:** Autonomous security vulnerability and supply-chain auditor for AI Agent skills, prompt instructions, MCP tool configurations, and bundled automation scripts. Synthesized from **[NVIDIA/SkillSpector](https://github.com/NVIDIA/SkillSpector)** (Apache 2.0). Features 71 detection vectors across 17 categories, the NVIDIA Prohibition Context Engine to eliminate false positives in defensive rules, and multi-format outputs (Terminal, JSON, Markdown, SARIF 2.1.0).
+- **Threat Categories Covered:**
+  - Prompt Injection (`P1`, `P2`, `P3`, `P4`, `P9`)
+  - Data Exfiltration & Credential Harvesting (`E1`–`E5`)
+  - Privilege Escalation & Container Escapes (`PE1`–`PE5`)
+  - Agent Configuration Snooping (`AS1`–`AS3` targeting `~/.claude`, `~/.gemini`, `mcp.json`)
+  - System Prompt Leakage (`P6`–`P8`)
+  - Anti-Refusal Statements & Jailbreaks (`AR1`–`AR3`)
+  - MCP Tool Poisoning & Unicode Homoglyphs (`TP1`–`TP4`)
+  - MCP Least Privilege (`LP1`–`LP4`)
+  - Behavioral AST & Dangerous Deserialization (`AST1`–`AST10`)
+  - Supply Chain & SSRF (`SC1`–`SC2`, `SSRF1`–`SSRF2`)
+- **CLI Syntax:**
+  ```bash
+  # 1. Audit a skill directory or file with rich terminal output
+  python tools/skillspector.py .agents/skills/my-skill/
+  agent-qa skillspector .agents/skills/my-skill/
+  npx synapse-hub skillspector .agents/skills/my-skill/
+
+  # 2. Output SARIF 2.1.0 for GitHub Security tab integration
+  python tools/skillspector.py .agents/skills/ --format sarif --output reports/skillspector.sarif
+
+  # 3. Output JSON for CI/CD automated policy gate
+  python tools/skillspector.py .agents/skills/ --format json --output reports/skillspector.json
+
+  # 4. Strict CI gate: exit code 1 if any CRITICAL or DO_NOT_INSTALL findings exist
+  python tools/skillspector.py .agents/skills/ --strict
+  ```
+
+---
+
+### 26. `tools/newman_analyzer.py` (Newman CI/CD SLA Quality Gatekeeper)
+- **Purpose:** Postman / Newman Automated Test Results Analyzer & CI/CD Gatekeeper. Ingests Newman JSON reports (`newman run -r json`), parses total requests, triages failed assertions with root causes, checks average latency SLA, and enforces deterministic exit code `0` (Pass) vs `1` (Fail) to prevent broken API contracts from deploying.
+- **CLI Syntax:**
+  ```bash
+  # 1. Execute Newman with JSON report export
+  newman run collection.json -e env.json -r cli,json --reporter-json-export newman_report.json
+
+  # 2. Enforce CI/CD Quality Gate (Exit code 0 on Pass, 1 on Fail)
+  agent-qa analyze-newman newman_report.json --max-failures 0 --sla-avg 500
+
+  # 3. Export Pull Request Markdown report & JSON metrics
+  agent-qa analyze-newman newman_report.json --markdown pr_api_report.md --json api_metrics.json
+
+  # 4. Dry-run sample benchmark verification
+  agent-qa analyze-newman --sample
+  ```
+
 

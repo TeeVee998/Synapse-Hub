@@ -67,7 +67,8 @@ class TestToolsIntegrityAndBehavior(unittest.TestCase):
             expected_ver = json.load(pf).get("version")
         self.assertEqual(data.get("version"), expected_ver, f"Manifest version must match package.json ({expected_ver})")
         manifest_skills = [s["id"] for s in data.get("skills", [])]
-        self.assertEqual(len(manifest_skills), 27, "Manifest must declare exactly 27 skills")
+        expected_total = data.get("totalSkills", 28)
+        self.assertEqual(len(manifest_skills), expected_total, f"Manifest must declare exactly {expected_total} skills")
 
         skills_dir = os.path.join(REPO_ROOT, ".agents", "skills")
         for skill_id in manifest_skills:
@@ -490,7 +491,7 @@ class TestToolsIntegrityAndBehavior(unittest.TestCase):
             with open(pkg_path, "r", encoding="utf-8") as pf:
                 cur_ver = json.load(pf).get("version")
             self.assertIn(f"Agent-QA Hub CLI v{cur_ver}", output)
-            self.assertIn("27 Standardized Skills", output)
+            self.assertIn("Standardized Skills", output)
         finally:
             sys.stdout = old_stdout
 

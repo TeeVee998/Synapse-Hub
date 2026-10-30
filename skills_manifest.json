@@ -3,7 +3,7 @@
   "name": "Enterprise Agent Skills Hub",
   "version": "2.1.1",
   "description": "Unified Catalog of 27 Specialized Skills for Autonomous AI Agents in Enterprise Software Quality Engineering, Performance, and Architecture.",
-  "totalSkills": 27,
+  "totalSkills": 28,
   "categories": {
     "context_and_optimization": [
       "token-and-context-optimizer",
@@ -29,6 +29,7 @@
       "file-and-report-validator",
       "db-state-verifier-and-seeder",
       "security-dast-sentinel",
+      "skillspector-security-guard",
       "flaky-test-sentinel-and-quarantine"
     ],
     "architecture_and_analysis": [
@@ -212,6 +213,15 @@
       "path": ".agents/skills/security-dast-sentinel/SKILL.md",
       "version": "1.0.0",
       "summary": "Run dynamic security audits: OWASP Top 10, security headers, IDOR, and token leakage."
+    },
+    {
+      "id": "skillspector-security-guard",
+      "name": "SkillSpector Security Guard",
+      "description": "Autonomous security scanner for AI Agent skills, prompt instructions, and MCP tool configs. Detects 71 vulnerability vectors across 17 categories (Prompt Injection, Data Exfiltration, Privilege Escalation, Agent Snooping, Tool Poisoning, Behavioral AST). Powered by NVIDIA SkillSpector heuristics with Prohibition Context Guard.",
+      "category": "verification_and_resilience",
+      "path": ".agents/skills/skillspector-security-guard/SKILL.md",
+      "version": "1.0.0",
+      "summary": "Audit and verify AI agent skills, prompts, and MCP configurations against 71 vulnerability vectors inspired by NVIDIA SkillSpector."
     },
     {
       "id": "self-healing-locator",

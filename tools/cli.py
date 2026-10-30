@@ -281,6 +281,12 @@ def cmd_generate_jmx(args):
     sys.exit(jmx_main())
 
 
+def cmd_skillspector(args):
+    from skillspector import main as skillspector_main
+    sys.argv = [sys.argv[0]] + (sys.argv[2:] if len(sys.argv) > 2 else [])
+    sys.exit(skillspector_main())
+
+
 def cmd_analyze_jtl(args):
     from jtl_analyzer import main as jtl_main
     sys.argv = [sys.argv[0]] + (sys.argv[2:] if len(sys.argv) > 2 else [])
@@ -291,6 +297,12 @@ def cmd_correlate_telemetry(args):
     from telemetry_correlator import main as telem_main
     sys.argv = [sys.argv[0]] + (sys.argv[2:] if len(sys.argv) > 2 else [])
     sys.exit(telem_main())
+
+
+def cmd_analyze_newman(args):
+    from newman_analyzer import main as newman_main
+    sys.argv = [sys.argv[0]] + (sys.argv[2:] if len(sys.argv) > 2 else [])
+    sys.exit(newman_main())
 
 
 def cmd_update(args):
@@ -460,10 +472,22 @@ def main():
     p_telemetry = subparsers.add_parser("correlate-telemetry", help="Correlate Client-Side JMeter latency with Server-Side APM CPU/RAM/DB telemetry")
     p_telemetry.set_defaults(func=cmd_correlate_telemetry)
 
+    # analyze-newman
+    p_newman = subparsers.add_parser("analyze-newman", help="Analyze Postman / Newman test results, triage failed assertions, and enforce CI/CD Quality Gate")
+    p_newman.set_defaults(func=cmd_analyze_newman)
+
     # update
     p_update = subparsers.add_parser("update", help="1-Click update Synapse-Hub to latest version from GitHub/NPM")
     p_update.add_argument("--check", action="store_true", help="Check for available updates without applying")
     p_update.set_defaults(func=cmd_update)
+
+    # skillspector (AI Agent Skill & MCP Security Scanner)
+    p_skillspector = subparsers.add_parser("skillspector", help="AI Agent Skill & MCP Security Sentinel (71 vectors, NVIDIA SkillSpector spec)")
+    p_skillspector.add_argument("path", nargs="?", default=".", help="Skill directory or file to scan (default: current directory)")
+    p_skillspector.add_argument("--format", choices=["terminal", "json", "markdown", "sarif"], default="terminal", help="Output format")
+    p_skillspector.add_argument("--output", "-o", help="Write report to output file")
+    p_skillspector.add_argument("--strict", action="store_true", help="Fail with non-zero exit code on HIGH/CRITICAL finding")
+    p_skillspector.set_defaults(func=cmd_skillspector)
 
     args, unknown = parser.parse_known_args()
     if getattr(args, "offline", False):
