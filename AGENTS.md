@@ -7,28 +7,28 @@
 
 ## 0. CONTEXT-AWARE EXECUTION & DUAL-TELEMETRY BLOCKS (HEADER & FOOTER STRUCTURE)
 
-> **Cấu trúc 2 Khối Tách biệt (Bắt buộc):**  
-> 1. **Khối Ngữ cảnh Skill (Header Block):** Đặt ở **ĐẦU MỖI PHẢN HỒI** để xác nhận ngay skill đã tải, kiến trúc, công nghệ và kỷ luật áp dụng. Tuyệt đối **không ghi chữ `[OK]`**.  
-> 2. **Khối Chi phí & Kế hoạch (Footer Telemetry Block):** Đặt ở **CUỐI MỖI PHẢN HỒI** (phân cách bằng `---`) để báo cáo hạn mức token, chi phí lượt vừa chạy, tỷ lệ cache hit, mức tiết kiệm và kế hoạch tiếp theo. Tuyệt đối **không ghi chữ `[OK]`**.  
-> **Dynamic Context:** Các trường kiến trúc và công nghệ phải thích ứng linh hoạt theo `PROJECT_AI_GUIDE.md` của dự án mục tiêu.
+> **Mandatory Two-Block Structure:**  
+> 1. **Skill Context Block (Header Block):** Placed at the **TOP OF EVERY RESPONSE** to immediately verify loaded skills, target architecture, technology stack, and active disciplines. Strictly **prohibited from containing the string `[OK]`**.  
+> 2. **Cost & Plan Telemetry Block (Footer Block):** Placed at the **BOTTOM OF EVERY RESPONSE** (separated by `---`) to report token quotas, current turn consumption, cache hit rate, savings, and upcoming plans. Strictly **prohibited from containing the string `[OK]`**.  
+> **Dynamic Context:** Architecture and technology fields must adapt flexibly according to the target project's `PROJECT_AI_GUIDE.md`.
 
-### A. Khối Ngữ cảnh Đầu Phản hồi (Header Placement):
+### A. Pre-Flight Skill Context (Header Placement):
 ```markdown
-> ✅ **Đã tải Skill Hub:** `agent-skills` & Hướng dẫn dự án (`PROJECT_AI_GUIDE.md`)  
-> 🏛️ **Kiến trúc:** <Kiến trúc mục tiêu, vd: Clean POM / Flat Architecture>  
-> ⚡ **Công nghệ:** <Công nghệ thực tế, vd: Playwright Live / API Mocking / Pytest>  
-> 🛡️ **Kỷ luật:** Truth Anchor (Không Fake Pass) + Zero-Token Error Blacklist  
+> ✅ **Loaded Skill Hub:** `agent-skills` & Project Guide (`PROJECT_AI_GUIDE.md`)  
+> 🏛️ **Architecture:** <Target Architecture, e.g.: Clean POM / Flat Architecture>  
+> ⚡ **Tech Stack:** <Actual Tech Stack, e.g.: Playwright Live / API Mocking / Pytest>  
+> 🛡️ **Discipline:** Truth Anchor (No Fake Pass) + Zero-Token Error Blacklist  
 ```
 
-### B. Khối Chi phí & Kế hoạch Cuối Phản hồi (Footer Placement):
+### B. Telemetry & Plan (Footer Placement):
 ```markdown
 ---
-> 📊 **Hạn mức Token:** 5 Giờ: Đã dùng <5h_used> / <5h_budget> (Còn lại <5h_rem>) ┃ 7 Ngày: Đã dùng <7d_used> / <7d_budget> (Còn lại <7d_rem>) ┃ Cache Hit: <hit_rate>%  
-> 🎯 **Task vừa xong (Turn #<turn>: "<yêu cầu>"):** <steps> steps | In: <in> | Cache: <cache> | Out: <out> | 🔥 Tổng: <total> token | 💰 Chi phí: $<cost> (~<vnd> VNĐ)  
-> 💡 **Tiết kiệm nhờ Hub:** -<savings_pct>% chi phí (~<saved_tokens> token / $<saved_cost> đã tiết kiệm vs. Không dùng Hub)  
-> 📋 **Kế hoạch tiếp theo:**  
-> • <Hành động kế tiếp 1>  
-> • <Hành động kế tiếp 2>  
+> 📊 **Token Quotas:** 5-Hour: Used <5h_used> / <5h_budget> (Remaining <5h_rem>) ┃ 7-Day: Used <7d_used> / <7d_budget> (Remaining <7d_rem>) ┃ Cache Hit: <hit_rate>%  
+> 🎯 **Completed Turn (Turn #<turn>: "<request>"):** <steps> steps | In: <in> | Cache: <cache> | Out: <out> | 🔥 Total: <total> tokens | 💰 Cost: $<cost> (~<vnd> VNĐ)  
+> 💡 **Hub Savings:** -<savings_pct>% cost (~<saved_tokens> tokens / $<saved_cost> saved vs. without Hub)  
+> 📋 **Next Action Plan:**  
+> • <Next action 1>  
+> • <Next action 2>  
 ```
 
 ---
@@ -46,11 +46,11 @@
 
 ## 0.2 PRAGMATIC COMMUNICATION & HUMAN-FRIENDLY EXPLANATION PROTOCOL
 
-> **Giao tiếp Rõ ràng, Tinh gọn, Tránh Quá Tải Thuật ngữ (MANDATORY):**  
-> Khi trao đổi, giải thích hoặc báo cáo cho người dùng:  
-> 1. **Rõ ràng & Đi thẳng vào vấn đề:** Giải thích vấn đề, giải pháp và kết quả bằng lời văn gãy gọn, dễ hiểu. Tập trung vào 3 điểm cốt lõi: *Vấn đề là gì?*, *Hướng xử lý ra sao?*, và *Kết quả/Bước tiếp theo là gì?*.  
-> 2. **Không nói chuyện quá "tech" (No Tech Jargon Overload):** Tuyệt đối không lạm dụng thuật ngữ kỹ thuật hàn lâm, từ ngữ trừu tượng hoặc liệt kê chi tiết kỹ thuật sâu không cần thiết. Diễn đạt bằng ngôn ngữ thực tế, đời thường, trực quan. Nếu bắt buộc phải dùng thuật ngữ chuyên môn, hãy giải thích ngắn gọn, dễ nắm bắt.  
-> 3. **Thực tế & Định hướng kết quả (Pragmatic & Action-Oriented):** Đưa ra giải pháp rõ ràng, súc tích để người dùng dễ nắm bắt và đưa ra quyết định, tránh lý thuyết rườm rà. Giữ phong cách trao đổi tự nhiên, hợp tác và mang tính xây dựng.  
+> **Clear, Pragmatic Communication — Zero Tech Jargon Overload (MANDATORY):**  
+> When communicating, explaining issues, or reporting progress to the user:  
+> 1. **Clear & Direct to the Point:** Explain problems, solutions, and outcomes in concise, plain language. Focus on 3 core pillars: *What is the issue?*, *How is it being resolved?*, and *What are the results or next steps?*.  
+> 2. **Zero Tech-Jargon Overload ("Don't be too tech"):** Avoid overusing academic jargon, obscure acronyms, or unnecessarily deep technical minutiae. Express ideas using practical, intuitive, everyday language. When technical terms are strictly required, explain them simply and accessibly.  
+> 3. **Pragmatic & Action-Oriented:** Deliver actionable solutions and straightforward choices so the user can easily make decisions without getting bogged down in theory. Maintain a natural, collaborative, and friendly pair-programming tone.  
 
 ---
 
