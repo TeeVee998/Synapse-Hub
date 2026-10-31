@@ -169,10 +169,10 @@ def gate_0_author_integrity(repo_root, mode="AUTO"):
 
 def gate_1_bom_check(repo_root, mode="AUTO"):
     print("\n[GATE 1] Scanning UTF-8 No BOM across repository...")
+    ignored_dirs = {".git", ".gradle", "node_modules", "allure-results", "graphify-out", "__pycache__", "build", "dist"}
     violations = []
     for root, dirs, files in os.walk(repo_root):
-        if any(ignored in root for ignored in [".git", ".gradle", "node_modules", "allure-results", "graphify-out"]):
-            continue
+        dirs[:] = [d for d in dirs if d not in ignored_dirs]
         for f in files:
             if f.endswith(BOM_EXTENSIONS):
                 full_path = os.path.join(root, f)

@@ -221,7 +221,7 @@ def build_repo_map(target_repo=None, output_txt=None, output_json=None):
 
     rendered_text = "\n".join(out_lines)
     compressed_bytes = len(rendered_text.encode("utf-8"))
-    ratio = (1.0 - (compressed_bytes / max(1, total_raw_bytes))) * 100
+    ratio = (1.0 - (compressed_bytes / total_raw_bytes)) * 100 if total_raw_bytes > 0 else 0.0
     est_tokens = len(rendered_text) // 4
 
     # 1. Save to primary destination (tools/repo_map.txt in Hub)

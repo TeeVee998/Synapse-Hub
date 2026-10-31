@@ -16,6 +16,7 @@ import os
 import sys
 import json
 import glob
+import re
 import argparse
 import subprocess
 
@@ -84,7 +85,7 @@ def build_fallback_graph(repo_root):
             with open(f, "r", encoding="utf-8", errors="ignore") as fp:
                 content = fp.read()
             for other_cls in class_map:
-                if other_cls != cls_name and other_cls in content:
+                if other_cls != cls_name and re.search(r"\b" + re.escape(other_cls) + r"\b", content):
                     edges.append({"source": cls_name, "target": other_cls})
         except Exception:
             pass
@@ -112,7 +113,9 @@ def build_fallback_graph(repo_root):
                 with open(f, "r", encoding="utf-8", errors="ignore") as fp:
                     content = fp.read()
                 for cls_name in class_map:
-                    if cls_name in content:
+                    # Word-boundary match: "BorrowPage" must not hit inside
+                    # "ApprovalBorrowPage" (substring match over-counted).
+                    if re.search(r"\b" + re.escape(cls_name) + r"\b", content):
                         edges.append({"source": rel_path, "target": cls_name})
             except Exception:
                 pass
@@ -120,20 +123,48 @@ def build_fallback_graph(repo_root):
     return {"nodes": nodes, "edges": edges}
 
 
+def merge_graphs(primary, fallback):
+    """Unions two graph dicts (nodes by id, edges by (source, target)).
+
+    The Graphify graph can silently miss edges (its Groovy extractor fails on
+    GString/closure-heavy files), so the grep-based fallback graph is always
+    merged in. Over-inclusion is the safe direction for impact analysis.
+    """
+    merged = {"nodes": [], "edges": []}
+    seen_nodes, seen_edges = set(), set()
+    for node in list(primary.get("nodes", [])) + list(fallback.get("nodes", [])):
+        node_id = node.get("id")
+        if node_id and node_id not in seen_nodes:
+            seen_nodes.add(node_id)
+            merged["nodes"].append(node)
+    for edge in list(primary.get("edges", [])) + list(fallback.get("edges", [])):
+        key = (edge.get("source"), edge.get("target"))
+        if key not in seen_edges:
+            seen_edges.add(key)
+            merged["edges"].append(edge)
+    return merged
+
+
 def load_graph(repo_root=None):
     root = repo_root or HUB_ROOT
+    graph_data = None
     graph_path = os.path.join(root, "graphify-out", "graph.json")
     if os.path.exists(graph_path):
         with open(graph_path, "r", encoding="utf-8") as fp:
-            return json.load(fp)
+            graph_data = json.load(fp)
+    else:
+        hub_graph = os.path.join(HUB_ROOT, "graphify-out", "graph.json")
+        if os.path.exists(hub_graph):
+            with open(hub_graph, "r", encoding="utf-8") as fp:
+                graph_data = json.load(fp)
 
-    hub_graph = os.path.join(HUB_ROOT, "graphify-out", "graph.json")
-    if os.path.exists(hub_graph):
-        with open(hub_graph, "r", encoding="utf-8") as fp:
-            return json.load(fp)
-
-    # Dynamic fallback graph
-    return build_fallback_graph(root)
+    # Always union the ground-truth fallback graph: when the target repo has a
+    # (possibly incomplete) graphify-out/graph.json the grep scan below is the
+    # only thing guaranteeing script->class edges actually exist.
+    fallback = build_fallback_graph(root)
+    if graph_data is None:
+        return fallback
+    return merge_graphs(graph_data, fallback)
 
 
 def get_git_modified_files(repo_root=None):
@@ -175,7 +206,15 @@ def get_total_test_cases(workspace_dir=None, graph_data=None, override_total=Non
     for pat in test_patterns:
         files.update(glob.glob(pat, recursive=True))
     if files:
-        return len(files)
+        # Katalon-style repos list one TC twice (Scripts/<TC_x>/ScriptN.groovy
+        # AND Test Cases/.../TC_x.tc) — dedupe by the TC identifier so the
+        # denominator counts logical test cases, not file copies.
+        identities = set()
+        for f in files:
+            rel = os.path.relpath(f, root).replace("\\", "/")
+            match = re.search(r"TC[_-]\d+", rel)
+            identities.add(("tc", match.group(0)) if match else ("file", rel))
+        return len(identities)
 
     # 2. Count test case nodes in graph if available
     if graph_data and "nodes" in graph_data:
