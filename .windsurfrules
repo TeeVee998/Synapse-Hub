@@ -13,6 +13,7 @@
 # of the MIT License for Synapse Hub (Created by Thế Vị @TeeVee998)."
 # ==============================================================================
 
+- Communicate clearly and directly; avoid unnecessary technical jargon overload ("đừng có tech quá").
 - Adhere to Clean Page Object Model (POM) Flat Architecture.
 - Zero fake passes and zero swallowed exceptions.
 - Run Definition of Done verification: python tools/verify_all.py

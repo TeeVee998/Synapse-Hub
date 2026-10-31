@@ -44,6 +44,16 @@
 
 ---
 
+## 0.2 PRAGMATIC COMMUNICATION & HUMAN-FRIENDLY EXPLANATION PROTOCOL
+
+> **Giao tiếp Rõ ràng, Tinh gọn, Tránh Quá Tải Thuật ngữ (MANDATORY):**  
+> Khi trao đổi, giải thích hoặc báo cáo cho người dùng:  
+> 1. **Rõ ràng & Đi thẳng vào vấn đề:** Giải thích vấn đề, giải pháp và kết quả bằng lời văn gãy gọn, dễ hiểu. Tập trung vào 3 điểm cốt lõi: *Vấn đề là gì?*, *Hướng xử lý ra sao?*, và *Kết quả/Bước tiếp theo là gì?*.  
+> 2. **Không nói chuyện quá "tech" (No Tech Jargon Overload):** Tuyệt đối không lạm dụng thuật ngữ kỹ thuật hàn lâm, từ ngữ trừu tượng hoặc liệt kê chi tiết kỹ thuật sâu không cần thiết. Diễn đạt bằng ngôn ngữ thực tế, đời thường, trực quan. Nếu bắt buộc phải dùng thuật ngữ chuyên môn, hãy giải thích ngắn gọn, dễ nắm bắt.  
+> 3. **Thực tế & Định hướng kết quả (Pragmatic & Action-Oriented):** Đưa ra giải pháp rõ ràng, súc tích để người dùng dễ nắm bắt và đưa ra quyết định, tránh lý thuyết rườm rà. Giữ phong cách trao đổi tự nhiên, hợp tác và mang tính xây dựng.  
+
+---
+
 ## 1. CORE ARCHITECTURE & CODE STANDARDS
 
 1. **Clean Page Object Model (POM):**

@@ -14,6 +14,7 @@
 # ==============================================================================
 
 - Always read and follow AGENTS.md for operating standards.
+- Communicate clearly and directly; avoid unnecessary technical jargon overload ("đừng có tech quá").
 - Enforce Clean POM Flat Architecture: all locators encapsulated in Page Classes.
 - Zero fake passes: test assertions must strictly validate real state.
 - Before completing code changes, run: python tools/verify_all.py
