@@ -107,3 +107,25 @@ Dispatch rules for agents:
    with an explicit `expect(...)`/`verify...` assertion (Truth Anchor).
 5. **Debug failures in two layers** — wrong step count = planning failed (add
    flow detail); wrong element = locating failed (add spatial detail).
+
+## 7. Observe → Act → Extract Triad & ARIA Snapshots
+
+> *Borrowed and adapted from the Stagehand primitives (MIT, browserbase/stagehand) and the Playwright MCP accessibility-snapshot contract (Apache-2.0, microsoft/playwright-mcp).*
+
+Structure every live-browser AI interaction as a three-primitive loop:
+
+1. **Observe before acting** — snapshot the current state
+   (`window.__qa.ariaSnapshot()` — Playwright-MCP-format ARIA tree with
+   `[ref=eN]` refs — or `getCompactAOM()` for the compact variant) and pick the
+   target from evidence, never from memory of what the page "should" contain.
+2. **Act on one primitive at a time** — a click, a fill, a press. One action,
+   one assertion of intent; batch related actions atomically via
+   `window.__qa.batch()`.
+3. **Extract to assert** — pull the resulting state back out of the page
+   (ariaSnapshot / AOM / `aiQuery`-style extraction) and assert on the
+   extracted value; an action without a post-state extraction is unverified.
+
+Cache-friendliness rule (Stagehand insight): identical observe/act/extract
+calls on an unchanged page should be replayable without re-reasoning — record
+snapshots and results into the hub memory cache (`cache_resolver`) so repeat
+runs cost zero tokens.

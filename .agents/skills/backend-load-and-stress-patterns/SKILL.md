@@ -111,3 +111,32 @@ export function teardown(data) {
 - **TearDown Hygiene:** Complement POST/creation load tests with automated teardown or ephemeral DB snapshots (`tools/db_sandbox.py`).
 - **Telemetry Correlation:** Pair JTL/k6 metrics with server CPU/Memory traces via `tools/telemetry_correlator.py`.
 - **Truth Anchor:** Never loosen thresholds to manufacture a false pass. A failing threshold indicates a system capacity limit to be investigated.
+
+---
+
+## 4. Code-as-Code Load Model (Locust)
+
+> *Borrowed and adapted from the Locust load-testing model (MIT license, locustio/locust).*
+
+When version-controlled, reviewable load tests matter more than XML tooling,
+generate a runnable locustfile from the same API ingestion used for JMeter:
+
+```bash
+synapse generate-jmx --spec swagger.json --emit-locust locustfile.py \
+  --weighted-mix "70,20,10" --think-time-min 500 --think-time-max 1500
+locust -f locustfile.py --host=https://api.staging.enterprise.local
+```
+
+The generated file follows the Locust shape — one `HttpUser` class, one
+`@task(weight)` method per endpoint, `wait_time` from think-time — so QA
+engineers can hand-tune scenarios in pure Python and commit them next to the
+test suite.
+
+1. **Weights are the traffic mix** — the same `--weighted-mix` percentages that
+   drive JMeter `ThroughputController`s drive `@task` weights; keep both exports
+   in sync from one spec.
+2. **Prefer code-as-code for logic-heavy journeys** — conditional flows
+   (login → create → assert → delete) are Python, not XML; use the JMX export
+   for protocol breadth (JDBC/Kafka/gRPC/WS) and Locust for flow logic.
+3. **Same SLA gates** — run `agent-qa analyze-jtl` semantics on Locust stats:
+   fail CI when P95 breaches the SLA budget.

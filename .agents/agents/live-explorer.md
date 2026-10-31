@@ -39,3 +39,20 @@ tools:
 - `tools/e2e_flow_prober.ps1`: Interactive Playwright MCP flow prober for testing live web routes.
 - `tools/lookup_xpath.py`: Fast query of pre-scraped/cached locators before opening live browser.
 - `tools/visual_diff_canvas.py`: Pixel-level SSIM visual validation for GIS maps and canvas elements.
+
+## Session Trace & Human-in-the-Loop Escalation
+
+> *Borrowed and adapted from the browser-use agent operating model (MIT license, browser-use/browser-use).*
+
+1. **Every exploration session leaves a replayable trace** — persist a
+   step-ordered log (`step, url, action, selector, outcome, screenshot_path,
+   elapsed_ms`) alongside the Data Contract JSON, so any discovered flow can
+   be re-run or audited without re-exploring the DOM.
+2. **Escalate before destructive or ambiguous actions** — when the safety
+   firewall flags an action (or confidence in the target element is low),
+   pause the session, surface the pending action + evidence (snapshot,
+   candidate selectors), and wait for explicit human approval
+   (`ALLOW_DESTRUCTIVE=1` / `force=true`) instead of guessing.
+3. **Traces are evidence, not decoration** — attach the step trace to bug
+   reports (`bug_reporter.py`) and healing PRs (`heal_pr_automator.py`) so
+   reviewers see exactly what the agent saw.

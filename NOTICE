@@ -47,3 +47,52 @@ Third-Party Borrowings (idea- and text-level)
 5. Agent Skills open standard (https://agentskills.io, governed by the
    Agentic AI Foundation) - SKILL.md frontmatter and description-trigger
    conventions followed for all hub skills.
+
+6. Playwright MCP (https://github.com/microsoft/playwright-mcp) - Apache
+   License 2.0. The ARIA snapshot serialization format in
+   tools/browser_helpers.js (ariaSnapshot) and the MCP tool-surface expansion
+   are adapted from the Playwright MCP contract.
+
+7. Stagehand (https://github.com/browserbase/stagehand) - MIT License.
+   The observe -> act -> extract interaction triad in
+   .agents/skills/playwright-live-interaction/SKILL.md and the action-result
+   caching guidance are adapted from the Stagehand primitives.
+
+8. OWASP ZAP (https://github.com/zaproxy/zaproxy) - Apache License 2.0.
+   The passive/active scan taxonomy and severity ladder in
+   .agents/skills/security-dast-sentinel/SKILL.md and tools/api_fuzzer.py
+   are adapted from ZAP's alert risk model.
+
+9. Selenium (https://github.com/SeleniumHQ/selenium) - Apache License 2.0.
+   Geometric relative-locator semantics (above/below/near/left-of/right-of)
+   in tools/heuristic_locator_matcher.py are adapted from Selenium relative
+   locators.
+
+10. Locust (https://github.com/locustio/locust) - MIT License. The
+    code-as-code load model (--emit-locust) in tools/generate_jmx_plan.py and
+    the Locust section in .agents/skills/backend-load-and-stress-patterns/
+    SKILL.md are adapted from the Locust user/task/weight model.
+
+11. Testcontainers (https://github.com/testcontainers/testcontainers-python)
+    - Apache License 2.0. The wait-ready readiness probe strategies
+    (port/http/sqlite) in tools/db_sandbox.py are adapted from the
+    Testcontainers WaitStrategy taxonomy.
+
+12. crewAI (https://github.com/crewAIInc/crewAI) - MIT License. The
+    hierarchical process / manager delegation guidance in
+    .agents/skills/agent-orchestration-multi-agent-optimize/SKILL.md is
+    adapted from the crewAI process model.
+
+13. browser-use (https://github.com/browser-use/browser-use) - MIT License.
+    Session-trace and human-in-the-loop escalation guidance in
+    .agents/agents/live-explorer.md is adapted from the browser-use agent
+    operating model.
+
+14. Appium (https://github.com/appium/appium) - Apache License 2.0. The
+    driver-architecture and image-based-matching rules in
+    .agents/rules/mobile_appium_rules.md are adapted from Appium's driver
+    and plugin concepts.
+
+15. LangChain (https://github.com/langchain-ai/langchain) - MIT License.
+    Consciously NOT adopted at framework level: the hub remains 0-LLM-
+    dependent by design. Recorded here as a documented decision, no content used.

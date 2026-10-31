@@ -67,3 +67,32 @@ test('DAST: Tenant B cannot access Tenant A entity', async ({ request }) => {
 
 - Automated security checks, fuzzing (`tools/api_fuzzer.py`), and DB sandboxing (`tools/db_sandbox.py`) enforce non-production allowlists (`localhost`, `staging`, `dev`, `qa`, `sandbox`).
 - Fuzzing production hosts without `SYNAPSE_ALLOW_PROD_FUZZ=1` is automatically blocked.
+
+---
+
+## 5. Passive vs Active Scan Taxonomy & Severity Levels
+
+> *Borrowed and adapted from the OWASP ZAP scanning model (Apache-2.0, zaproxy/zaproxy).*
+
+Structure every DAST engagement in two phases, and severity-tag every finding
+so CI can gate on risk instead of raw counts:
+
+| Phase | Traffic | Purpose | Hub Tooling |
+| :--- | :--- | :--- | :--- |
+| **Passive** | Zero traffic | Audit the OpenAPI/Swagger contract pre-flight: mutating endpoints without declared auth, unprotected admin paths, unbounded string props | `agent-qa fuzz-api --mode passive` |
+| **Active** | Controlled attacks | Dispatch fuzz vectors against staging and evaluate the defect oracle | `agent-qa fuzz-api` (allowlist-guarded) |
+
+Severity ladder (fixed mapping): `CRITICAL` (stacktrace/DB leak, auth bypass) →
+`HIGH` (server crash 5xx, unprotected sensitive path) → `MEDIUM` (connection
+errors, unverified targets) → `LOW` (SLA breaches, unbounded input) → `INFO`.
+
+Rules:
+1. **Never skip passive** — a contract that leaks an admin route costs zero
+   requests to find; active scan only after passive findings are triaged.
+2. **Gate on CRITICAL alone** — a run with any CRITICAL alarm fails CI
+   regardless of total counts.
+3. **An untested endpoint must never PASS** — connection failures are
+   `CONNECTION_ERROR` findings, not green results (Truth Anchor).
+4. **OpenAPI-driven breadth** — ingest the spec (JSON) so every path/method is
+   enumerated; combine with authentication scripts from
+   `auth-session-and-cookie-manager` before active scanning.

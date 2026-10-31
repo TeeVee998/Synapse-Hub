@@ -62,3 +62,27 @@ def shard_test_workload(suite_files: list, max_agents: int = 4) -> list:
 - Always establish baseline metrics before applying workflow changes.
 - Ensure subagent dynamic test data uses unique runtime IDs (`AUTO_<timestamp>_<agentId>`).
 - Enforce automated teardown for all creation actions dispatched by subagents.
+
+---
+
+## 6. Hierarchical Process & Manager Delegation
+
+> *Borrowed and adapted from the crewAI hierarchical process model (MIT license, crewAIInc/crewAI).*
+
+The hub's default is a flat swarm with the `orchestrator` as single front-door
+(Section 2). For tasks too large for one dispatch round, escalate to a
+**hierarchical process**:
+
+1. **Manager delegation** — the orchestrator becomes a manager: it decomposes
+   the goal, assigns one bounded sub-task per specialist (`live-explorer`,
+   `pom-crafter`, `test-runner`, `failure-analyst`), and validates each result
+   before assigning the next. Workers never talk sideways; all coordination
+   flows through the manager.
+2. **Bounded delegation depth** — max 2 levels (orchestrator → specialist →
+   sub-task). Deeper recursion hides cost and breaks the token budget.
+3. **Validation gates between hops** — a manager accepts a sub-task result
+   only when it passes its stage gate (e.g. Stage 1 Data Contract JSON is
+   schema-valid); rejected results are retried once, then escalated.
+4. **Escalate structure, not authority** — the hierarchy speeds coordination;
+   Truth Anchor, safety firewall and quality gates apply identically at every
+   level. Delegation never bypasses a gate.

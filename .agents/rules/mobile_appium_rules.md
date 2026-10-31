@@ -105,3 +105,28 @@ public class LoginScreen extends BaseScreen {
      `driver.runAppInBackground(Duration.ofSeconds(5));`
 4. **Virtual Keyboard Handling:**
    - Always dismiss virtual keyboards (`driver.hideKeyboard()`) after input to prevent occluding action buttons.
+
+---
+
+## 6. Driver Architecture & Image-Based Matching
+
+> *Borrowed and adapted from the Appium driver/plugin architecture concepts (Apache-2.0, appium/appium).*
+
+1. **Driver isolation** — each platform driver (UIAutomator2, XCUITest)
+   encapsulates its own locator translation and gesture mapping; Screen Object
+   classes must never branch on driver type outside the driver layer. A
+   `*Screen` class speaks intent ("tap primary action"), the driver layer
+   speaks mechanics.
+2. **Capabilities belong in profiles, not scripts** — device/OS/app
+   capabilities live in versioned capability profiles; test classes receive a
+   ready session. Hardcoding `platformVersion`/`deviceName` inside scripts is a
+   prohibited anti-pattern (see Section 2).
+3. **Image-based matching is a last-resort locator** — for canvas/maps/WebView
+   hybrids where the accessibility tree is empty, an image-reference plugin
+   (template match against a committed reference screenshot with a similarity
+   threshold, e.g. ≥ 0.9) may resolve elements. It is slower and flakier than
+   `AccessibilityID`/`ResourceID` — use only after the locator hierarchy in
+   Section 1 is exhausted, and always commit the reference image next to the
+   Screen class.
+4. **Match the session teardown to the driver lifecycle** — quit sessions
+   explicitly; orphaned driver processes leak devices in the grid.
