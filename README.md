@@ -82,6 +82,8 @@ flowchart TD
 | **Bộ nhớ sửa lỗi liên phiên** | Mất sạch khi mở chat mới | **Bền vững qua SQLite Cache** | Lưu ngoại tuyến tại `~/.agent_memory/global_cache.db`. |
 | **Thời gian tự sửa lỗi (MTTR)** | 5 – 15 phút thử sai | **< 1s khi cache-hit** | Truy xuất giải pháp có sẵn trong < 0.1s. |
 
+> 📝 **Phương pháp đo & phạm vi áp dụng:** Các con số trên là **tự đánh giá nội bộ**, đo qua chính harness của Hub (`benchmarks/qa_eval/eval_runner.py` — 25 challenges chuẩn hóa; `tools/distill_log.py`; `tools/repo_map.py`) trên corpus mẫu đi kèm, **chưa được kiểm chứng độc lập bởi bên thứ ba**. Kết quả thực tế sẽ thay đổi theo dự án, stack và quy mô log/test. Hãy tái lập trên chính dự án của bạn bằng `agent-qa verify` + benchmark harness trước khi dùng các số liệu này để ra quyết định.
+
 ---
 
 ## 👥 3. Hệ Thống Multi-Agent Swarm (6 Vai Trò Chuyên Biệt)

@@ -307,7 +307,7 @@ class TestToolsIntegrityAndBehavior(unittest.TestCase):
             self.assertFalse(has_passed, "gate_6_credential_security must fail when hardcoded password exists")
 
     def test_verify_all_complete_run_hub_mode(self):
-        """Validates that all 7 gates pass on the QA Hub."""
+        """Validates that static Gates 1-7 pass on the QA Hub (Gate 0 author-integrity and Gate 8 mutation have dedicated tests)."""
         repo_root = REPO_ROOT
         gates = [
             verify_all.gate_1_bom_check,
@@ -976,7 +976,16 @@ class TestToolsIntegrityAndBehavior(unittest.TestCase):
             evaluator = eval_runner.BenchmarkEvaluator()
             challenges = evaluator.load_challenges(category_filter="locator_drift")
             self.assertGreaterEqual(len(challenges), 5)
-            summary = evaluator.run_all(category_filter="locator_drift")
+            # Truth Anchor: redirect report export to a temp dir so this filtered
+            # (partial) run never clobbers the canonical benchmark artifacts,
+            # which must remain the product of FULL 25-challenge runs only.
+            with tempfile.TemporaryDirectory() as tmp_reports:
+                original_reports_dir = eval_runner.REPORTS_DIR
+                eval_runner.REPORTS_DIR = tmp_reports
+                try:
+                    summary = evaluator.run_all(category_filter="locator_drift")
+                finally:
+                    eval_runner.REPORTS_DIR = original_reports_dir
             self.assertEqual(summary["resolution_rate_pct"], 100.0)
             self.assertGreater(summary["avg_mutation_score"], 0)
         finally:

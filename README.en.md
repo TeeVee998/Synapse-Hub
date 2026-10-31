@@ -76,6 +76,8 @@ flowchart TD
 | **Cross-Session Fix Memory** | Forgotten immediately | **Persistent in SQLite** | Offline cosine cache in `~/.agent_memory/global_cache.db`. |
 | **Mean Time-to-Heal (MTTR)** | 5 – 15 minutes | **< 1s on cache hits** | Pre-cached resolutions resolve in 0.1s. |
 
+> 📝 **Measurement Methodology & Scope:** The figures above are **internal self-measurements**, captured via the Hub's own harness (`benchmarks/qa_eval/eval_runner.py` — 25 standardized challenges; `tools/distill_log.py`; `tools/repo_map.py`) on the bundled sample corpus, and are **not independently verified by any third party**. Real-world results vary by project, stack, and log/test size. Reproduce them on your own project with `agent-qa verify` + the benchmark harness before making decisions based on these numbers.
+
 ---
 
 ## 👥 Multi-Agent Swarm System (6 Specialized Roles)

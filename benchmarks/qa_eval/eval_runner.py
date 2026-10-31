@@ -211,7 +211,7 @@ class BenchmarkEvaluator:
         print(f"  Target Scope     : {len(challenges)} production-grade challenges")
         print(f"  Active Domains   : locator_drift, api_contract_drift, timing_and_race,")
         print(f"                     stale_and_mutation, fake_pass_tautology")
-        print(f"  Quality Standard : 8 Quality Gates + Mutation Score >= 80% + Safety Firewall")
+        print(f"  Quality Standard : 9 Quality Gates + Mutation Score >= 80% + Safety Firewall")
         print("=" * 78 + "\n")
 
         self.results = []
@@ -295,14 +295,34 @@ class BenchmarkEvaluator:
     def generate_markdown_report(self, summary: Dict[str, Any]) -> str:
         """Generates comprehensive empirical Markdown benchmark report."""
         cat_rates = [data['resolution_rate'] for data in summary["categories"].values()]
-        bar_chart_str = f"bar {cat_rates}" if cat_rates else "bar [100, 100, 100, 100, 100]"
+        bar_chart_str = f"bar {cat_rates}" if cat_rates else "bar []"
+
+        # Truth Anchor: chart axes and scope MUST reflect only what was actually run.
+        # A filtered (partial) run must never render domain labels it did not evaluate.
+        DOMAIN_LABELS = {
+            "locator_drift": "Locator Drift",
+            "api_contract_drift": "API Contract",
+            "timing_and_race": "Timing & Race",
+            "stale_and_mutation": "Stale DOM",
+            "fake_pass_tautology": "Mutation/Tautology",
+        }
+        run_domains = list(summary["categories"].keys())
+        axis_labels = json.dumps([DOMAIN_LABELS.get(c, c.replace("_", " ").title()) for c in run_domains])
+        is_partial = summary["total_challenges"] < 25
+        scope_line = (
+            f"> **Run Scope:** ⚠️ PARTIAL — {summary['total_challenges']}/25 challenges"
+            f" (domains evaluated: {', '.join(run_domains) if run_domains else 'none'})."
+            " Executive metrics below describe ONLY these domains, not the full benchmark suite.  \n"
+            if is_partial
+            else "> **Run Scope:** FULL — 25/25 challenges across all 5 domains.  \n"
+        )
 
         report = f"""# QA Agent Benchmark Evaluation Report (Eval Harness)
 
 > **Evaluation Suite:** Enterprise QA Automation Self-Healing & Defect Sentinel Benchmark  
 > **Target Framework:** `agent-skills` QA Hub  
 > **Timestamp:** `{summary['timestamp']}`  
-> **Discipline:** Truth Anchor (No Fake Pass) + Hard Policy Enforcement + 9 Quality Gates  
+{scope_line}> **Discipline:** Truth Anchor (No Fake Pass) + Hard Policy Enforcement + 9 Quality Gates  
 
 ---
 
@@ -324,7 +344,7 @@ class BenchmarkEvaluator:
 ```mermaid
 xychart-beta
     title "Autonomous Resolution Rate by Domain (%)"
-    x-axis ["Locator Drift", "API Contract", "Timing & Race", "Stale DOM", "Mutation/Tautology"]
+    x-axis {axis_labels}
     y-axis "Resolution Rate (%)" 0 --> 100
     {bar_chart_str}
 ```
