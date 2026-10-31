@@ -52,6 +52,13 @@ EMPTY_CATCH_PATTERN = re.compile(
     re.MULTILINE
 )
 
+# Whitelisted best-effort compatibility calls (UTF-8 console reconfigure, file
+# permission chmod, stream flush). An empty catch guarding ONLY these is an
+# intentional no-op-on-failure idiom, not a swallowed test failure.
+BENIGN_TRY_CALL_PATTERN = re.compile(
+    r'^[\w\.]*\.(?:reconfigure|chmod|flush)\s*\('
+)
+
 # Rule L3: Tautological assertions (e.g. expect(true).toBe(true), assert True, assert true, assert 1 == 1)
 TAUTOLOGY_PATTERN = re.compile(
     r'(?:expect\s*\(\s*(?:true|1)\s*\)\s*\.\s*(?:toBe|toEqual)\s*\(\s*(?:true|1)\s*\)'
@@ -98,6 +105,25 @@ def strip_comments_and_strings(source_code, preserve_newlines=True):
     return pattern.sub(replacer, source_code)
 
 
+def _is_benign_empty_catch(clean_code, match_start):
+    """
+    True when an empty catch block exclusively guards whitelisted best-effort
+    calls (e.g. sys.stdout.reconfigure(), os.chmod()) - an intentional
+    no-op-on-failure compatibility idiom rather than a swallowed test failure.
+    Conservative by design: only Python-style 'try:' blocks are whitelisted;
+    C-style brace bodies still get flagged.
+    """
+    body_lines = []
+    for line in reversed(clean_code[:match_start].splitlines()):
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if re.match(r'try\s*(?:[:{]|$)', stripped):
+            return bool(body_lines) and all(BENIGN_TRY_CALL_PATTERN.match(l) for l in body_lines)
+        body_lines.append(stripped)
+    return False
+
+
 def analyze_script(file_path):
     """Performs static rule scanning on a single test script file."""
     with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
@@ -129,6 +155,8 @@ def analyze_script(file_path):
 
     # Rule 2: Swallowed Exceptions (empty catch blocks)
     for match in EMPTY_CATCH_PATTERN.finditer(clean_code):
+        if _is_benign_empty_catch(clean_code, match.start()):
+            continue
         line_no = clean_code[:match.start()].count("\n") + 1
         defects.append({
             "type": "SWALLOWED_EXCEPTION",

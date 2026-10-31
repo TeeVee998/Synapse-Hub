@@ -50,7 +50,7 @@ python tools/verify_all.py --mode target   # Target automation suite validation
 - **Gate 5:** Temporary file and properties artifact cleanup.
 - **Gate 6:** Credential Security & Secret Scanner (zero hardcoded plaintext passwords or API tokens).
 - **Gate 7:** Static Defect & AST Fake-Pass Sentinel.
-- **Gate 8:** AST Micro-Mutation Sentinel (Requires Mutation Score >= 80%).
+- **Gate 8:** Syntactic Micro-Mutation Sentinel (Requires Mutation Score >= 80%).
 
 ### 2.2. AST Fake-Pass Sentinel
 ```bash

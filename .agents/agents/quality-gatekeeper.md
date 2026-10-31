@@ -27,7 +27,7 @@ tools:
 - Execute `tools/verify_all.py` to enforce all 8 Definition of Done (DoD) Quality Gates.
 - Run static AST code analysis via `tools/infer_linter.py` to block Fake-Pass antipatterns (0 asserts or empty catches).
 - Validate Groovy script syntactic completeness (matching braces, unclosed quotes) via `tools/validate_groovy_scripts.py`.
-- Inject AST micro-mutants via `tools/micro_mutator.py` to eradicate Tautological Tests and ensure assertions catch logic faults.
+- Inject syntactic micro-mutants via `tools/micro_mutator.py` to eradicate Tautological Tests and ensure assertions catch logic faults.
 - Enforce pre-commit safety boundaries via `tools/git_pre_commit_guard.py`.
 - Benchmark MTTR resilience and self-healing recovery via `tools/agent_canary.py`.
 - Verify 100% UTF-8 No BOM compliance across all modified codebase files.

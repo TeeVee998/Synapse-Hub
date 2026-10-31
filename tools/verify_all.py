@@ -17,7 +17,7 @@ Verifies:
   Gate 5: Cleanup Blacklist: No temporary properties or debug dump files on disk.
   Gate 6: Credential Security: No plaintext passwords in Profiles/default.glbl or repository.
   Gate 7: Static Defect Sentinel: Meta Infer-style AST scan for fake passes and empty catches.
-  Gate 8: AST Micro-Mutation Sentinel: Injects syntactic faults to eliminate tautological tests (Mutation Score >= 80%).
+  Gate 8: Syntactic Micro-Mutation Sentinel: Injects syntactic faults to eliminate tautological tests (Mutation Score >= 80%).
 
 Supports:
   - Hub Mode: Verifies the centralized QA Hub / skills repository integrity.
@@ -442,7 +442,7 @@ def gate_7_infer_linter(repo_root, mode="AUTO"):
 
 
 def gate_8_micro_mutator(repo_root, mode="AUTO"):
-    print("\n[GATE 8] Running AST Micro-Mutation Testing Sentinel (Min Mutation Score >= 80%)...")
+    print("\n[GATE 8] Running Syntactic Micro-Mutation Testing Sentinel (Min Mutation Score >= 80%)...")
     scripts_dir = os.path.join(repo_root, "Scripts")
     tests_dir = os.path.join(repo_root, "tests")
 
@@ -458,7 +458,7 @@ def gate_8_micro_mutator(repo_root, mode="AUTO"):
 
     if not target_dir:
         if mode == "HUB":
-            print("[PASS] Hub Mode: AST Micro-Mutation engine verified and operational.")
+            print("[PASS] Hub Mode: Syntactic Micro-Mutation engine verified and operational.")
             return True
         else:
             print("[SKIP] No automated test scripts found in Scripts/ or tests/ to mutate.")
@@ -471,7 +471,7 @@ def gate_8_micro_mutator(repo_root, mode="AUTO"):
     if os.path.exists(mutator_script):
         res = subprocess.run([sys.executable, mutator_script, target_dir, "--min-score", "80.0", "--json"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         if res.returncode != 0:
-            print("[FAIL] AST Micro-Mutation Sentinel REJECTED: Mutation score < 80% or unasserted logic found.")
+            print("[FAIL] Syntactic Micro-Mutation Sentinel REJECTED: Mutation score < 80% or unasserted logic found.")
             try:
                 data = json.loads(res.stdout)
                 print(f"   Mutation Score: {data.get('mutation_score', 0)}% (Required: >= 80%)")
@@ -485,10 +485,10 @@ def gate_8_micro_mutator(repo_root, mode="AUTO"):
                 data = json.loads(res.stdout)
                 print(f"[PASS] Mutation Score: {data.get('mutation_score', 100)}% >= 80% (Killed {data.get('killed', 0)}/{data.get('total_mutants', 0)} mutants). Zero Tautological Tests.")
             except Exception:
-                print("[PASS] AST Micro-Mutation Sentinel passed: Mutation score >= 80%.")
+                print("[PASS] Syntactic Micro-Mutation Sentinel passed: Mutation score >= 80%.")
             return True
 
-    print("[PASS] AST Micro-Mutation verified.")
+    print("[PASS] Syntactic Micro-Mutation verified.")
     return True
 
 
@@ -509,7 +509,7 @@ def run_all_gates(repo_root, mode="AUTO"):
         ("Gate 5: Temporary Files Blacklist", gate_5_cleanup_blacklist),
         ("Gate 6: Credential Security", gate_6_credential_security),
         ("Gate 7: Static Defect Sentinel", gate_7_infer_linter),
-        ("Gate 8: AST Micro-Mutation Sentinel", gate_8_micro_mutator),
+        ("Gate 8: Syntactic Micro-Mutation Sentinel", gate_8_micro_mutator),
     ]
 
     all_passed = True

@@ -62,7 +62,7 @@ flowchart TD
 
 ### 1. 🧠 System-2 Reasoning & Cognitive Forcing
 - **Eliminates Unconscious Autocomplete:** Forces AI through a 4-step thinking protocol: *Invariant Extraction ➔ Popper Falsification ➔ Self-Debate ➔ Defensive Synthesis*.
-- **Red-Team vs Blue-Team Mutation Testing:** Injects AST micro-mutants (`tools/micro_mutator.py`), rejecting test suites with **Mutation Score < 80%**.
+- **Red-Team vs Blue-Team Mutation Testing:** Injects syntactic micro-mutants (`tools/micro_mutator.py`), rejecting test suites with **Mutation Score < 80%**.
 
 ### 2. ⚡ Radical Token Optimization (85% – 95% Context Savings)
 - **95% Log Distillation:** `tools/distill_log.py` compresses 3,000 noise lines to ~10 actionable exception lines (< 50 tokens).

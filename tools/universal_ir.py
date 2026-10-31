@@ -271,6 +271,9 @@ class PageClassIR:
 
 @dataclass
 class TestCaseIR:
+    # IR model, not a pytest test class - prefix "Test" must not trigger collection.
+    __test__ = False
+
     id: str
     title: str
     steps: List[StepIR] = field(default_factory=list)

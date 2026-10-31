@@ -90,5 +90,5 @@ agent-qa verify
 | :--- | :--- | :--- |
 | `npx synapse-hub verify` | Executes all 9 Quality Gates DoD | Exits `0` if all PASS; non-zero if any FAIL. |
 | `npx synapse-hub lint` | Meta Infer-style static defect and fake-pass scan | Fails if 0-assert tests or empty catches exist. |
-| `npx synapse-hub mutate --min-score 80` | AST Micro-Mutation verification | Fails if test assertion score < 80%. |
+| `npx synapse-hub mutate --min-score 80` | Syntactic Micro-Mutation verification | Fails if test assertion score < 80%. |
 | `npx synapse-hub analyze` | Comprehensive 5-in-1 health audit | Outputs health score and JSON/Markdown artifacts. |

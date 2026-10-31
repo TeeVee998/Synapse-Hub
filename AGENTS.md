@@ -100,7 +100,7 @@ This repository defines specialized multi-agent profiles (configured in `.agents
 5. **Failure Autopsy Analyst (`failure-analyst`):**
    - Performs closed-loop diagnosis (`auto_heal.py`), auto-generates Jira/Markdown bug tickets with RCA (`bug_reporter.py`), executes CI self-healing & PR drafting (`ci_healing_hook.py`, `heal_pr_automator.py`), and resolves fixes from SQLite memory (`cache_resolver.py`).
 6. **Quality Gatekeeper & Sentinel (`quality-gatekeeper`):**
-   - Enforces 9 Quality Gates (`verify_all.py`), scans fake passes (`infer_linter.py`), injects AST micro-mutants (`micro_mutator.py` requiring >= 80% mutation score), audits visual regression masks (`smart_visual_masker.py`), and checks DB leaks (`trace_data_flow.py`).
+   - Enforces 9 Quality Gates (`verify_all.py`), scans fake passes (`infer_linter.py`), injects syntactic micro-mutants (`micro_mutator.py` requiring >= 80% mutation score), audits visual regression masks (`smart_visual_masker.py`), and checks DB leaks (`trace_data_flow.py`).
 
 ### 4.1 SINGLE FRONT-DOOR PROTOCOL & DETERMINISTIC FSM WORKFLOW
 

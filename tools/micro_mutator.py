@@ -1,16 +1,22 @@
 #!/usr/bin/env python3
 """
-Enterprise AST Micro-Mutation Testing Sentinel
+Enterprise Syntactic Micro-Mutation Testing Sentinel
 -----------------------------------------------
 Evaluates the true defect-catching efficacy of AI-generated tests by injecting
 syntactic micro-mutants (inverting operators, flipping booleans, altering boundaries)
 to eradicate 'Tautological Tests' (tests that pass unconditionally without valid assertions).
 
 Features:
-  - Atomic AST/syntactic fault injection across Groovy, Python, TypeScript, JavaScript
+  - Atomic syntactic (regex-based) fault injection across Groovy, Python, TypeScript, JavaScript
   - Static assertion sensitivity analysis (killing mutants when valid assertions exist)
   - Dynamic test execution mode (--test-cmd) for live mutant verification
   - Quality Gatekeeper hard threshold enforcement (--min-score, default: 80.0%)
+
+Implementation Note:
+  Mutations are applied lexically via pattern rules over source text (fast,
+  polyglot), not via full-fidelity AST rewriting; pattern rules may therefore
+  also touch string literals or comments. Treat results as a heuristic
+  assertion-strength gate, not a compiler-grade mutation engine.
 """
 
 import os
@@ -407,7 +413,7 @@ def evaluate_target(target_path: str, min_score: float = 80.0, test_cmd: str = "
 
 
 def main():
-    parser = argparse.ArgumentParser(description="AST Micro-Mutation Testing Sentinel & Quality Gate")
+    parser = argparse.ArgumentParser(description="Syntactic Micro-Mutation Testing Sentinel & Quality Gate")
     parser.add_argument("target", nargs="?", default=os.getcwd(), help="Target script or directory to mutate")
     parser.add_argument("--min-score", "--threshold", type=float, default=80.0, dest="min_score",
                         help="Minimum mutation score percentage required to pass Quality Gate (default: 80.0)")

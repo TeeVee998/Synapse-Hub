@@ -136,7 +136,7 @@ MCP_TOOLS = [
     },
     {
         "name": "run_micro_mutation",
-        "description": "Injects AST micro-mutants (flipping operators, booleans) to verify that AI-generated test assertions are robust.",
+        "description": "Injects syntactic micro-mutants (flipping operators, booleans) to verify that AI-generated test assertions are robust.",
         "inputSchema": {
             "type": "object",
             "properties": {

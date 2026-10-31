@@ -149,5 +149,40 @@ class TestInferLinter8Cases(unittest.TestCase):
             self.assertLessEqual(score, 100.0, "L8: Health score cannot exceed 100%")
 
 
+    def test_l9_benign_best_effort_guard_not_flagged(self):
+        """L9: Empty catch guarding only best-effort compatibility calls
+        (reconfigure/chmod) is an accepted idiom, not a swallowed exception."""
+        py_code = """
+        if hasattr(sys.stdout, 'reconfigure'):
+            try:
+                sys.stdout.reconfigure(encoding='utf-8')
+                sys.stderr.reconfigure(encoding='utf-8')
+            except Exception:
+                pass
+        try:
+            os.chmod(sh_path, 0o755)
+        except Exception:
+            pass
+        """
+        res = self._analyze_code(py_code, ".py")
+        swallowed = [d for d in res["defects"] if d["type"] == "SWALLOWED_EXCEPTION"]
+        self.assertEqual(len(swallowed), 0, "L9: Best-effort reconfigure/chmod guard must not be flagged")
+
+    def test_l10_mixed_try_body_still_flagged(self):
+        """L10: Empty catch whose try body mixes benign calls with real logic
+        must still be reported as CRITICAL (whitelist must not over-reach)."""
+        py_code = """
+        try:
+            save_report(results)
+            sys.stdout.reconfigure(encoding='utf-8')
+        except Exception:
+            pass
+        """
+        res = self._analyze_code(py_code, ".py")
+        swallowed = [d for d in res["defects"] if d["type"] == "SWALLOWED_EXCEPTION"]
+        self.assertTrue(len(swallowed) > 0, "L10: Mixed try body must still be caught")
+        self.assertEqual(swallowed[0]["severity"], "CRITICAL")
+
+
 if __name__ == "__main__":
     unittest.main()

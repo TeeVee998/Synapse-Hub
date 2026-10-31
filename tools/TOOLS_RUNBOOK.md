@@ -15,7 +15,7 @@
 | **API Contract Drift (Breaking Change Detection)** | `tools/api_drift_sentinel.py` | `python tools/api_drift_sentinel.py --old base.json --new curr.json` (or `agent-qa contract-drift`) |
 | **Autonomous API Fuzzing & Chaos Breaker** | `tools/api_fuzzer.py` | `agent-qa fuzz-api --base-url <url> --spec <swagger.json>` (Catches 500, DB leaks, SLA breach) |
 | **FastMCP JSON-RPC Server (Cursor/Claude/Antigravity)** | `tools/mcp_server.py` | `python tools/mcp_server.py` (or `agent-qa mcp-serve`) |
-| **AST Micro-Mutation (Assertion Quality Verification)** | `tools/micro_mutator.py` | `python tools/micro_mutator.py [target]` (or `agent-qa mutate`) |
+| **Syntactic Micro-Mutation (Assertion Quality Verification)** | `tools/micro_mutator.py` | `python tools/micro_mutator.py [target]` (or `agent-qa mutate`) |
 | **Self-Healing PR Automator (Trace & Visual Diff Proof)** | `tools/heal_pr_automator.py` | `python tools/heal_pr_automator.py --page P.groovy --old "//a" --new "//b" --trace-zip trace.zip` (or `agent-qa heal-pr`) |
 | **Duration-Balanced Matrix Sharder (CI/CD Load Balancing)** | `tools/matrix_sharder.py` | `python tools/matrix_sharder.py [target] --shards 4` (or `agent-qa shard`) |
 | **Enterprise ALM & TMS Sync Bridge (Jira/Xray/TestRail)** | `tools/tms_sync_bridge.py` | `python tools/tms_sync_bridge.py pull PROJ-1042` / `report-bug` |
@@ -108,7 +108,7 @@ agent-qa update
 ---
 
 ### 3. `tools/verify_all.py`
-- **Purpose:** Supreme Definition of Done (DoD) verification gate running all 9 Quality Gates (including AST Micro-Mutation >= 80%) prior to completing tasks or git commits. Supports dual operational modes (`hub` vs `target`) and dynamic target project resolution.
+- **Purpose:** Supreme Definition of Done (DoD) verification gate running all 9 Quality Gates (including Syntactic Micro-Mutation >= 80%) prior to completing tasks or git commits. Supports dual operational modes (`hub` vs `target`) and dynamic target project resolution.
 - **CLI Syntax:**
   ```bash
   # Auto-detection (automatically targets CWD if inside a test project, otherwise falls back to QA Hub)

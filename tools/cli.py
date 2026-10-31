@@ -390,7 +390,7 @@ def main():
     p_heal_pr.set_defaults(func=cmd_heal_pr)
 
     # mutate
-    p_mut = subparsers.add_parser("mutate", help="Inject AST micro-mutants to verify test assertion strength")
+    p_mut = subparsers.add_parser("mutate", help="Inject syntactic micro-mutants to verify test assertion strength")
     p_mut.set_defaults(func=cmd_mutate)
 
     # shard
