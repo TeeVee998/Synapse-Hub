@@ -13,7 +13,7 @@
 (function () {
   'use strict';
 
-  if (window.__qa && window.__qa.__version === '2.3.0') {
+  if (window.__qa && window.__qa.__version === '2.3.1') {
     return window.__qa;
   }
 
@@ -47,7 +47,7 @@
   }
 
   const qa = {
-    __version: '2.3.0',
+    __version: '2.3.1',
 
     /**
      * 1. Smart Action Batching
@@ -503,6 +503,97 @@
 
       walk(root === document ? document.body : root, 1);
       return aomNodes;
+    },
+
+    /**
+     * 8. ARIA Snapshot (Playwright-MCP-style YAML serialization)
+     * Serializes the visible accessibility tree into the ARIA snapshot text
+     * format that MCP-style agents consume: `- role "name" [state] [ref=eN]`.
+     * (Format borrowed and adapted from microsoft/playwright-mcp, Apache-2.0.)
+     * @param {Element|Document} [root=document]
+     * @param {number} [maxDepth=6]
+     * @returns {string} YAML-style ARIA snapshot text (one node per line)
+     */
+    ariaSnapshot: function (root = document, maxDepth = 6) {
+      const lines = [];
+      let refCounter = 0;
+
+      function getRole(el) {
+        const explicitRole = el.getAttribute('role');
+        if (explicitRole) return explicitRole.toLowerCase();
+        const tag = el.tagName.toLowerCase();
+        if (tag === 'button') return 'button';
+        if (tag === 'a' && el.hasAttribute('href')) return 'link';
+        if (tag === 'input') {
+          const type = (el.getAttribute('type') || 'text').toLowerCase();
+          if (['checkbox', 'radio', 'button', 'submit'].includes(type)) return type;
+          return 'textbox';
+        }
+        if (tag === 'select') return 'combobox';
+        if (tag === 'textarea') return 'textbox';
+        if (tag === 'h1' || tag === 'h2' || tag === 'h3' || tag === 'h4' || tag === 'h5' || tag === 'h6') return 'heading';
+        if (tag === 'img') return 'img';
+        if (tag === 'ul' || tag === 'ol') return 'list';
+        if (tag === 'li') return 'listitem';
+        return null;
+      }
+
+      function getAccessibleName(el) {
+        return (
+          el.getAttribute('aria-label') ||
+          el.getAttribute('aria-placeholder') ||
+          el.getAttribute('placeholder') ||
+          el.getAttribute('title') ||
+          (el.innerText ? el.innerText.trim().slice(0, 80).replace(/\s+/g, ' ') : '') ||
+          el.getAttribute('alt') ||
+          ''
+        );
+      }
+
+      function isVisible(el) {
+        if (!el || el.nodeType !== 1) return false;
+        const style = window.getComputedStyle(el);
+        if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return false;
+        const rect = el.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+      }
+
+      function walk(node, depth) {
+        if (depth > maxDepth || !node) return;
+        const children = node.children || [];
+        for (let i = 0; i < children.length; i++) {
+          const child = children[i];
+          if (!isVisible(child)) continue;
+
+          const role = getRole(child);
+          if (role) {
+            refCounter += 1;
+            const rawName = getAccessibleName(child);
+            const namePart = rawName ? ' "' + rawName.replace(/"/g, "'") + '"' : '';
+            let states = '';
+            if (child.disabled || child.getAttribute('aria-disabled') === 'true') states += ' [disabled]';
+            if (child.getAttribute('aria-checked') === 'true') states += ' [checked]';
+            if (child.getAttribute('aria-expanded') !== null) {
+              states += child.getAttribute('aria-expanded') === 'true' ? ' [expanded]' : ' [collapsed]';
+            }
+            if (child.getAttribute('aria-selected') === 'true') states += ' [selected]';
+            const tagLower = child.tagName.toLowerCase();
+            const level = (role === 'heading' && /^h[1-6]$/.test(tagLower)) ? ' [level=' + tagLower[1] + ']' : '';
+            const testId = child.getAttribute('data-testid') || child.getAttribute('data-cy') || '';
+            const idPart = testId ? ' [testid=' + testId + ']' : '';
+            lines.push('  '.repeat(depth - 1) + '- ' + role + namePart + level + states + ' [ref=e' + refCounter + ']' + idPart);
+          }
+
+          // Pierce Shadow DOM
+          if (child.shadowRoot) {
+            walk(child.shadowRoot, depth + 1);
+          }
+          walk(child, depth + 1);
+        }
+      }
+
+      walk(root === document ? document.body : root, 1);
+      return lines.join('\n');
     },
 
     /**

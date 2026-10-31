@@ -18,7 +18,11 @@ Comprehensive 10/10 Pinnacle Performance Features:
      - RegexExtractor for HTML hidden CSRF / Anti-Forgery tokens
      - JSONPostProcessor with Match Number 0 (Random dynamic item choice avoiding duplicate lockups)
      - Chaining Bearer JWT token & entity IDs.
-  6. Workload Archetypes: Linear, Step-Up (Break-point), Spike, and Soak profiles.
+  6. Workload Archetypes: Linear, Step-Up (Break-point), Spike, and Soak profiles -
+     step/spike emit staged ThreadGroups (per-stage threads/ramp/hold/delay windows).
+  6b. Locust Code-as-Code Export (`--emit-locust`): generates a runnable
+      locustfile.py (User class + weighted @task endpoints) from the same
+      OpenAPI/Postman/HAR ingestion - concept borrowed from Locust (MIT).
   7. Enterprise Security: JSR223 Groovy HMAC-SHA256 payload signer & correlation IDs.
   8. Full-Stack Observability & Telemetry:
      - InfluxDB Backend Listener for live Grafana APM dashboard streaming
@@ -55,6 +59,40 @@ if hasattr(sys.stdout, "reconfigure"):
         sys.stderr.reconfigure(encoding="utf-8")
     except Exception:
         pass
+
+
+def compute_workload_stages(workload_profile: str, vus: int, ramp_up: int, duration: int) -> List[Dict[str, int]]:
+    """Computes staged execution windows for step/spike profiles.
+
+    Each stage is a plain JMeter ThreadGroup with its own scheduler window
+    (threads, ramp, hold, delay) so staged load works on vanilla JMeter 5.x
+    without plugins. Linear/soak return a single stage (behavior unchanged).
+    """
+    if workload_profile == "step":
+        step_count = 4
+        per_step = max(1, (vus + step_count - 1) // step_count)
+        window_ramp = max(1, min(10, ramp_up))
+        window_hold = max(30, duration // step_count)
+        stages = []
+        for i in range(step_count):
+            threads = min(per_step * (i + 1), vus)
+            stages.append({"threads": threads, "ramp": window_ramp,
+                           "hold": window_hold, "delay": i * (window_ramp + window_hold)})
+        return stages
+
+    if workload_profile == "spike":
+        base = max(1, round(vus * 0.2))
+        base_hold = max(10, round(duration * 0.7))
+        spike_hold = max(10, round(duration * 0.15))
+        tail_hold = max(10, duration - base_hold - spike_hold)
+        return [
+            {"threads": base, "ramp": ramp_up, "hold": base_hold, "delay": 0},
+            {"threads": vus, "ramp": 5, "hold": spike_hold, "delay": base_hold},
+            {"threads": base, "ramp": 5, "hold": tail_hold, "delay": base_hold + spike_hold},
+        ]
+
+    # linear / soak: single continuous stage (legacy behavior, property-overridable)
+    return [{"threads": vus, "ramp": ramp_up, "hold": duration, "delay": 0}]
 
 
 def build_jmx_xml(
@@ -351,23 +389,46 @@ def build_jmx_xml(
     if workload_profile == "soak" and duration < 3600:
         actual_duration = 3600  # Default 1h for soak
 
-    xml_lines.extend([
-        f'      <!-- Main Thread Group: {workload_profile.upper()} Profile -->',
-        f'      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="{tg_name}" enabled="true">',
-        '        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>',
-        '        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">',
-        f'          <boolProp name="LoopController.continue_forever">{continue_forever}</boolProp>',
-        f'          <stringProp name="LoopController.loops">${{__P(loops,{loops_str})}}</stringProp>',
-        '        </elementProp>',
-        f'        <stringProp name="ThreadGroup.num_threads">${{__P(vus,{vus})}}</stringProp>',
-        f'        <stringProp name="ThreadGroup.ramp_time">${{__P(ramp_up,{ramp_up})}}</stringProp>',
-        '        <boolProp name="ThreadGroup.scheduler">true</boolProp>',
-        f'        <stringProp name="ThreadGroup.duration">${{__P(duration,{actual_duration})}}</stringProp>',
-        '        <stringProp name="ThreadGroup.delay">0</stringProp>',
-        '        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>',
-        '      </ThreadGroup>',
-        '      <hashTree>'
-    ])
+    stages = compute_workload_stages(workload_profile, vus, ramp_up, actual_duration)
+    is_staged = len(stages) > 1
+
+    def _emit_stage_group(stage: Dict[str, int], stage_index: int) -> None:
+        """Emits one stage ThreadGroup header. Single-stage plans keep the
+        legacy property-overridable form (${__P(vus,...)}); staged plans use
+        concrete per-stage windows."""
+        name = tg_name if not is_staged else f"{tg_name} - Stage {stage_index + 1}"
+        if is_staged:
+            threads_prop = str(stage["threads"])
+            ramp_prop = str(stage["ramp"])
+            duration_prop = str(stage["hold"])
+            delay_prop = str(stage["delay"])
+            header = f'      <!-- Workload Stage {stage_index + 1}/{len(stages)}: {stage["threads"]} VUs, ramp {stage["ramp"]}s, hold {stage["hold"]}s, delay {stage["delay"]}s -->'
+        else:
+            threads_prop = f'${{__P(vus,{stage["threads"]})}}'
+            ramp_prop = f'${{__P(ramp_up,{stage["ramp"]})}}'
+            duration_prop = f'${{__P(duration,{stage["hold"]})}}'
+            delay_prop = "0"
+            header = f'      <!-- Main Thread Group: {workload_profile.upper()} Profile -->'
+        xml_lines.extend([
+            header,
+            f'      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="{name}" enabled="true">',
+            '        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>',
+            '        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">',
+            f'          <boolProp name="LoopController.continue_forever">{continue_forever}</boolProp>',
+            f'          <stringProp name="LoopController.loops">${{__P(loops,{loops_str})}}</stringProp>',
+            '        </elementProp>',
+            f'        <stringProp name="ThreadGroup.num_threads">{threads_prop}</stringProp>',
+            f'        <stringProp name="ThreadGroup.ramp_time">{ramp_prop}</stringProp>',
+            '        <boolProp name="ThreadGroup.scheduler">true</boolProp>',
+            f'        <stringProp name="ThreadGroup.duration">{duration_prop}</stringProp>',
+            f'        <stringProp name="ThreadGroup.delay">{delay_prop}</stringProp>',
+            '        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>',
+            '      </ThreadGroup>',
+            '      <hashTree>'
+        ])
+
+    _emit_stage_group(stages[0], 0)
+    stage_body_start = len(xml_lines)
 
     # CSV Data Set Config (Dynamic credentials / entities)
     if csv_file:
@@ -677,51 +738,168 @@ def build_jmx_xml(
             '        <hashTree/>'
         ])
 
-    # Result Collectors for CLI JTL export and Summary
+    # Capture the first stage's hashTree body, close it, then replicate it for
+    # the remaining staged profiles (step/spike) so every stage executes the
+    # full sampler set inside its own scheduler window (vanilla JMeter, no
+    # plugins). The Result Collector moves to Test-Plan level so all stages
+    # stream into one JTL file.
+    stage_body = xml_lines[stage_body_start:]
+    xml_lines.append('      </hashTree>')
+
+    for stage_idx in range(1, len(stages)):
+        _emit_stage_group(stages[stage_idx], stage_idx)
+        xml_lines.extend(stage_body)
+        xml_lines.append('      </hashTree>')
+
+    # Result Collectors for CLI JTL export and Summary (plan-level: one JTL
+    # across all workload stages)
     xml_lines.extend([
-        '        <!-- Headless JTL Result Collector & Summary Report -->',
-        '        <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="true">',
-        '          <boolProp name="ResultCollector.error_logging">false</boolProp>',
-        '          <objProp>',
-        '            <name>saveConfig</name>',
-        '            <value class="SampleSaveConfiguration">',
-        '              <time>true</time>',
-        '              <latency>true</latency>',
-        '              <timestamp>true</timestamp>',
-        '              <success>true</success>',
-        '              <label>true</label>',
-        '              <code>true</code>',
-        '              <message>true</message>',
-        '              <threadName>true</threadName>',
-        '              <dataType>true</dataType>',
-        '              <encoding>false</encoding>',
-        '              <assertions>true</assertions>',
-        '              <subresults>true</subresults>',
-        '              <responseData>false</responseData>',
-        '              <samplerData>false</samplerData>',
-        '              <xml>false</xml>',
-        '              <fieldNames>true</fieldNames>',
-        '              <responseHeaders>false</responseHeaders>',
-        '              <requestHeaders>false</requestHeaders>',
-        '              <responseDataOnError>false</responseDataOnError>',
-        '              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>',
-        '              <assertionsResultsToSave>0</assertionsResultsToSave>',
-        '              <bytes>true</bytes>',
-        '              <sentBytes>true</sentBytes>',
-        '              <url>true</url>',
-        '              <threadCounts>true</threadCounts>',
-        '              <idleTime>true</idleTime>',
-        '              <connectTime>true</connectTime>',
-        '            </value>',
-        '          </objProp>',
-        '          <stringProp name="filename">jmeter_results.jtl</stringProp>',
-        '        </ResultCollector>',
-        '        <hashTree/>',
-        '      </hashTree>',
+        '      <!-- Headless JTL Result Collector & Summary Report (plan-level, all stages) -->',
+        '      <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="true">',
+        '        <boolProp name="ResultCollector.error_logging">false</boolProp>',
+        '        <objProp>',
+        '          <name>saveConfig</name>',
+        '          <value class="SampleSaveConfiguration">',
+        '            <time>true</time>',
+        '            <latency>true</latency>',
+        '            <timestamp>true</timestamp>',
+        '            <success>true</success>',
+        '            <label>true</label>',
+        '            <code>true</code>',
+        '            <message>true</message>',
+        '            <threadName>true</threadName>',
+        '            <dataType>true</dataType>',
+        '            <encoding>false</encoding>',
+        '            <assertions>true</assertions>',
+        '            <subresults>true</subresults>',
+        '            <responseData>false</responseData>',
+        '            <samplerData>false</samplerData>',
+        '            <xml>false</xml>',
+        '            <fieldNames>true</fieldNames>',
+        '            <responseHeaders>false</responseHeaders>',
+        '            <requestHeaders>false</requestHeaders>',
+        '            <responseDataOnError>false</responseDataOnError>',
+        '            <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>',
+        '            <assertionsResultsToSave>0</assertionsResultsToSave>',
+        '            <bytes>true</bytes>',
+        '            <sentBytes>true</sentBytes>',
+        '            <url>true</url>',
+        '            <threadCounts>true</threadCounts>',
+        '            <idleTime>true</idleTime>',
+        '            <connectTime>true</connectTime>',
+        '          </value>',
+        '        </objProp>',
+        '        <stringProp name="filename">jmeter_results.jtl</stringProp>',
+        '      </ResultCollector>',
+        '      <hashTree/>',
         '    </hashTree>',
         '  </hashTree>',
         '</jmeterTestPlan>'
     ])
+
+    return "\n".join(xml_lines)
+
+
+def generate_locustfile(
+    plan_name: str,
+    base_host: str,
+    protocol: str,
+    port: str,
+    samplers: List[Dict[str, Any]],
+    weighted_mix: Optional[str] = None,
+    think_time_min_ms: int = 0,
+    think_time_max_ms: int = 0,
+) -> str:
+    """Generates a runnable locustfile.py (code-as-code load model).
+
+    Concept borrowed from Locust (MIT): the plan becomes a User class with
+    weighted @task endpoints, honoring the same --weighted-mix traffic shaping
+    as the JMX export (weights chunk the samplers sequentially).
+    """
+    host = f"{protocol}://{base_host}" if port in ("80", "443") else f"{protocol}://{base_host}:{port}"
+
+    # Distribute weights: chunk samplers sequentially per percentage.
+    task_weights: List[int] = [1] * len(samplers)
+    if weighted_mix:
+        try:
+            parts = [p.strip() for p in weighted_mix.split(",")]
+            pcts = [int(p.split(":")[0]) for p in parts if p]
+            total = sum(pcts) or 1
+            chunk = max(1, (len(samplers) + len(pcts) - 1) // len(pcts))
+            for gi, pct in enumerate(pcts):
+                for si in range(gi * chunk, min((gi + 1) * chunk, len(samplers))):
+                    task_weights[si] = max(1, round(pct * 10 / total))
+        except ValueError:
+            task_weights = [1] * len(samplers)
+
+    def _slug(name: str, idx: int) -> str:
+        words = re.sub(r"[^a-zA-Z0-9]+", "_", name).strip("_").lower() or f"endpoint_{idx}"
+        return f"task_{idx + 1:02d}_{words[:40]}"
+
+    def _locust_body(raw: str) -> str:
+        """Converts JMeter placeholders into a runtime-safe .format() body."""
+        if not raw:
+            return ""
+        s = raw.replace("${__time(HMS,)}", "\x01ts\x01")
+        s = s.replace("${RANDOM_ITEM_ID}", "\x01rnd\x01")
+        s = s.replace("${LAST_CREATED_ID}", "\x01last_id\x01")
+        s = re.sub(r"\$\{([A-Za-z0-9_]+)\}", lambda m: "sample_" + m.group(1).lower(), s)
+        s = s.replace("{", "{{").replace("}", "}}")
+        s = s.replace("\x01ts\x01", "{ts}").replace("\x01rnd\x01", "{rnd}").replace("\x01last_id\x01", "{last_id}")
+        return s
+
+    method_lines: List[str] = []
+    for idx, s in enumerate(samplers):
+        fn = _slug(s.get("name", f"{s.get('method')} {s.get('path')}"), idx)
+        weight = task_weights[idx] if idx < len(task_weights) else 1
+        method = (s.get("method") or "GET").upper()
+        path = (s.get("path") or "/").replace('"', '\\"')
+        method_lines.append(f"    @task({weight})")
+        method_lines.append(f"    def {fn}(self):")
+        method_lines.append(f'        """{s.get("name", method + " " + path)}"""')
+        if method in ("POST", "PUT", "PATCH"):
+            method_lines.append(
+                f'        self.client.{method.lower()}("{path}", '
+                f'name="{method} {path}", '
+                f'json=json.loads(BODIES["{fn}"].format(ts=datetime.now(timezone.utc).strftime("%H%M%S"), rnd=random.randint(1, 9999), last_id=LAST_CREATED_ID)))'
+            )
+        else:
+            method_lines.append(f'        self.client.get("{path}", name="{method} {path}")')
+        method_lines.append("")
+
+    think_time = (
+        f"between({think_time_min_ms / 1000:.2f}, {think_time_max_ms / 1000:.2f})"
+        if think_time_max_ms > 0
+        else "constant_pacing(1.0)"
+    )
+
+    bodies = "\n".join(
+        f'    "{_slug(s.get("name", ""), i)}": {_locust_body(s.get("body", ""))!r},'
+        for i, s in enumerate(samplers)
+        if (s.get("method") or "").upper() in ("POST", "PUT", "PATCH")
+    )
+
+    class_name = re.sub(r"[^A-Za-z0-9]+", "", plan_name.title()) or "EnterpriseUser"
+
+    return (
+        '"""Generated by Synapse Hub tools/generate_jmx_plan.py --emit-locust\n'
+        "Code-as-code load model (concept borrowed from Locust, MIT).\n"
+        "Run: locust -f this_file.py --host=HOST\n"
+        '"""\n'
+        "import json\n"
+        "import random\n"
+        "from datetime import datetime, timezone\n\n"
+        "from locust import HttpUser, task, between, constant_pacing\n\n"
+        "LAST_CREATED_ID = 1\n\n"
+        "BODIES = {\n"
+        f"{bodies}\n"
+        "}\n\n\n"
+        f"class {class_name}(HttpUser):\n"
+        f'    """{plan_name}"""\n\n'
+        f"    host = \"{host}\"\n"
+        f"    wait_time = {think_time}\n\n"
+        + "\n".join(method_lines)
+    )
 
     return "\n".join(xml_lines)
 
@@ -929,6 +1107,7 @@ def main():
     parser.add_argument("--loop-count", type=int, default=-1, help="Loop iterations count (-1 for infinite). Default: -1.")
     parser.add_argument("--sla-p95", type=int, default=500, help="P95 Latency SLA assertion threshold in ms. Default: 500.")
     parser.add_argument("--output", "-o", help="Target output JMeter test plan file path (.jmx).")
+    parser.add_argument("--emit-locust", dest="emit_locust", help="Also/instead emit a runnable Locust locustfile.py (code-as-code load model).")
     parser.add_argument("--sample", action="store_true", help="Generate a sample load test plan using built-in enterprise schema.")
     
     # Advanced JMeter 360° Extensions
@@ -1038,6 +1217,28 @@ def main():
             port = str(p.port) if p.port else ("443" if protocol == "https" else "80")
         else:
             base_host = args.base_url
+
+    # Code-as-code Locust export (concept borrowed from Locust, MIT)
+    if args.emit_locust:
+        locust_source = generate_locustfile(
+            plan_name=plan_name,
+            base_host=base_host,
+            protocol=protocol,
+            port=port,
+            samplers=samplers,
+            weighted_mix=args.weighted_mix,
+            think_time_min_ms=args.think_time_min,
+            think_time_max_ms=args.think_time_max,
+        )
+        out_dir = os.path.dirname(os.path.abspath(args.emit_locust))
+        if out_dir and not os.path.exists(out_dir):
+            os.makedirs(out_dir, exist_ok=True)
+        with open(args.emit_locust, "w", encoding="utf-8") as f:
+            f.write(locust_source)
+        print(f"🐍 [LOCUST EXPORT] Runnable locustfile written: {args.emit_locust}")
+        print(f"   Run: locust -f \"{args.emit_locust}\" --host={protocol}://{base_host}:{port}")
+        if not args.output:
+            return
 
     jmx_content = build_jmx_xml(
         plan_name=plan_name,

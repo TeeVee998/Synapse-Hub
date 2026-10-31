@@ -11,19 +11,29 @@ Features:
   2. Ephemeral Snapshot & Rapid Restore (< 0.5s):
      - Takes snapshot of database state before test suite execution.
      - Restores pristine clean state immediately after test completion.
-     - Supports SQLite, PostgreSQL schema isolation, MySQL, and Docker/Testcontainers hooks.
+     - SQLite implemented natively; other engines via file-copy hooks. Boot
+       containers with external `docker`/Testcontainers, then gate readiness
+       with the `wait-ready` command (see Wait Strategies below).
   3. Taint Pollution Auditor:
      - Automatically detects orphan rows created during test sessions and performs
        dependency-aware cascading cleanup.
+  4. Container Readiness Wait Strategies (`wait-ready`):
+     - port / http / sqlite probes with deadline + backoff, so CI never races
+       a not-yet-ready database (concept borrowed from the Testcontainers
+       WaitStrategy taxonomy, Apache-2.0, re-implemented stdlib-only).
 """
 
 import os
+import re
 import sys
 import time
 import json
 import shutil
+import socket
 import sqlite3
 import argparse
+import urllib.request
+import urllib.error
 from typing import Dict, Any, List, Optional, Tuple
 
 # Enforce UTF-8 stdout encoding for Windows console compatibility
@@ -254,6 +264,111 @@ class DBSandbox:
         }
 
 
+# -------------------------------------------------------------------------
+# 4. CONTAINER READINESS WAIT STRATEGIES
+#    (Concept borrowed from the Testcontainers WaitStrategy taxonomy,
+#     Apache-2.0 - re-implemented stdlib-only. Boot the container with
+#     external `docker`/Testcontainers, then gate on readiness here.)
+# -------------------------------------------------------------------------
+
+def _probe_sqlite(target: str) -> Tuple[bool, str]:
+    """Ready when the SQLite file opens read-only and answers a pragma."""
+    try:
+        conn = sqlite3.connect(f"file:{target}?mode=ro", uri=True, timeout=2.0)
+        try:
+            conn.execute("PRAGMA schema_version").fetchone()
+        finally:
+            conn.close()
+        return True, "sqlite pragma answered"
+    except sqlite3.Error as exc:
+        return False, f"sqlite probe failed: {exc}"
+
+
+def _probe_port(target: str) -> Tuple[bool, str]:
+    """Ready when a TCP connection to host:port succeeds."""
+    m = re.match(r"^(?:[\w.\-]+://)?([\w.\-]+):(\d+)$", target)
+    if not m:
+        return False, f"invalid host:port target '{target}'"
+    host, port = m.group(1), int(m.group(2))
+    try:
+        with socket.create_connection((host, port), timeout=2.0):
+            return True, f"tcp {host}:{port} accepted"
+    except OSError as exc:
+        return False, f"tcp {host}:{port} refused: {exc}"
+
+
+def _probe_http(target: str) -> Tuple[bool, str]:
+    """Ready when the endpoint answers with any non-5xx status (an auth wall
+    such as 401/403 still proves the service is up)."""
+    try:
+        req = urllib.request.Request(target, method="GET")
+        with urllib.request.urlopen(req, timeout=2.0) as resp:
+            return True, f"http {resp.getcode()}"
+    except urllib.error.HTTPError as exc:
+        if exc.code < 500:
+            return True, f"http {exc.code} (service reachable)"
+        return False, f"http {exc.code} server error"
+    except (urllib.error.URLError, OSError) as exc:
+        return False, f"http probe failed: {exc}"
+
+
+def infer_wait_strategy(target: str) -> str:
+    """Auto-detects the wait strategy from the target shape."""
+    lowered = target.lower()
+    if lowered.startswith("http://") or lowered.startswith("https://"):
+        return "http"
+    if lowered.endswith((".db", ".sqlite", ".sqlite3")) or os.path.exists(target):
+        return "sqlite"
+    if re.match(r"^[\w.\-]+:\d+$", target):
+        return "port"
+    return "port"
+
+
+def wait_for_ready(target: str, strategy: str = "auto", timeout_sec: float = 30.0) -> Dict[str, Any]:
+    """Polls a readiness probe until it succeeds or the deadline expires.
+
+    Returns a structured result; exit codes are enforced by the CLI
+    (0 = ready, 1 = timeout) so CI pipelines can gate on database health
+    before dispatching suites.
+    """
+    if strategy == "auto":
+        strategy = infer_wait_strategy(target)
+    probes = {"sqlite": _probe_sqlite, "port": _probe_port, "http": _probe_http}
+    probe = probes.get(strategy)
+    if probe is None:
+        return {"target": target, "strategy": strategy, "ready": False,
+                "elapsed_ms": 0, "attempts": 0, "error": f"unknown strategy '{strategy}'"}
+
+    start = time.perf_counter()
+    attempts = 0
+    backoff = 0.25
+    last_error = ""
+    while time.perf_counter() - start < timeout_sec:
+        attempts += 1
+        ok, detail = probe(target)
+        if ok:
+            return {
+                "target": target,
+                "strategy": strategy,
+                "ready": True,
+                "elapsed_ms": round((time.perf_counter() - start) * 1000, 1),
+                "attempts": attempts,
+                "error": None,
+            }
+        last_error = detail
+        time.sleep(backoff)
+        backoff = min(backoff * 2, 2.0)
+
+    return {
+        "target": target,
+        "strategy": strategy,
+        "ready": False,
+        "elapsed_ms": round((time.perf_counter() - start) * 1000, 1),
+        "attempts": attempts,
+        "error": last_error or "timeout expired before readiness",
+    }
+
+
 def main():
     parser = argparse.ArgumentParser(description="Zero-Pollution Database Sandbox & Ephemeral Teardown")
     subparsers = parser.add_subparsers(dest="command", help="Sandbox command")
@@ -281,7 +396,29 @@ def main():
     aud_p.add_argument("--db-path", default="", help="Path to database file")
     aud_p.add_argument("--json", action="store_true", help="Output JSON format")
 
+    # Command: wait-ready (Testcontainers-style readiness gate)
+    wait_p = subparsers.add_parser("wait-ready", help="Wait until a database/container is ready (port|http|sqlite probe)")
+    wait_p.add_argument("target", help="URL (http(s)://), host:port, or SQLite file path")
+    wait_p.add_argument("--strategy", choices=["auto", "port", "http", "sqlite"], default="auto",
+                        help="Readiness probe strategy (default: auto-detect)")
+    wait_p.add_argument("--timeout", type=float, default=30.0, help="Deadline in seconds (default: 30)")
+    wait_p.add_argument("--json", action="store_true", help="Output JSON format")
+
     args = parser.parse_args()
+
+    if args.command == "wait-ready":
+        res = wait_for_ready(args.target, strategy=args.strategy, timeout_sec=args.timeout)
+        if args.json:
+            print(json.dumps(res, indent=2))
+        else:
+            if res["ready"]:
+                print(f"✅ [READY] {res['target']} via {res['strategy']} probe "
+                      f"({res['elapsed_ms']}ms, {res['attempts']} attempt(s))")
+            else:
+                print(f"❌ [NOT READY] {res['target']} via {res['strategy']} probe "
+                      f"after {res['elapsed_ms']}ms / {res['attempts']} attempt(s)")
+                print(f"   Last error: {res['error']}")
+        return 0 if res["ready"] else 1
 
     sandbox = DBSandbox(db_path=args.db_path)
 
