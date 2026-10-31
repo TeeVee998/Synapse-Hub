@@ -81,3 +81,29 @@ Mandatory 5-point verification before committing POM code:
 - [**Runtime Browser Helper (`tools/browser_helpers.js`)**](tools/browser_helpers.js): Unified JavaScript module providing `window.__qa` (`batch`, `audit`, `heal`, `clickSafe`, `exportSession`).
 - [**5 Superpowers & 5 AI Paradigms**](references/advanced_superpowers.md): Zero-Second Auth (`session.json`), Direct API Seeding, AOM Snapshots, Multi-Context Dual Role, Route Mocking, Self-Healing Locators, Fuzzing, CDP Profiling.
 - [**Multi-Agent Swarm Orchestration**](references/swarm_orchestration.md): Specialized swarm roles and collaboration protocol.
+
+## 6. Instant Action vs Auto-Planning Dispatch
+
+> *Borrowed and adapted from the Midscene.js prompting model (MIT license, web-infra-dev/midscene).*
+
+When driving the live browser through an AI vision model, choose the dispatch
+mode deliberately — the trade-off is control vs cost:
+
+| Mode | When to Use | Cost Profile |
+| :--- | :--- | :--- |
+| **Instant action** (`aiTap`, `aiInput`, `aiHover`, `aiQuery`) | You already know the exact single action; AI only locates the element | Faster and more accurate; deterministic control |
+| **Auto planning** (`aiAction("<full task>")`) | Multi-step flow not yet decomposed; you want the model to plan | Flexible but costs more time and tokens; plan can drift |
+
+Dispatch rules for agents:
+
+1. **One task per call** — split "Click Login then fill the form" into separate
+   calls; combined prompts produce messy plans.
+2. **Describe position, not internals** — the model sees pixels/AOM only:
+   prefer "the button at the top-right of the cart panel" over DOM properties.
+3. **Assert only what is visible** — DOM internals, tab counts, or network
+   state are invisible to the model; use `aiQuery` to extract data, then assert
+   on the extracted value with a real assertion.
+4. **Never trust the model's own success claim** — pair every instant action
+   with an explicit `expect(...)`/`verify...` assertion (Truth Anchor).
+5. **Debug failures in two layers** — wrong step count = planning failed (add
+   flow detail); wrong element = locating failed (add spatial detail).

@@ -80,3 +80,31 @@ IndustryDataPage.deleteRecordByCode(uniqueCode)
 - Zero raw XPaths, CSS selectors, or `findTestObject` in the generated script.
 - Always generate dynamic identifiers with prefixes via `BasePage.uniqueCode()`.
 - Always generate mandatory teardown cleanup for created entities.
+
+## 4. Proven-vs-Owed Traceability Pipeline
+
+> *Borrowed and adapted from the Kane CLI generate→execute→prove workflow (Apache-2.0, lambdatest/kane-cli).*
+
+Generated scripts must be traceable to the acceptance criteria they prove.
+For every user story, maintain the chain:
+
+```mermaid
+flowchart LR
+    Story["<b>User Story</b>"] --> UC["<b>Use Cases</b><br/>(each cites its source line)"]
+    UC --> AC["<b>Acceptance Criteria</b><br/>(Given/When/Then, testable)"]
+    AC --> SC["<b>Scenarios</b><br/>(happy + negative + boundary)"]
+    SC --> TC["<b>Automation Scripts</b><br/>(Clean POM, 0 raw XPath)"]
+    TC --> EV["<b>Proven vs Owed</b><br/>coverage per criterion"]
+```
+
+Rules:
+
+1. **Every generated script cites its criterion** — keep the AC id in the test
+   case name or a comment header; a script nobody can trace back is a liability.
+2. **Report coverage as proven vs owed, not test counts** — a criterion with no
+   passing automated script is *owed*; N scripts proving one criterion is waste.
+3. **Reconcile on requirement change** — when a story changes, re-run the chain
+   and mark stale scripts before trusting any green run.
+4. For BDD inputs, the `gherkin-to-suite` skill performs the AC→scenario
+   expansion deterministically (0-token); feed its Universal IR here for
+   codification.

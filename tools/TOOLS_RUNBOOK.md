@@ -16,6 +16,7 @@
 | **Autonomous API Fuzzing & Chaos Breaker** | `tools/api_fuzzer.py` | `agent-qa fuzz-api --base-url <url> --spec <swagger.json>` (Catches 500, DB leaks, SLA breach) |
 | **FastMCP JSON-RPC Server (Cursor/Claude/Antigravity)** | `tools/mcp_server.py` | `python tools/mcp_server.py` (or `agent-qa mcp-serve`) |
 | **Syntactic Micro-Mutation (Assertion Quality Verification)** | `tools/micro_mutator.py` | `python tools/micro_mutator.py [target]` (or `agent-qa mutate`) |
+| **Gherkin BDD Suite Compiler (Natural-Language Ingestion, 0-token)** | `tools/gherkin_suite.py` | `python tools/gherkin_suite.py tests/bdd/` (or `agent-qa gherkin`; `--emit-ir` for Universal IR) |
 | **Self-Healing PR Automator (Trace & Visual Diff Proof)** | `tools/heal_pr_automator.py` | `python tools/heal_pr_automator.py --page P.groovy --old "//a" --new "//b" --trace-zip trace.zip` (or `agent-qa heal-pr`) |
 | **Duration-Balanced Matrix Sharder (CI/CD Load Balancing)** | `tools/matrix_sharder.py` | `python tools/matrix_sharder.py [target] --shards 4` (or `agent-qa shard`) |
 | **Enterprise ALM & TMS Sync Bridge (Jira/Xray/TestRail)** | `tools/tms_sync_bridge.py` | `python tools/tms_sync_bridge.py pull PROJ-1042` / `report-bug` |

@@ -1,0 +1,334 @@
+{
+  "timestamp": "2026-10-31T17:19:59.032559",
+  "file": ".agents/skills/gherkin-to-suite/examples/checkout.feature",
+  "feature": "Checkout Flow",
+  "tags": [
+    "@checkout",
+    "@smoke"
+  ],
+  "totals": {
+    "scenarios": 3,
+    "expanded_cases": 5,
+    "steps": 22,
+    "invalid_cases": 0
+  },
+  "errors": [],
+  "gaps": [
+    {
+      "severity": "WARNING",
+      "rule": "G3-THIN_EXAMPLES",
+      "target": "Apply voucher <voucher>",
+      "message": "Examples table has 1 row(s) - add boundary and negative rows (empty, max length, special chars)."
+    }
+  ],
+  "cases": [
+    {
+      "id": "checkout-flow--pay-with-credit-card",
+      "name": "Pay with credit card",
+      "tags": [
+        "@checkout",
+        "@smoke",
+        "@happy"
+      ],
+      "steps": [
+        {
+          "action": "custom_call",
+          "target": null,
+          "value": null,
+          "assertion_type": null,
+          "expected": null,
+          "wait_strategy": null,
+          "is_sanitized_wait": false,
+          "timeout_ms": 5000,
+          "description": "Given the user is logged in as \"member\""
+        },
+        {
+          "action": "goto",
+          "target": null,
+          "value": "https://shop.example.com/checkout",
+          "assertion_type": null,
+          "expected": null,
+          "wait_strategy": null,
+          "is_sanitized_wait": false,
+          "timeout_ms": 5000,
+          "description": "the user navigates to \"https://shop.example.com/checkout\""
+        },
+        {
+          "action": "fill",
+          "target": "Card Number",
+          "value": "4111-1111-1111-1111",
+          "assertion_type": null,
+          "expected": null,
+          "wait_strategy": null,
+          "is_sanitized_wait": false,
+          "timeout_ms": 5000,
+          "description": "the user fills in \"4111-1111-1111-1111\" into \"Card Number\""
+        },
+        {
+          "action": "click",
+          "target": "Pay Now",
+          "value": null,
+          "assertion_type": null,
+          "expected": null,
+          "wait_strategy": null,
+          "is_sanitized_wait": false,
+          "timeout_ms": 5000,
+          "description": "the user clicks the \"Pay Now\" button"
+        },
+        {
+          "action": "assert",
+          "target": null,
+          "value": null,
+          "assertion_type": "contains_text",
+          "expected": "Order Confirmed",
+          "wait_strategy": null,
+          "is_sanitized_wait": false,
+          "timeout_ms": 5000,
+          "description": "the user should see \"Order Confirmed\""
+        },
+        {
+          "action": "assert",
+          "target": null,
+          "value": null,
+          "assertion_type": "url_contains",
+          "expected": "/confirmation",
+          "wait_strategy": null,
+          "is_sanitized_wait": false,
+          "timeout_ms": 5000,
+          "description": "the url should contain \"/confirmation\""
+        }
+      ],
+      "valid": true
+    },
+    {
+      "id": "checkout-flow--apply-voucher-voucher--row-1",
+      "name": "Apply voucher <voucher> [@row-1]",
+      "tags": [
+        "@checkout",
+        "@smoke",
+        "@data-driven",
+        "@row-1"
+      ],
+      "steps": [
+        {
+          "action": "custom_call",
+          "target": null,
+          "value": null,
+          "assertion_type": null,
+          "expected": null,
+          "wait_strategy": null,
+          "is_sanitized_wait": false,
+          "timeout_ms": 5000,
+          "description": "Given the user is logged in as \"member\""
+        },
+        {
+          "action": "fill",
+          "target": "Voucher Input",
+          "value": "SAVE10",
+          "assertion_type": null,
+          "expected": null,
+          "wait_strategy": null,
+          "is_sanitized_wait": false,
+          "timeout_ms": 5000,
+          "description": "the user enters \"SAVE10\" into \"Voucher Input\""
+        },
+        {
+          "action": "click",
+          "target": "Apply",
+          "value": null,
+          "assertion_type": null,
+          "expected": null,
+          "wait_strategy": null,
+          "is_sanitized_wait": false,
+          "timeout_ms": 5000,
+          "description": "the user clicks the \"Apply\" button"
+        },
+        {
+          "action": "assert",
+          "target": null,
+          "value": null,
+          "assertion_type": "contains_text",
+          "expected": "90",
+          "wait_strategy": null,
+          "is_sanitized_wait": false,
+          "timeout_ms": 5000,
+          "description": "the total should show \"90\""
+        }
+      ],
+      "valid": true
+    },
+    {
+      "id": "checkout-flow--apply-voucher-voucher--row-2",
+      "name": "Apply voucher <voucher> [@row-2]",
+      "tags": [
+        "@checkout",
+        "@smoke",
+        "@data-driven",
+        "@row-2"
+      ],
+      "steps": [
+        {
+          "action": "custom_call",
+          "target": null,
+          "value": null,
+          "assertion_type": null,
+          "expected": null,
+          "wait_strategy": null,
+          "is_sanitized_wait": false,
+          "timeout_ms": 5000,
+          "description": "Given the user is logged in as \"member\""
+        },
+        {
+          "action": "fill",
+          "target": "Voucher Input",
+          "value": "SHIP0",
+          "assertion_type": null,
+          "expected": null,
+          "wait_strategy": null,
+          "is_sanitized_wait": false,
+          "timeout_ms": 5000,
+          "description": "the user enters \"SHIP0\" into \"Voucher Input\""
+        },
+        {
+          "action": "click",
+          "target": "Apply",
+          "value": null,
+          "assertion_type": null,
+          "expected": null,
+          "wait_strategy": null,
+          "is_sanitized_wait": false,
+          "timeout_ms": 5000,
+          "description": "the user clicks the \"Apply\" button"
+        },
+        {
+          "action": "assert",
+          "target": null,
+          "value": null,
+          "assertion_type": "contains_text",
+          "expected": "100",
+          "wait_strategy": null,
+          "is_sanitized_wait": false,
+          "timeout_ms": 5000,
+          "description": "the total should show \"100\""
+        }
+      ],
+      "valid": true
+    },
+    {
+      "id": "checkout-flow--apply-voucher-voucher--row-1-2",
+      "name": "Apply voucher <voucher> [@row-1]",
+      "tags": [
+        "@checkout",
+        "@smoke",
+        "@data-driven",
+        "@row-1"
+      ],
+      "steps": [
+        {
+          "action": "custom_call",
+          "target": null,
+          "value": null,
+          "assertion_type": null,
+          "expected": null,
+          "wait_strategy": null,
+          "is_sanitized_wait": false,
+          "timeout_ms": 5000,
+          "description": "Given the user is logged in as \"member\""
+        },
+        {
+          "action": "fill",
+          "target": "Voucher Input",
+          "value": "OLD1",
+          "assertion_type": null,
+          "expected": null,
+          "wait_strategy": null,
+          "is_sanitized_wait": false,
+          "timeout_ms": 5000,
+          "description": "the user enters \"OLD1\" into \"Voucher Input\""
+        },
+        {
+          "action": "click",
+          "target": "Apply",
+          "value": null,
+          "assertion_type": null,
+          "expected": null,
+          "wait_strategy": null,
+          "is_sanitized_wait": false,
+          "timeout_ms": 5000,
+          "description": "the user clicks the \"Apply\" button"
+        },
+        {
+          "action": "assert",
+          "target": null,
+          "value": null,
+          "assertion_type": "contains_text",
+          "expected": "200",
+          "wait_strategy": null,
+          "is_sanitized_wait": false,
+          "timeout_ms": 5000,
+          "description": "the total should show \"200\""
+        }
+      ],
+      "valid": true
+    },
+    {
+      "id": "checkout-flow--invalid-card-is-rejected",
+      "name": "Invalid card is rejected",
+      "tags": [
+        "@checkout",
+        "@smoke",
+        "@negative"
+      ],
+      "steps": [
+        {
+          "action": "custom_call",
+          "target": null,
+          "value": null,
+          "assertion_type": null,
+          "expected": null,
+          "wait_strategy": null,
+          "is_sanitized_wait": false,
+          "timeout_ms": 5000,
+          "description": "Given the user is logged in as \"member\""
+        },
+        {
+          "action": "fill",
+          "target": "Card Number",
+          "value": "4000-0000-0000-0002",
+          "assertion_type": null,
+          "expected": null,
+          "wait_strategy": null,
+          "is_sanitized_wait": false,
+          "timeout_ms": 5000,
+          "description": "the user fills in \"4000-0000-0000-0002\" into \"Card Number\""
+        },
+        {
+          "action": "click",
+          "target": "Pay Now",
+          "value": null,
+          "assertion_type": null,
+          "expected": null,
+          "wait_strategy": null,
+          "is_sanitized_wait": false,
+          "timeout_ms": 5000,
+          "description": "the user clicks the \"Pay Now\" button"
+        },
+        {
+          "action": "assert",
+          "target": null,
+          "value": null,
+          "assertion_type": "contains_text",
+          "expected": "Payment declined",
+          "wait_strategy": null,
+          "is_sanitized_wait": false,
+          "timeout_ms": 5000,
+          "description": "the user should see \"Payment declined\""
+        }
+      ],
+      "valid": true
+    }
+  ],
+  "health_score_pct": 100.0,
+  "markdown_plan": "<... full Markdown plan emitted to stdout ...>",
+  "_note": "Trimmed sample of reports/gherkin_suite_report.json generated by tools/gherkin_suite.py"
+}

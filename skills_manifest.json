@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "name": "Enterprise Agent Skills Hub",
   "version": "2.3.0",
-  "description": "Unified Catalog of 29 Specialized Skills for Autonomous AI Agents in Enterprise Software Quality Engineering, Performance, and Architecture.",
-  "totalSkills": 29,
+  "description": "Unified Catalog of 30 Specialized Skills for Autonomous AI Agents in Enterprise Software Quality Engineering, Performance, and Architecture.",
+  "totalSkills": 30,
   "categories": {
     "context_and_optimization": [
       "token-and-context-optimizer",
@@ -16,6 +16,7 @@
       "katalon-cli-runner",
       "bats-testing-patterns",
       "lam-script-generator",
+      "gherkin-to-suite",
       "auth-session-and-cookie-manager",
       "backend-load-and-stress-patterns",
       "rbt-manual-testing"
@@ -392,6 +393,14 @@
       "path": ".agents/skills/web-vitals-and-performance-profiler/SKILL.md",
       "summary": "Measure Core Web Vitals (LCP, CLS, INP) and network waterfalls via CDP.",
       "version": "2.0.0"
+    },
+    {
+      "id": "gherkin-to-suite",
+      "name": "Gherkin to Suite Compiler",
+      "category": "test_automation_and_execution",
+      "path": ".agents/skills/gherkin-to-suite/SKILL.md",
+      "summary": "Compile Gherkin .feature files into an expanded test matrix, Universal IR and coverage-gap report (0-token).",
+      "version": "1.0.0"
     }
   ]
 }

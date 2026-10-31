@@ -193,7 +193,7 @@ For full details, refer to [tools/TOOLS_RUNBOOK.md](tools/TOOLS_RUNBOOK.md):
 - `tools/generate_tc_from_story.py`: Large Action Model parser generating Clean POM skeletons from stories.
 - `tools/trace_data_flow.py`: Taint analysis tracking test data flow and preventing database orphan junk.
 - `scripts/install.ps1` & `scripts/setup.sh`: 1-click bootstrap scripts setting up the hub environment.
-- `scripts/lint_skills.ps1`: Linter verifying skill integrity across 29 skills and metadata manifest.
+- `scripts/lint_skills.ps1`: Linter verifying skill integrity across 30 skills and metadata manifest.
 - `pyproject.toml` & `tools/cli.py`: PEP 621 packaging for the global `agent-qa` CLI.
 
 </details>

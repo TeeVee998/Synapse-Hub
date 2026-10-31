@@ -199,7 +199,7 @@ Chi tiết đầy đủ xem tại [tools/TOOLS_RUNBOOK.md](tools/TOOLS_RUNBOOK.m
 - `tools/generate_tc_from_story.py`: Large Action Model parser sinh khung Clean POM từ User Story.
 - `tools/trace_data_flow.py`: Kiểm tra luồng dữ liệu kiểm thử, phát hiện rác dữ liệu DB (Orphan Data).
 - `scripts/install.ps1` & `scripts/setup.sh`: Script cài đặt 1-click tự động khởi tạo môi trường Hub.
-- `scripts/lint_skills.ps1`: Linter kiểm tra tính toàn vẹn 29 skills và metadata manifest.
+- `scripts/lint_skills.ps1`: Linter kiểm tra tính toàn vẹn 30 skills và metadata manifest.
 - `pyproject.toml` & `tools/cli.py`: Đóng gói chuẩn PEP 621 cho lệnh CLI toàn cầu `agent-qa`.
 
 </details>

@@ -2,7 +2,7 @@
 """
 Test Skills Examples Completeness (Task B3 Standard)
 -----------------------------------------------------
-Verifies that all 28 skills declared in skills_manifest.json contain
+Verifies that all skills declared in skills_manifest.json contain
 a valid examples/ directory with at least one representative file.
 """
 

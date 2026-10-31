@@ -285,6 +285,12 @@ def cmd_som(args):
     sys.exit(som_main())
 
 
+def cmd_gherkin(args):
+    from gherkin_suite import main as gherkin_main
+    sys.argv = [sys.argv[0]] + (sys.argv[2:] if len(sys.argv) > 2 else [])
+    sys.exit(gherkin_main())
+
+
 def cmd_export_postman(args):
     from export_postman_collection import main as postman_main
     sys.argv = [sys.argv[0]] + (sys.argv[2:] if len(sys.argv) > 2 else [])
@@ -432,6 +438,10 @@ def main():
     # impact
     p_impact = subparsers.add_parser("impact", help="Analyze code change impact using AST Knowledge Graph")
     p_impact.set_defaults(func=cmd_impact)
+
+    # gherkin
+    p_gherkin = subparsers.add_parser("gherkin", help="Compile Gherkin .feature files into test matrix, Universal IR and coverage-gap report (0-token)")
+    p_gherkin.set_defaults(func=cmd_gherkin)
 
     # canary
     p_canary = subparsers.add_parser("canary", help="Run autonomous canary resilience benchmark")
