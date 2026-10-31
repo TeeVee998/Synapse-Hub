@@ -108,3 +108,16 @@ Rules:
 4. For BDD inputs, the `gherkin-to-suite` skill performs the AC→scenario
    expansion deterministically (0-token); feed its Universal IR here for
    codification.
+
+---
+
+## 5. Boundary vs `clean-pom-crafter` and `gherkin-to-suite`
+
+- **This skill** = natural-language story → action-sequence script skeleton
+  (the "what steps, in what order" reasoning layer).
+- **`clean-pom-crafter`** owns the Page Classes and locator discipline that the
+  skeleton's business-flow calls resolve against — never inline raw selectors
+  here.
+- **`gherkin-to-suite`** is the deterministic (0-token) alternative when
+  requirements already exist as `.feature` files; use it first, and feed its
+  Universal IR here only when story-level reasoning must fill the gaps.

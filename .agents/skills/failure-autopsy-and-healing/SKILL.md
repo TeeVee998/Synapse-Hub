@@ -50,3 +50,17 @@ flowchart LR
 - [**Diagnostic & Healing Matrix (`healing_matrix.md`)**](references/healing_matrix.md): Concrete code prescriptions for disabled buttons, boundary overlaps, `ElementClickInterceptedException`, `StaleElementReferenceException`, and 4 flaky test root causes.
 - [**Fast-Fix Triad & Runtime Helper (`tools/browser_helpers.js`)**](tools/browser_helpers.js): In-browser diagnosis engine via `window.__qa` (`audit`, `heal`, `clickSafe`, `hud`).
 - **Automated Triage Script:** `python3 ~/.zcode/synapse-hub/tools/pinpoint_failure.py` and `scripts/triage_failures.sh`.
+
+---
+
+## 4. Boundary vs `self-healing-locator` (Do Not Confuse)
+
+- **This skill** = the general physician: accepts ANY failed test run, performs
+  root-cause analysis (JUnit XML, logs, screenshots), queries the memory cache,
+  files the bug ticket, and produces a full healing plan (which may involve
+  environment, data, timing, or code fixes).
+- **`self-healing-locator`** = the orthopedic specialist: one failure class only
+  — broken locators/stale elements. Its matching cascade is *dispatched by*
+  this skill's plan when the RCA concludes "locator drift".
+- Rule of thumb: if the failure reason is not yet known, start here; only after
+  the RCA says "locator broke" hand the repair to `self-healing-locator`.

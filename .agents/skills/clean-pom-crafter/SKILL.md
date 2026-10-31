@@ -70,3 +70,21 @@ All Page Classes **MUST** follow this strict locator hierarchy:
 - [**Standard Test Script Template (`standard_test_case.groovy`)**](examples/standard_test_case.groovy): 7-step complete script template from Login -> Create -> Search -> Edit -> Delete.
 - [**Zero-Token XPath Lookup (`~/.zcode/synapse-hub/tools/lookup_xpath.py`)**](~/.zcode/synapse-hub/tools/lookup_xpath.py): Command `python3 ~/.zcode/synapse-hub/tools/lookup_xpath.py <PageClass>` returns exact locators in <200 tokens without parsing full files.
 - [**Browser Runtime Helper (`tools/browser_helpers.js`)**](tools/browser_helpers.js): In-browser validation engine for form audits, safe clicks, and batch verification.
+
+---
+
+## 6. Boundary: Three Ingress Points, One Codification Target
+
+`clean-pom-crafter` is the codification layer — it owns Page Class design and
+the zero-raw-locator discipline. Test *sources* arrive from three siblings and
+must not be re-invented here:
+
+| Source skill | Input | Hands over |
+| :--- | :--- | :--- |
+| `gherkin-to-suite` | `.feature` BDD specs | Test matrix + Universal IR |
+| `lam-script-generator` | User stories / acceptance criteria | Action-sequence script skeletons |
+| `playwright-live-interaction` | Live DOM/AOM survey | Verified selector contracts |
+
+Rule: upstream skills produce intents and IR; **only this skill** turns them
+into Page Classes with real locators (with `playwright-live-interaction`
+supplying the verified selectors).

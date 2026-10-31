@@ -89,3 +89,15 @@ Exit codes: `0` = compiled (warnings allowed) · `1` = parse/authoring errors
   Examples blocks, tags, data tables).
 - `examples/suite_report_sample.json` — trimmed JSON report shape emitted to
   `reports/gherkin_suite_report.json`.
+
+---
+
+## 8. Boundary vs `lam-script-generator` and `clean-pom-crafter`
+
+- **This skill** = deterministic `.feature` → test matrix/IR compiler (0 LLM
+  tokens). Prefer it whenever BDD specs already exist.
+- **`lam-script-generator`** is the LLM-reasoning path for stories that are NOT
+  in Gherkin form; feed this skill's Universal IR to it when codification needs
+  story-level reasoning.
+- **`clean-pom-crafter`** receives the matrix/IR from either path and owns all
+  Page Class + locator decisions — this skill never emits raw selectors.

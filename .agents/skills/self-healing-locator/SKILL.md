@@ -70,3 +70,17 @@ Execute this compact JavaScript probe via Playwright or Chrome DevTools to locat
 1. **Verify Uniqueness:** Ensure the candidate locator matches exactly 1 element on the live DOM.
 2. **Encapsulate in Page Class:** Update the locator constant or private selector inside the relevant Page Class (e.g. `BasePage` or domain Page Class).
 3. **Never Leak to Test Scripts:** Test scripts must remain 100% clean of raw selectors.
+
+---
+
+## 5. Boundary vs `failure-autopsy-and-healing`
+
+- **This skill** = a locator-repair cascade (cache → testid → text-semantic →
+  geometric relative match), used when the diagnosis "stale/broken locator"
+  is ALREADY established. It takes a broken selector plus a DOM snapshot and
+  returns healed candidates with confidence scores.
+- **`failure-autopsy-and-healing`** = the upstream diagnosis that decides WHEN
+  this skill is needed (it also handles every non-locator failure class this
+  skill does not touch).
+- Chain of custody: autopsy RCA → "locator drift" verdict → this skill repairs
+  → autopsy re-runs the healed test to close the loop.
