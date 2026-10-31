@@ -348,6 +348,24 @@ def cmd_update(args):
     update_sentinel.perform_update()
 
 
+def cmd_tokens(args):
+    import count_tokens
+    sys.argv = [sys.argv[0]] + (sys.argv[2:] if len(sys.argv) > 2 else [])
+    count_tokens.main()
+
+
+def cmd_dashboard(args):
+    import dashboard_generator
+    sys.argv = [sys.argv[0]] + (sys.argv[2:] if len(sys.argv) > 2 else [])
+    dashboard_generator.main()
+
+
+def cmd_watch(args):
+    import watch_mode
+    sys.argv = [sys.argv[0]] + (sys.argv[2:] if len(sys.argv) > 2 else [])
+    watch_mode.main()
+
+
 def _hub_version():
     manifest_path = os.path.join(REPO_ROOT, "skills_manifest.json")
     version = "2.3.0"
@@ -549,6 +567,38 @@ def main():
     # verify-author (Author Provenance & Anti-Tamper Integrity Guard)
     p_author = subparsers.add_parser("verify-author", help="Verify author attribution, provenance, and anti-tamper integrity")
     p_author.set_defaults(func=cmd_verify_author)
+
+    # tokens (Cross-Platform Token & Cost Auditor)
+    p_tokens = subparsers.add_parser("tokens", help="Audit token usage and estimated API cost across Antigravity, Cursor, and Claude Code")
+    p_tokens.add_argument("--platform", "-p", choices=["auto", "antigravity", "cursor", "claude", "all"], default="auto", help="AI platform to audit (default: auto)")
+    p_tokens.add_argument("--session", type=str, help="Specific session ID or index to audit")
+    p_tokens.add_argument("--current", action="store_true", help="Audit current active conversation")
+    p_tokens.add_argument("--last", action="store_true", help="Audit previous completed session (default)")
+    p_tokens.add_argument("--last-task", action="store_true", help="Audit specifically the last turn of target session")
+    p_tokens.add_argument("--turns", action="store_true", help="Show full turn-by-turn breakdown table")
+    p_tokens.add_argument("--rolling", "--budget", action="store_true", dest="rolling", help="Show 5-hour and 7-day rolling window quota & remaining tokens")
+    p_tokens.add_argument("--savings", action="store_true", help="Show Hub vs. Non-Hub token and cost savings comparison")
+    p_tokens.add_argument("--header", action="store_true", help="Print Pre-Flight confirmation block lines")
+    p_tokens.add_argument("--list", action="store_true", help="List recent conversations")
+    p_tokens.add_argument("--pricing", choices=["gemini-flash", "gemini-pro", "claude-sonnet", "claude-opus", "gpt-4o", "gpt-4o-mini"], default=None, help="Model pricing basis (default: auto-detected)")
+    p_tokens.add_argument("--json", action="store_true", help="Output machine-readable JSON format")
+    p_tokens.add_argument("--file", type=str, help="Direct path to a transcript.jsonl file")
+    p_tokens.set_defaults(func=cmd_tokens)
+
+    # dashboard (Standalone One-Page HTML Executive Dashboard)
+    p_dashboard = subparsers.add_parser("dashboard", help="Generate standalone one-page executive HTML dashboard (zero CDN deps)")
+    p_dashboard.add_argument("target", nargs="?", default=None, help="Target repository directory (default: current or Hub)")
+    p_dashboard.add_argument("--output", "-o", help="Output HTML file path (default: <target>/reports/PROJECT_DASHBOARD.html)")
+    p_dashboard.add_argument("--open", action="store_true", help="Automatically open generated dashboard in default browser")
+    p_dashboard.add_argument("--json", action="store_true", help="Print summary JSON to stdout")
+    p_dashboard.set_defaults(func=cmd_dashboard)
+
+    # watch (Real-Time Incremental Watch Mode Sentinel)
+    p_watch = subparsers.add_parser("watch", help="Real-Time incremental watch mode & test engineering HUD (< 100ms feedback)")
+    p_watch.add_argument("target", nargs="?", default=".", help="Directory to monitor (default: current directory)")
+    p_watch.add_argument("--debounce", type=float, default=0.8, help="Debounce interval in seconds (default: 0.8)")
+    p_watch.add_argument("--once", action="store_true", help="Run incremental scan once on all files and exit")
+    p_watch.set_defaults(func=cmd_watch)
 
     args, unknown = parser.parse_known_args()
     if getattr(args, "offline", False):

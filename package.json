@@ -58,6 +58,8 @@
     "setup": "node ./bin/agent-qa.js setup",
     "analyze": "node ./bin/agent-qa.js analyze",
     "lint": "node ./bin/agent-qa.js lint",
+    "dashboard": "node ./bin/agent-qa.js dashboard",
+    "watch": "node ./bin/agent-qa.js watch",
     "test": "python3 -m unittest discover tests -p 'test_*.py'",
     "bump": "python3 tools/bump_version.py",
     "bump:minor": "python3 tools/bump_version.py minor",

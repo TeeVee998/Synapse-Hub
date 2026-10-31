@@ -1316,6 +1316,113 @@ class TestToolsIntegrityAndBehavior(unittest.TestCase):
             if os.path.exists(temp_xlsx):
                 os.remove(temp_xlsx)
 
+    def test_dashboard_generator_functional(self):
+        """Validates that dashboard_generator compiles HTML for both Hub and Target project modes."""
+        import dashboard_generator
+        with tempfile.NamedTemporaryFile("w", suffix=".html", delete=False, encoding="utf-8") as f:
+            temp_html = f.name
+
+        try:
+            # 1. Hub Mode test
+            out_file = dashboard_generator.generate_dashboard(
+                target_dir=REPO_ROOT,
+                output_path=temp_html,
+                open_browser=False
+            )
+            self.assertTrue(os.path.exists(out_file))
+            with open(out_file, "r", encoding="utf-8") as fp:
+                content = fp.read()
+            self.assertIn("Enterprise QA Executive Dashboard", content)
+            self.assertIn("9 Quality Gates", content)
+            self.assertIn("Synapse-Hub", content)
+            self.assertIn("Specialized AI Agent Skills Catalog", content)
+
+            # 2. Target Project Mode test
+            target_tmp = tempfile.mkdtemp(prefix="target_suite_")
+            try:
+                os.makedirs(os.path.join(target_tmp, "tests"))
+                with open(os.path.join(target_tmp, "playwright.config.ts"), "w") as tf:
+                    tf.write("export default {};")
+                with open(os.path.join(target_tmp, "tests", "smoke.spec.ts"), "w") as tf:
+                    tf.write("// smoke test")
+
+                target_out = os.path.join(target_tmp, "reports", "PROJECT_DASHBOARD.html")
+                dashboard_generator.generate_dashboard(target_dir=target_tmp, open_browser=False)
+                self.assertTrue(os.path.exists(target_out))
+                with open(target_out, "r", encoding="utf-8") as fp:
+                    target_content = fp.read()
+                self.assertIn("TARGET PROJECT", target_content)
+                self.assertIn("Playwright Test", target_content)
+                self.assertIn("smoke.spec", target_content)
+            finally:
+                import shutil
+                if os.path.exists(target_tmp):
+                    shutil.rmtree(target_tmp)
+        finally:
+            if os.path.exists(temp_html):
+                os.remove(temp_html)
+
+    def test_watch_mode_functional(self):
+        """Validates that watch_mode runs incremental audits and --once scan cleanly."""
+        import watch_mode
+        license_file = os.path.join(REPO_ROOT, "LICENSE")
+        self.assertFalse(watch_mode.check_file_bom(license_file))
+        self.assertEqual(watch_mode.check_forbidden_paths(license_file), [])
+
+        audit_res = watch_mode.run_incremental_audit(license_file, REPO_ROOT)
+        self.assertTrue(audit_res["bom_pass"])
+        self.assertTrue(audit_res["path_pass"])
+        self.assertTrue(audit_res["lint_pass"])
+
+        # Run scan once mode on current repo
+        exit_code = watch_mode.watch_directory(REPO_ROOT, run_once=True)
+        self.assertEqual(exit_code, 0)
+
+    def test_count_tokens_multi_platform(self):
+        """Validates count_tokens multi-platform adapters for Antigravity, Cursor, and file sniffer."""
+        import count_tokens
+        # 1. Token estimation
+        self.assertGreater(count_tokens.estimate_tokens("Hello world!"), 0)
+        self.assertGreater(count_tokens.estimate_tokens("Kiểm thử tự động tiếng Việt"), 5)
+
+        # 2. Antigravity sessions discovery
+        antigravity_sessions = count_tokens.AntigravityAdapter.get_sessions()
+        self.assertIsInstance(antigravity_sessions, list)
+
+        # 3. Cursor sessions discovery
+        cursor_sessions = count_tokens.CursorAdapter.get_sessions()
+        self.assertIsInstance(cursor_sessions, list)
+
+        # 4. Sniffer detection
+        with tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False, encoding="utf-8") as f:
+            f.write('{"source":"USER_EXPLICIT","type":"USER_INPUT","content":"<USER_REQUEST>Hi</USER_REQUEST>"}\n')
+            f.write('{"source":"MODEL","type":"PLANNER_RESPONSE","input_tokens":100,"cache_read_tokens":50,"output_tokens":20}\n')
+            temp_antigravity = f.name
+
+        with tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False, encoding="utf-8") as f:
+            f.write('{"role":"user","message":{"content":[{"type":"text","text":"<user_query>Hello</user_query>"}]}}\n')
+            temp_cursor = f.name
+
+        try:
+            self.assertEqual(count_tokens.detect_platform_from_file(temp_antigravity), "antigravity")
+            self.assertEqual(count_tokens.detect_platform_from_file(temp_cursor), "cursor")
+
+            # Parse temporary Antigravity file
+            parsed_a = count_tokens.AntigravityAdapter.parse_transcript(temp_antigravity)
+            self.assertEqual(parsed_a["input_tokens"], 100)
+            self.assertEqual(parsed_a["output_tokens"], 20)
+
+            # Parse temporary Cursor file
+            parsed_c = count_tokens.CursorAdapter.parse_transcript(temp_cursor)
+            self.assertEqual(parsed_c["platform"], "cursor")
+            self.assertEqual(parsed_c["turns_count"], 1)
+        finally:
+            if os.path.exists(temp_antigravity):
+                os.remove(temp_antigravity)
+            if os.path.exists(temp_cursor):
+                os.remove(temp_cursor)
+
+
 
 if __name__ == "__main__":
     unittest.main()

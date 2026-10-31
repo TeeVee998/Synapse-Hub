@@ -5,20 +5,30 @@
 
 ---
 
-## 0. CONTEXT-AWARE PRE-FLIGHT CONFIRMATION BLOCK (CODE & TEST ACTIONS ONLY)
+## 0. CONTEXT-AWARE EXECUTION & DUAL-TELEMETRY BLOCKS (HEADER & FOOTER STRUCTURE)
 
-> **Trigger Condition:** This confirmation block is **MANDATORY ONLY** when executing technical tasks: generating code, editing test scripts, refactoring Page Classes, or executing runner tools.  
-> **Conversational Exemption:** For general discussions, architecture questions, planning, and Q&A, **DO NOT emit this block** — respond directly and concisely.  
-> **Dynamic Context:** The architecture and technique fields must adapt dynamically to the target project's `PROJECT_AI_GUIDE.md` (e.g., Playwright/TS, Clean POM/Groovy, Pytest/Python, REST API).
+> **Cấu trúc 2 Khối Tách biệt (Bắt buộc):**  
+> 1. **Khối Ngữ cảnh Skill (Header Block):** Đặt ở **ĐẦU MỖI PHẢN HỒI** để xác nhận ngay skill đã tải, kiến trúc, công nghệ và kỷ luật áp dụng. Tuyệt đối **không ghi chữ `[OK]`**.  
+> 2. **Khối Chi phí & Kế hoạch (Footer Telemetry Block):** Đặt ở **CUỐI MỖI PHẢN HỒI** (phân cách bằng `---`) để báo cáo hạn mức token, chi phí lượt vừa chạy, tỷ lệ cache hit, mức tiết kiệm và kế hoạch tiếp theo. Tuyệt đối **không ghi chữ `[OK]`**.  
+> **Dynamic Context:** Các trường kiến trúc và công nghệ phải thích ứng linh hoạt theo `PROJECT_AI_GUIDE.md` của dự án mục tiêu.
 
+### A. Khối Ngữ cảnh Đầu Phản hồi (Header Placement):
 ```markdown
-> ✅ **[OK] Skill Hub Loaded:** `agent-skills` & Project Guide (`PROJECT_AI_GUIDE.md`)  
-> 🏛️ **[OK] Architecture:** <Target Architecture, e.g.: Clean POM / Flat Architecture>  
-> ⚡ **[OK] Target Tech:** <Actual Project Tech, e.g.: Playwright Live / API Mocking / Pytest>  
-> 🛡️ **[OK] Discipline:** Truth Anchor (No Fake Pass) + Zero-Token Error Blacklist  
-> 🎯 **[OK] Execution Plan:**  
-> • <Immediate Action Item 1>  
-> • <Immediate Action Item 2>  
+> ✅ **Đã tải Skill Hub:** `agent-skills` & Hướng dẫn dự án (`PROJECT_AI_GUIDE.md`)  
+> 🏛️ **Kiến trúc:** <Kiến trúc mục tiêu, vd: Clean POM / Flat Architecture>  
+> ⚡ **Công nghệ:** <Công nghệ thực tế, vd: Playwright Live / API Mocking / Pytest>  
+> 🛡️ **Kỷ luật:** Truth Anchor (Không Fake Pass) + Zero-Token Error Blacklist  
+```
+
+### B. Khối Chi phí & Kế hoạch Cuối Phản hồi (Footer Placement):
+```markdown
+---
+> 📊 **Hạn mức Token:** 5 Giờ: Đã dùng <5h_used> / <5h_budget> (Còn lại <5h_rem>) ┃ 7 Ngày: Đã dùng <7d_used> / <7d_budget> (Còn lại <7d_rem>) ┃ Cache Hit: <hit_rate>%  
+> 🎯 **Task vừa xong (Turn #<turn>: "<yêu cầu>"):** <steps> steps | In: <in> | Cache: <cache> | Out: <out> | 🔥 Tổng: <total> token | 💰 Chi phí: $<cost> (~<vnd> VNĐ)  
+> 💡 **Tiết kiệm nhờ Hub:** -<savings_pct>% chi phí (~<saved_tokens> token / $<saved_cost> đã tiết kiệm vs. Không dùng Hub)  
+> 📋 **Kế hoạch tiếp theo:**  
+> • <Hành động kế tiếp 1>  
+> • <Hành động kế tiếp 2>  
 ```
 
 ---

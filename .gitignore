@@ -36,6 +36,7 @@ htmlcov/
 *.spec
 omni-qc.spec
 .sandbox_snapshots/
+.zcode/
 tools/memory_cache.db
 tools/repo_map.txt
 tools/repo_map.json

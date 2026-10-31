@@ -58,6 +58,9 @@
 | **Linting Markdown documentation quality** | `tools/lint_ai_docs.py` | `python tools/lint_ai_docs.py` |
 | **Auditing AI Agent Skills & MCP Security** | `tools/skillspector.py` | `python tools/skillspector.py [path]` (or `agent-qa skillspector [path]` / `npx synapse-hub skillspector`) |
 | **Author Provenance & Anti-Tamper Integrity Guard** | `tools/author_integrity.py` | `python tools/author_integrity.py` (or `agent-qa verify-author` / `verify_all Gate 0`) |
+| **Cross-Platform Token & Cost Auditor (Antigravity / Cursor / Claude)** | `tools/count_tokens.py` | `python tools/count_tokens.py` (or `--platform cursor` / `--platform all --list` / `--file <path>`) |
+| **Standalone Executive HTML Dashboard Generator** | `tools/dashboard_generator.py` | `python tools/dashboard_generator.py` (or `agent-qa dashboard [--open]`) |
+| **Real-Time Incremental Watch Mode Sentinel** | `tools/watch_mode.py` | `python tools/watch_mode.py` (or `agent-qa watch [--once]`) |
 | **Upstream Version Check & 1-Click Self-Update** | `tools/update_sentinel.py` | `python tools/update_sentinel.py --check / --update` (or `agent-qa update` / `npx synapse-hub update`) |
 
 ---
@@ -428,4 +431,78 @@ agent-qa update
 
   # 3. Direct python execution
   python3 tools/md_to_xlsx.py path/to/cases.md -o export.xlsx
+  ```
+
+---
+
+### 38. `tools/count_tokens.py` (Cross-Platform Token & Cost Auditor)
+- **Purpose:** Audits and calculates token usage (Uncached Input, KV Cache Read, and Output/Thinking tokens) and estimated API costs across **Google Antigravity, Cursor Agent, and Claude Code**. Supports turn-by-turn breakdown, per-prompt profiling, multi-client session discovery, and cache hit rate tracking.
+- **Trigger Condition:** On-demand after completing a task, turn, or test run to monitor context efficiency, detect token bloat, or calculate LLM cost across any supported AI client.
+- **CLI Syntax:**
+  ```bash
+  # 1. Audit active Antigravity session
+  agent-qa tokens
+  python3 tools/count_tokens.py
+
+  # 2. Audit Cursor Agent sessions (parses ~/.cursor/projects/*/agent-transcripts/*/*.jsonl)
+  python3 tools/count_tokens.py --platform cursor
+  python3 tools/count_tokens.py --platform cursor --last-task
+  python3 tools/count_tokens.py --platform cursor --turns
+
+  # 3. List recent sessions across all platforms (Antigravity, Cursor, Claude)
+  python3 tools/count_tokens.py --platform all --list
+
+  # 4. Direct audit of any transcript file with auto-format detection
+  python3 tools/count_tokens.py --file /path/to/transcript.jsonl
+
+  # 5. Audit current active session (Antigravity)
+  agent-qa tokens --current
+
+  # 6. Show 5-hour and 7-day rolling window quota usage
+  agent-qa tokens --rolling
+
+  # 7. Benchmark Hub vs. Vanilla token & cost savings
+  agent-qa tokens --savings
+
+  # 8. Calculate cost with specific pricing model (gemini-flash, gemini-pro, claude-sonnet, claude-opus, gpt-4o, gpt-4o-mini)
+  agent-qa tokens --pricing claude-sonnet
+
+  # 9. Output machine-readable JSON
+  agent-qa tokens --json
+  ```
+
+---
+
+### 39. `tools/dashboard_generator.py` (Standalone Executive HTML Dashboard)
+- **Purpose:** Compiles project health metrics, 9 Quality Gates status, AST repository maps, benchmark results, and skills inventory into a single, dependency-free, modern HTML dashboard (`PROJECT_DASHBOARD.html`).
+- **Trigger Condition:** On-demand when presenting project status to stakeholders, QA leads, or managers, or after completing project analysis/audits.
+- **CLI Syntax:**
+  ```bash
+  # 1. Generate dashboard for current project
+  agent-qa dashboard
+  python3 tools/dashboard_generator.py
+
+  # 2. Generate and open directly in browser
+  agent-qa dashboard --open
+
+  # 3. Output to custom path
+  agent-qa dashboard -o reports/custom_dashboard.html
+  ```
+
+---
+
+### 40. `tools/watch_mode.py` (Real-Time Incremental Watch Mode Sentinel)
+- **Purpose:** Continuously monitors repository files for code changes and triggers near-instant (< 100ms) incremental verification (UTF-8 No BOM, absolute machine paths, AST Meta Infer-style fake-pass checks) with an interactive terminal Heads-Up Display (HUD).
+- **Trigger Condition:** During active test development or refactoring sessions to get immediate feedback without manually running commands.
+- **CLI Syntax:**
+  ```bash
+  # 1. Start real-time watch mode on current directory
+  agent-qa watch
+  python3 tools/watch_mode.py
+
+  # 2. Watch with custom debounce interval
+  agent-qa watch --debounce 0.5
+
+  # 3. Run incremental scan once on all files and exit (ideal for CI/CD pre-commit hooks)
+  agent-qa watch --once
   ```
