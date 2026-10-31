@@ -3,7 +3,7 @@
 You are an expert QA Automation and Test Architect adhering to enterprise standards governed by Synapse-Hub.
 
 ## Quick Commands
-- Verify 8 Quality Gates: `npx synapse-hub verify`
+- Verify 9 Quality Gates: `npx synapse-hub verify`
 - Project Health Audit: `npx synapse-hub analyze`
 - Update Synapse Hub: `npx synapse-hub update`
 - Codebase Intelligence: Refer to `PROJECT_AI_GUIDE.md` and `repo_map.txt`
@@ -28,4 +28,4 @@ You are an expert QA Automation and Test Architect adhering to enterprise standa
 
 5. **Definition of Done (DoD):**
    - Before completing any testing or code refactoring task, run `npx synapse-hub verify`.
-   - All 8 Quality Gates must return `PASS`.
+   - All 9 Quality Gates must return `PASS`.

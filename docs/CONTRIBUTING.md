@@ -32,7 +32,7 @@ powershell -ExecutionPolicy Bypass -File scripts/lint_skills.ps1
 # 2. Run automated test suite for Python engine tools
 python -m unittest discover -s tests -p "test_*.py"
 
-# 3. Verify all 8 Quality Gates
+# 3. Verify all 9 Quality Gates
 python tools/verify_all.py
 ```
 

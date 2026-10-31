@@ -140,7 +140,7 @@ def generate_pr_draft(
 #### 3. Verification Checklist
 - [x] Confidence score meets threshold ($\ge 90\%$)
 - [x] Tested with `python tools/test_impact.py` on impacted test cases
-- [x] 8 Quality Gates DoD satisfied
+- [x] 9 Quality Gates DoD satisfied
 {checklist_trace}{evidence_markdown}
 """
     return {

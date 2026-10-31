@@ -127,7 +127,7 @@ def run_tests() -> bool:
     if res_verify.returncode != 0:
         print("❌ Quality Gates failed! Aborting release.")
         return False
-    print("✅ 8 Quality Gates DoD PASSED.")
+    print("✅ 9 Quality Gates DoD PASSED.")
     return True
 
 def git_commit_and_tag(version: str, push: bool = False):

@@ -3,5 +3,6 @@
 # Optional vision and canvas diffing dependencies:
 Pillow>=13.0.0
 
-# Dev/test dependencies (run local test suite: .venv/bin/python -m pytest tests/ -q)
+# Dev/test dependencies (run local test suite: ~/.venvs/synapse-hub/bin/python -m pytest tests/ -q)
 pytest>=8.0
+openpyxl>=3.1

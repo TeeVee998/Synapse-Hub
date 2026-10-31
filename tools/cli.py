@@ -414,7 +414,7 @@ def main():
     p_analyze.set_defaults(func=cmd_analyze)
 
     # verify
-    p_verify = subparsers.add_parser("verify", help="Execute 7 Quality Gates DoD Verification")
+    p_verify = subparsers.add_parser("verify", help="Execute 9 Quality Gates DoD Verification")
     p_verify.set_defaults(func=cmd_verify)
 
     # lint

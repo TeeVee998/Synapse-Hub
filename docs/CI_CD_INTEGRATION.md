@@ -21,7 +21,7 @@ on:
 
 jobs:
   quality-gate:
-    name: 8 Quality Gates DoD Verification
+    name: 9 Quality Gates DoD Verification
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Project Source
@@ -35,7 +35,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Verify 8 Quality Gates
+      - name: Verify 9 Quality Gates
         run: npx synapse-hub verify
 ```
 
@@ -88,7 +88,7 @@ agent-qa verify
 
 | Command | Purpose | SLA / Exit Code |
 | :--- | :--- | :--- |
-| `npx synapse-hub verify` | Executes all 8 Quality Gates DoD | Exits `0` if all PASS; non-zero if any FAIL. |
+| `npx synapse-hub verify` | Executes all 9 Quality Gates DoD | Exits `0` if all PASS; non-zero if any FAIL. |
 | `npx synapse-hub lint` | Meta Infer-style static defect and fake-pass scan | Fails if 0-assert tests or empty catches exist. |
 | `npx synapse-hub mutate --min-score 80` | AST Micro-Mutation verification | Fails if test assertion score < 80%. |
 | `npx synapse-hub analyze` | Comprehensive 5-in-1 health audit | Outputs health score and JSON/Markdown artifacts. |

@@ -31,7 +31,7 @@ This rule governs all AI Agents operating on the repository. It mandates strict 
      ```bash
      python3 tools/verify_all.py
      ```
-   - All 8 Gates must return `PASS`. If any gate fails, the task is NOT complete.
+   - All 9 Gates must return `PASS`. If any gate fails, the task is NOT complete.
 2. **Targeted Re-Test:**
    - After modifying Page Classes, check impacted Test Cases with:
      ```bash
@@ -61,7 +61,7 @@ This rule governs all AI Agents operating on the repository. It mandates strict 
 | **Dispatching Browser Actions (Live/CDP)** | `python3 tools/safety_firewall.py --dry-run` | Mandatory Pre-execution Hook: Block irreversible/destructive operations before browser dispatch. |
 | **Creating or updating Test Scripts** | `python3 tools/infer_linter.py` | Run AST scan for Fake-Pass (0 asserts) and empty catch blocks. |
 | **New/Modified Test Case Quality** | `python3 tools/micro_mutator.py --min-score 80` | AST Mutation Testing: Reject test suites with mutation score < 80%. |
-| **Before Git Commit or Completing Task** | `python3 tools/verify_all.py` | Validate all 8 Quality Gates DoD. |
+| **Before Git Commit or Completing Task** | `python3 tools/verify_all.py` | Validate all 9 Quality Gates DoD. |
 | **After modifying Page Classes** | `python3 tools/test_impact.py --git-diff` | Scope impacted test cases; avoid re-running entire test suites. |
 | **When Test FAILS in CLI/KRE** | `python3 tools/pinpoint_failure.py` | Parse JUnit XML to identify exact failing line and exception in 0.1s. |
 | **When CLI / Gradle logs are verbose** | `python3 tools/distill_log.py <log>` | Filter 95% noise; preserve only actionable stacktraces and pointers. |

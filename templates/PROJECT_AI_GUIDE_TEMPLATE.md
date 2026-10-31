@@ -51,7 +51,7 @@
   ```bash
   [e.g., npx playwright test tests/e2e/login.spec.ts]
   ```
-- **Execute 8 Quality Gates Verification:**
+- **Execute 9 Quality Gates Verification:**
   ```bash
   npx synapse-hub verify
   # or
@@ -68,7 +68,7 @@ This repository supports multi-agent and multi-IDE automation natively through S
 - **GitHub Copilot:** Custom system instructions at `.github/copilot-instructions.md`.
 - **Windsurf (Cascade):** Automation invariants at `.windsurfrules`.
 
-All bridges enforce Clean POM, Truth Anchor, and 8 Quality Gates DoD automatically.
+All bridges enforce Clean POM, Truth Anchor, and 9 Quality Gates DoD automatically.
 
 ---
 

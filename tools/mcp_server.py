@@ -48,7 +48,7 @@ SERVER_VERSION = "2.3.0"
 MCP_TOOLS = [
     {
         "name": "verify_all_gates",
-        "description": "Validates the 8 Quality Gates Definition of Done (UTF-8, paths, Clean POM, AI docs, blacklist, security, infer linter, micro-mutator).",
+        "description": "Validates the 9 Quality Gates Definition of Done (author attribution, UTF-8, paths, Clean POM, AI docs, blacklist, security, infer linter, micro-mutator).",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -260,7 +260,7 @@ def handle_tool_call(name: str, arguments: Dict[str, Any]) -> str:
             results.append(f"{g_name}: {'PASS' if res else 'FAIL'}")
             if not res:
                 passed = False
-        summary = "100% ALL 8 GATES PASSED" if passed else "VERIFICATION FAILED"
+        summary = "100% ALL 9 GATES PASSED" if passed else "VERIFICATION FAILED"
         return f"[{summary}]\n" + "\n".join(results)
 
     elif name == "analyze_project":

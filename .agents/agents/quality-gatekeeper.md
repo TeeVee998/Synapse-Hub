@@ -1,6 +1,6 @@
 ---
 name: quality-gatekeeper
-description: Sentinel gatekeeper enforcing 8 Quality Gates, AST mutation thresholds (>= 80%), and static verification before task completion.
+description: Sentinel gatekeeper enforcing 9 Quality Gates, AST mutation thresholds (>= 80%), and static verification before task completion.
 skills:
   - antigravity-test-sentinel
   - code-refactoring-refactor-clean

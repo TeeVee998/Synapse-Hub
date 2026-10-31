@@ -31,7 +31,7 @@ AI Agents execute the clean standard Git workflow within the target project:
 ### Step 1: Pre-Push Verification (DoD Gate)
 Run the project's quality verification gate or test suite before committing:
 ```bash
-# Example: 7 Quality Gates verification or project test runner
+# Example: 9 Quality Gates verification or project test runner
 python tools/verify_all.py  # or npm test / npx playwright test
 ```
 *Never push unverified code or broken tests.*

@@ -8,7 +8,7 @@ on:
 
 jobs:
   quality-gate:
-    name: 8 Quality Gates DoD Verification
+    name: 9 Quality Gates DoD Verification
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Project Source

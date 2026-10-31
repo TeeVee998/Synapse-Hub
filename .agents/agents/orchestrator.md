@@ -47,4 +47,4 @@ tools:
 2. **Stage 2 (Synthesis):** Pass Data Contract to `pom-crafter` to generate Clean POM classes and flat test scripts.
 3. **Stage 3 (Execution):** Dispatch headless execution via `test-runner`.
 4. **Stage 4 (Autopsy):** If test fails, invoke `failure-analyst` to perform RCA and auto-heal.
-5. **Stage 5 (Acceptance):** Trigger `quality-gatekeeper` to verify all 8 Quality Gates and mutation score >= 80%.
+5. **Stage 5 (Acceptance):** Trigger `quality-gatekeeper` to verify all 9 Quality Gates and mutation score >= 80%.

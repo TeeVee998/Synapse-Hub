@@ -81,7 +81,7 @@
      * Breaking API change suspected -> Run `tools/api_drift_sentinel.py`.
      * Parallel CI/CD runner setup needed -> Run `tools/matrix_sharder.py`.
      * Verifying test assertion quality -> Run `tools/micro_mutator.py` (reject if Mutation Score < 80%).
-     * Before completing code tasks -> Autonomously run `tools/verify_all.py` (8 Quality Gates DoD).
+     * Before completing code tasks -> Autonomously run `tools/verify_all.py` (9 Quality Gates DoD).
 
 ---
 
@@ -100,7 +100,7 @@ This repository defines specialized multi-agent profiles (configured in `.agents
 5. **Failure Autopsy Analyst (`failure-analyst`):**
    - Performs closed-loop diagnosis (`auto_heal.py`), auto-generates Jira/Markdown bug tickets with RCA (`bug_reporter.py`), executes CI self-healing & PR drafting (`ci_healing_hook.py`, `heal_pr_automator.py`), and resolves fixes from SQLite memory (`cache_resolver.py`).
 6. **Quality Gatekeeper & Sentinel (`quality-gatekeeper`):**
-   - Enforces 8 Quality Gates (`verify_all.py`), scans fake passes (`infer_linter.py`), injects AST micro-mutants (`micro_mutator.py` requiring >= 80% mutation score), audits visual regression masks (`smart_visual_masker.py`), and checks DB leaks (`trace_data_flow.py`).
+   - Enforces 9 Quality Gates (`verify_all.py`), scans fake passes (`infer_linter.py`), injects AST micro-mutants (`micro_mutator.py` requiring >= 80% mutation score), audits visual regression masks (`smart_visual_masker.py`), and checks DB leaks (`trace_data_flow.py`).
 
 ### 4.1 SINGLE FRONT-DOOR PROTOCOL & DETERMINISTIC FSM WORKFLOW
 
@@ -117,7 +117,7 @@ flowchart TD
         Stage2["<b>Stage 2: Code Synthesis</b><br/>• Subagent: pom-crafter<br/>• Clean POM + Flat Architecture<br/>• Zero XPaths in scripts"]
         Stage3["<b>Stage 3: Headless Execution</b><br/>• Subagent: test-runner<br/>• Run headless CLI + distill logs<br/>• Output Pass/Fail status"]
         Stage4["<b>Stage 4: Failure Autopsy & Healing</b><br/>• Subagent: failure-analyst<br/>• Activated ONLY if Stage 3 Fails<br/>• In-place healing via JUnit XML/Screenshot"]
-        Stage5["<b>Stage 5: Final Acceptance (DoD)</b><br/>• Subagent: quality-gatekeeper<br/>• 8 Quality Gates + Mutation Score >= 80%<br/>• Task Done"]
+        Stage5["<b>Stage 5: Final Acceptance (DoD)</b><br/>• Subagent: quality-gatekeeper<br/>• 9 Quality Gates + Mutation Score >= 80%<br/>• Task Done"]
         
         Stage1 --> Stage2 --> Stage3
         Stage3 -->|Pass| Stage5
@@ -145,7 +145,7 @@ flowchart TD
 All quality control and audit tasks are dispatched via scripts in `tools/` (Refer to `tools/TOOLS_RUNBOOK.md`):
 
 ```bash
-# 1. Run 8 Quality Gates Verification
+# 1. Run 9 Quality Gates Verification
 python tools/verify_all.py
 
 # 2. Run AST linter for fake passes and empty catches
