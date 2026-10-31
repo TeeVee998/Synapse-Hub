@@ -1,6 +1,6 @@
 ---
 name: e2e-testing-patterns
-description: "Design robust multi-browser E2E test architectures, parallel sharding, and retry governance."
+description: "Design robust multi-browser E2E test architectures, parallel sharding, and retry governance. Use when designing end-to-end test suites for web applications."
 ---
 
 # E2E Testing Architectural Patterns

@@ -1,6 +1,6 @@
 ---
 name: backend-load-and-stress-patterns
-description: "Orchestrate k6, Locust, and JMeter backend load, stress, and SLA endurance test suites."
+description: "Orchestrate k6, Locust, and JMeter backend load, stress, and SLA endurance test suites. Use when designing load, stress, or spike test patterns for backend systems."
 ---
 
 # Backend Load & Performance Testing Skill

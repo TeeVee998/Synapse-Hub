@@ -1,6 +1,6 @@
 ---
 name: github-actions-templates
-description: "Create production-ready GitHub Actions workflows for automated test suites and CI/CD."
+description: "Create production-ready GitHub Actions workflows for automated test suites and CI/CD. Use when wiring test pipelines, matrix shards, or quality gates into GitHub Actions."
 ---
 
 # GitHub Actions CI/CD Patterns for Test Automation

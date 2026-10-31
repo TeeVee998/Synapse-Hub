@@ -1,6 +1,6 @@
 ---
 name: bats-testing-patterns
-description: "Test bash/sh scripts, CLI tools, and CI/CD pipelines with Bats."
+description: "Test bash/sh scripts, CLI tools, and CI/CD pipelines with Bats. Use when writing Bash automation tests with the BATS framework."
 ---
 
 # Bats Testing Patterns (Bash Automated Testing System)

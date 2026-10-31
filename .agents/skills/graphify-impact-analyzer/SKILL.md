@@ -1,6 +1,6 @@
 ---
 name: graphify-impact-analyzer
-description: "Analyze code change blast radius and scope impacted test cases via AST."
+description: "Analyze code change blast radius and scope impacted test cases via AST. Use when analyzing the blast radius of code changes via dependency graphs."
 ---
 
 # Graphify Impact Analyzer — AST Knowledge Graph Navigation & Zero-Waste Impact Analysis

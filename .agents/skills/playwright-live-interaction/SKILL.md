@@ -1,6 +1,6 @@
 ---
 name: playwright-live-interaction
-description: "Probe live web DOM/AOM and verify selectors under 200ms using headless Playwright."
+description: "Probe live web DOM/AOM and verify selectors under 200ms using headless Playwright. Use when probing live DOM/AOM, verifying selectors, or debugging a live browser session."
 ---
 
 # Playwright Live Interaction & Fast Debugging Handbook (Enterprise Web & Clean POM)

@@ -1,6 +1,6 @@
 ---
 name: flaky-test-sentinel-and-quarantine
-description: "Detect non-deterministic flaky tests, calculate flakiness scores, and manage quarantine."
+description: "Detect non-deterministic flaky tests, calculate flakiness scores, and manage quarantine. Use when detecting flaky tests and managing quarantine lifecycles."
 ---
 
 # Flaky Test Sentinel & Quarantine Protocol

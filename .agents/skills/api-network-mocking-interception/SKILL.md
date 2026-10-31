@@ -1,6 +1,6 @@
 ---
 name: api-network-mocking-interception
-description: "Intercept HTTP/GraphQL traffic, stub routes, and simulate chaos network failures."
+description: "Intercept HTTP/GraphQL traffic, stub routes, and simulate chaos network failures. Use when stubbing, mocking, or intercepting network calls during UI or API tests."
 ---
 
 # API Network Mocking, Interception & Resilience Skill

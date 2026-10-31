@@ -1,6 +1,6 @@
 ---
 name: auth-session-and-cookie-manager
-description: "Manage browser authentication sessions, storageState, JWT tokens, and multi-role state."
+description: "Manage browser authentication sessions, storageState, JWT tokens, and multi-role state. Use when managing login sessions, storage state, or cookie reuse across tests."
 ---
 
 # Auth Session & Cookie Manager Skill

@@ -1,6 +1,6 @@
 ---
 name: katalon-cli-runner
-description: "Execute headless Katalon and Gradle test runners with automatic driver cleanup."
+description: "Execute headless Katalon and Gradle test runners with automatic driver cleanup. Use when running Katalon suites headless or integrating KRE into CI/CD."
 ---
 
 # Katalon CLI & Enterprise Runner — Dual-Mode Execution Management

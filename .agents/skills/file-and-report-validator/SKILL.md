@@ -1,6 +1,6 @@
 ---
 name: file-and-report-validator
-description: "Validate downloaded and uploaded files (Excel, CSV, PDF) schemas and tabular integrity."
+description: "Validate downloaded and uploaded files (Excel, CSV, PDF) schemas and tabular integrity. Use when validating exported files or reports against a schema."
 ---
 
 # File & Report Validator Skill

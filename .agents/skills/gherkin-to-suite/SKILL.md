@@ -1,6 +1,6 @@
 ---
 name: gherkin-to-suite
-description: "Compile Gherkin .feature files into an expanded test matrix, hub Universal IR and a proven-vs-owed coverage-gap report with zero LLM tokens."
+description: "Compile Gherkin .feature files into an expanded test matrix, hub Universal IR and a proven-vs-owed coverage-gap report with zero LLM tokens. Use when the user supplies BDD .feature specs or wants a BDD suite audited before codification."
 ---
 
 # Gherkin to Suite Compiler — Natural-Language Test Ingestion (0-Token)

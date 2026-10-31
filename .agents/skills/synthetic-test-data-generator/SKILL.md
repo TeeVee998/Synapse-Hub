@@ -1,6 +1,6 @@
 ---
 name: synthetic-test-data-generator
-description: "Generate idempotent, boundary-value synthetic test data with unique runtime timestamps."
+description: "Generate idempotent, boundary-value synthetic test data with unique runtime timestamps. Use when generating idempotent, unique test data for creation tests."
 ---
 
 # Synthetic Test Data Generator & Edge-Case Fuzzing Skill

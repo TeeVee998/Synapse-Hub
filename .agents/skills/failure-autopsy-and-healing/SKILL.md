@@ -1,6 +1,6 @@
 ---
 name: failure-autopsy-and-healing
-description: "Triage test failures from JUnit XML/screenshots and heal broken Page Class locators."
+description: "Triage test failures from JUnit XML/screenshots and heal broken Page Class locators. Use when diagnosing failed test runs and producing closed-loop healing plans."
 ---
 
 # Failure Autopsy & Auto-Healing (Diagnostic & Self-Healing Engine)

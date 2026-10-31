@@ -1,6 +1,6 @@
 ---
 name: code-refactoring-refactor-clean
-description: "Eliminate technical debt and refactor code using SOLID and Clean Code patterns."
+description: "Eliminate technical debt and refactor code using SOLID and Clean Code patterns. Use when refactoring legacy test code toward clean, maintainable structures."
 ---
 
 # Refactor, Clean Code & Technical Debt Remediation

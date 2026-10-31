@@ -1,6 +1,6 @@
 ---
 name: architecture-decision-records
-description: "Record, structure, and maintain technical Architecture Decision Records (ADRs)."
+description: "Record, structure, and maintain technical Architecture Decision Records (ADRs). Use when documenting significant architecture decisions as ADRs."
 ---
 
 # Architecture Decision Records (ADR) Skill

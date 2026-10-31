@@ -1,6 +1,6 @@
 ---
 name: wcag-audit-patterns
-description: "Audit WCAG 2.2 accessibility (A/AA), keyboard navigation, and ARIA roles."
+description: "Audit WCAG 2.2 accessibility (A/AA), keyboard navigation, and ARIA roles. Use when auditing accessibility against WCAG 2.2 A/AA criteria."
 ---
 
 # WCAG 2.2 Accessibility Audit Patterns

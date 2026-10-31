@@ -1,6 +1,6 @@
 ---
 name: token-and-context-optimizer
-description: "Optimize prompt context, distill verbose logs, and prevent context rot in Antigravity."
+description: "Optimize prompt context, distill verbose logs, and prevent context rot in Antigravity. Use when optimizing prompts or reducing token and context overhead."
 ---
 
 # Token & Context Optimizer — Antigravity Engineering Standard

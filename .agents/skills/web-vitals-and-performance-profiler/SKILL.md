@@ -1,6 +1,6 @@
 ---
 name: web-vitals-and-performance-profiler
-description: "Measure Core Web Vitals (LCP, CLS, INP) and network waterfalls via CDP."
+description: "Measure Core Web Vitals (LCP, CLS, INP) and network waterfalls via CDP. Use when the user asks why a page is slow or needs CWV budgets enforced in CI."
 ---
 
 # Web Vitals & Performance Profiler Skill

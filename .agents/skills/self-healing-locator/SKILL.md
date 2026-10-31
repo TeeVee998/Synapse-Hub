@@ -1,6 +1,6 @@
 ---
 name: self-healing-locator
-description: "Heal broken locators using semantic AOM diffing with Role, Label, and TestId hierarchy."
+description: "Heal broken locators using semantic AOM diffing with Role, Label, and TestId hierarchy. Use when locators break and automated healing strategies are needed."
 ---
 
 # Self-Healing Locator Skill â€” Token-Efficient AOM Diffing

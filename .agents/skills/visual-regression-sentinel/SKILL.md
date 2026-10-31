@@ -1,6 +1,6 @@
 ---
 name: visual-regression-sentinel
-description: "Run pixel and layout shift visual regression checks with anti-flake masking."
+description: "Run pixel and layout shift visual regression checks with anti-flake masking. Use when comparing screenshots for visual regressions with anti-flake masking."
 ---
 
 # Visual Regression Sentinel Skill
@@ -60,3 +60,23 @@ When visual regression fails:
 2. Determine if it is a **Real Regression** (CSS bug, broken layout) or **Intentional Redesign**.
 3. If intentional redesign: update baseline snapshots via `npx playwright test --update-snapshots`.
 4. If bug: file bug report with side-by-side artifact comparison.
+
+---
+
+## 4. Assert on Extracted Data, Not on the Model's Claim
+
+> *Borrowed and adapted from the Midscene.js prompting model (MIT license, web-infra-dev/midscene).*
+
+When an AI/vision agent reports a step as "done", that claim is **not evidence**:
+
+1. **Extract the visible state first** — pull structured data from what is
+   actually rendered (accessibility tree text, OCR'd region, or `aiQuery`-style
+   structured extraction), never the model's self-report.
+2. **Assert on the extracted values** — pair every extraction with a real
+   assertion (`expect(...)`/`verify...`) against the expected value; a vision
+   model can read a screen, but only an assertion can *prove* it.
+3. **Vision sees pixels, not DOM internals** — assertions on tab counts,
+   network state, or hidden attributes are invisible to the model; assert on
+   what is rendered.
+4. **Only then run the visual diff** — feed the §3 autopsy protocol; a green
+   extraction plus a clean diff is proven, everything else is owed.

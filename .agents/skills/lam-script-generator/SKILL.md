@@ -1,6 +1,6 @@
 ---
 name: lam-script-generator
-description: "Transform user stories and acceptance criteria into Clean POM automation scripts."
+description: "Transform user stories and acceptance criteria into Clean POM automation scripts. Use when the user provides a user story, acceptance criteria, or requirement document that must become a runnable script."
 ---
 
 # LAM Script Generator — Large Action Model for Test Automation

@@ -17,3 +17,33 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
+--------------------------------------------------------------------------------
+Third-Party Borrowings (idea- and text-level)
+--------------------------------------------------------------------------------
+
+1. Midscene.js (https://github.com/web-infra-dev/midscene) - MIT License.
+   The "Instant Action vs Auto-Planning Dispatch" guidance in
+   .agents/skills/playwright-live-interaction/SKILL.md and the
+   assert-on-extracted-data guidance in
+   .agents/skills/visual-regression-sentinel/SKILL.md are adapted from the
+   Midscene.js prompting model. Copyright (c) ByteDance / web-infra-dev.
+
+2. Kane CLI (https://github.com/lambdatest/kane-cli) - Apache License 2.0.
+   The "proven vs owed" coverage traceability concept used in
+   .agents/skills/lam-script-generator/SKILL.md and in tools/gherkin_suite.py
+   is adapted from the Kane CLI generate -> execute -> prove workflow.
+
+3. TestZeus Hercules (https://github.com/test-zeus-ai/testzeus-hercules) -
+   GNU Affero General Public License v3.0. tools/gherkin_suite.py is an
+   independent, from-scratch implementation of the Gherkin-driven E2E test
+   ingestion concept. NO upstream code or text is used; AGPL content is
+   incompatible with this MIT repository. Idea-level inspiration only.
+
+4. Anthropic Agent Skills (https://github.com/anthropics/skills) - no license
+   file (all rights reserved). SKILL.md structural conventions only were
+   observed as reference; no upstream text is copied.
+
+5. Agent Skills open standard (https://agentskills.io, governed by the
+   Agentic AI Foundation) - SKILL.md frontmatter and description-trigger
+   conventions followed for all hub skills.

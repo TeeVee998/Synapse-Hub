@@ -1,6 +1,6 @@
 ---
 name: db-state-verifier-and-seeder
-description: "Seed isolated test fixtures and assert database mutations across SQL and NoSQL."
+description: "Seed isolated test fixtures and assert database mutations across SQL and NoSQL. Use when seeding, verifying, or cleaning database state around tests."
 ---
 
 # Database State Verifier & Seeder Skill

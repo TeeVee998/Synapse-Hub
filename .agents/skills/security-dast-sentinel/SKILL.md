@@ -1,6 +1,6 @@
 ---
 name: security-dast-sentinel
-description: "Run dynamic security audits: OWASP Top 10, security headers, IDOR, and token leakage."
+description: "Run dynamic security audits: OWASP Top 10, security headers, IDOR, and token leakage. Use when running or planning DAST and security scans against a target app."
 ---
 
 # Security DAST Sentinel (Dynamic Application Security & OWASP Top 10)

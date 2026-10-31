@@ -1,6 +1,6 @@
 ---
 name: antigravity-test-sentinel
-description: "Enforce verification-first discipline: blocks task completion until tests and quality gates pass."
+description: "Enforce verification-first discipline: blocks task completion until tests and quality gates pass. Use when enforcing Definition-of-Done quality gates before completing a code or test task."
 ---
 
 # Antigravity Test Sentinel — Verification-First Gatekeeper

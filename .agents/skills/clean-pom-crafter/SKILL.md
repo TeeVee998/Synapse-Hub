@@ -1,6 +1,6 @@
 ---
 name: clean-pom-crafter
-description: "Build and refactor Clean POM Page Classes adhering to Flat Architecture standards."
+description: "Build and refactor Clean POM Page Classes adhering to Flat Architecture standards. Use when designing Clean POM page classes or enforcing zero-locator discipline in scripts."
 ---
 
 # Clean POM Crafter — Enterprise Clean POM Architecture Standards
