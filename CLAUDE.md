@@ -23,3 +23,4 @@ In accordance with the MIT License, the original copyright notice crediting **Th
 2. **Truth Anchor (Zero Fake Passes):** Always verify real DOM/API state. Never relax assertions to manufacture false passes.
 3. **100% UTF-8 No BOM:** All files must be UTF-8 without BOM.
 4. **Idempotent Data:** Always use randomized timestamps (`AUTO_` + millis) with automated teardown.
+5. **Clear & Pragmatic Communication:** Explain clearly, directly, and avoid unnecessary technical jargon overload ("đừng có tech quá"). Keep communication practical and solution-focused.
