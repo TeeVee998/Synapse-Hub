@@ -85,7 +85,7 @@ def diagnose_and_plan_heal(target_dir, junit_xml_path=None):
 
     # 2. Query 0-token memory cache & 3-layer heuristic matcher
     print(f"{BOLD}[1/2] Checking 3-Layer Heuristic Matcher & Memory Cache...{RESET}")
-    cache_solution = cache_resolver.query_cache(err_sig, threshold=0.35)
+    cache_solution = cache_resolver.query_solution(err_sig, threshold=0.35)
 
     # 2b. Query Episodic Reflexion Memory (Top 2 historical lessons)
     lessons = cache_resolver.query_lessons(f"{test_name} {err_sig}", limit=2)

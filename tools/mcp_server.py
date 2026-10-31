@@ -41,6 +41,8 @@ import tms_sync_bridge
 import db_sandbox
 import traffic_session_converter
 import visual_som_helper
+import gherkin_suite
+import api_fuzzer
 
 SERVER_NAME = "enterprise-agent-qa"
 SERVER_VERSION = "2.3.0"
@@ -234,6 +236,31 @@ MCP_TOOLS = [
                 "mark_id": {"type": "integer", "description": "Specific Mark ID to click."}
             }
         }
+    },
+    {
+        "name": "compile_gherkin_suite",
+        "description": "Compiles Gherkin .feature files into an expanded test matrix, hub Universal IR and a proven-vs-owed coverage-gap report (0 LLM tokens).",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "target": {"type": "string", "description": "A .feature file or directory containing .feature files."}
+            },
+            "required": ["target"]
+        }
+    },
+    {
+        "name": "fuzz_api",
+        "description": "Autonomous API fuzzing (active, dry-run by default for safety) or offline passive spec audit with ZAP-style severity taxonomy.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "base_url": {"type": "string", "description": "Base URL of target API (non-production allowlist enforced)."},
+                "spec_path": {"type": "string", "description": "Path or URL to OpenAPI/Swagger JSON spec."},
+                "mode": {"type": "string", "enum": ["active", "passive"], "description": "active fuzzing or passive offline spec audit."},
+                "dry_run": {"type": "boolean", "description": "Deterministic offline mock (default true for safety)."}
+            },
+            "required": ["base_url"]
+        }
     }
 ]
 
@@ -295,7 +322,7 @@ def handle_tool_call(name: str, arguments: Dict[str, Any]) -> str:
         return api_drift_sentinel.generate_markdown_report(analysis, arguments["old_spec_path"], arguments["new_spec_path"])
 
     elif name == "query_memory_cache":
-        res = cache_resolver.query_cache(arguments["error_signature"])
+        res = cache_resolver.query_solution(arguments["error_signature"])
         return json.dumps(res, indent=2) if res else "No matching solution found in memory cache."
 
     elif name == "distill_log":
@@ -371,6 +398,44 @@ def handle_tool_call(name: str, arguments: Dict[str, Any]) -> str:
         marked_img, marks_map = helper.generate_som_overlay(img, [])
         resolved = helper.resolve_mark_coordinates(marks_map, target_mark_id=mid, target_label=lbl)
         return json.dumps({"marked_image": marked_img, "resolved_target": resolved}, indent=2)
+
+    elif name == "compile_gherkin_suite":
+        target = arguments["target"]
+        res = gherkin_suite.compile_feature(target) if os.path.isfile(target) else gherkin_suite.run(target)
+        if isinstance(res, int):
+            return json.dumps({"exit_code": res, "detail": "see reports/gherkin_suite_report.json"}, indent=2)
+        persist = {k: v for k, v in res.items() if not k.startswith("_")}
+        return json.dumps({
+            "feature": persist.get("feature"),
+            "totals": persist.get("totals"),
+            "errors": persist.get("errors"),
+            "gaps": persist.get("gaps"),
+            "health_score_pct": persist.get("health_score_pct"),
+        }, indent=2)
+
+    elif name == "fuzz_api":
+        mode = arguments.get("mode", "active")
+        dry_run = arguments.get("dry_run", True)
+        fuzzer = api_fuzzer.ApiFuzzer(
+            base_url=arguments["base_url"],
+            spec_path_or_url=arguments.get("spec_path"),
+        )
+        if mode == "passive":
+            scorecard = fuzzer.run_passive_scan()
+            return json.dumps({
+                "mode": scorecard["mode"],
+                "total_findings": scorecard["total_findings"],
+                "severity_summary": scorecard["severity_summary"],
+                "findings": scorecard["findings"],
+            }, indent=2)
+        scorecard = fuzzer.run_fuzz_suite(dry_run=dry_run)
+        return json.dumps({
+            "mode": scorecard["mode"],
+            "total_mutations": scorecard["total_mutations"],
+            "passed": scorecard["passed"],
+            "failed": scorecard["failed"],
+            "severity_summary": scorecard["severity_summary"],
+        }, indent=2)
 
     raise ValueError(f"Unknown MCP tool: {name}")
 

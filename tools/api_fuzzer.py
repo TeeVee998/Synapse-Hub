@@ -61,6 +61,26 @@ STACKTRACE_LEAK_PATTERNS = [
     re.compile(r'ODBC SQL Server Driver', re.IGNORECASE),
 ]
 
+# Severity taxonomy (concept borrowed from OWASP ZAP's alert risk levels,
+# Apache-2.0 - re-expressed for the fuzz oracle). Each alarm class maps to a
+# fixed risk level so CI can gate on CRITICAL findings alone.
+ALARM_SEVERITY = {
+    "HTTP_": "HIGH",            # HTTP_500/502/503_SERVER_CRASH
+    "STACKTRACE_LEAK": "CRITICAL",
+    "SLA_TIMEOUT": "LOW",
+    "AUTH_BYPASS": "CRITICAL",
+    "CONNECTION_ERROR": "MEDIUM",
+}
+SEVERITY_LEVELS = ["INFO", "LOW", "MEDIUM", "HIGH", "CRITICAL"]
+
+
+def classify_alarm_severity(alarm: str) -> str:
+    """Maps an alarm string onto the ZAP-style severity taxonomy."""
+    for prefix, severity in ALARM_SEVERITY.items():
+        if alarm.startswith(prefix):
+            return severity
+    return "INFO"
+
 GREEN = "\033[92m"
 RED = "\033[91m"
 YELLOW = "\033[93m"
@@ -290,6 +310,29 @@ class ApiFuzzer:
             "headers": mut_headers
         })
 
+        # 4. Catalog-Driven Vectors via tools/fuzz_payloads.py (XSS polyglots,
+        #    emoji surrogates, numeric boundaries). Formerly a dead import -
+        #    now wired into generation so the catalog actually fires.
+        if get_field_fuzz_scenarios is not None:
+            existing_names = {m["name"] for m in mutations}
+            for p_name, p_schema in props.items():
+                p_type = p_schema.get("type", "string")
+                for scen in get_field_fuzz_scenarios(p_name, p_type):
+                    mut_body = dict(valid_body)
+                    mut_body[p_name] = scen["value"]
+                    name = f"{method} {path} - {scen['scenario']}"
+                    if name in existing_names:
+                        continue
+                    existing_names.add(name)
+                    mutations.append({
+                        "name": name,
+                        "type": scen["category"],
+                        "path": path,
+                        "method": method,
+                        "body": mut_body,
+                        "headers": self.custom_headers
+                    })
+
         return mutations
 
     def execute_request(self, mutation: Dict[str, Any], dry_run: bool = False) -> Dict[str, Any]:
@@ -310,6 +353,7 @@ class ApiFuzzer:
                 "status_code": 400 if mutation["type"] != "BASELINE" else 200,
                 "duration_ms": 42.5,
                 "verdict": "PASS",
+                "severity": "INFO",
                 "alarms": [],
                 "response_preview": '{"status": "handled_by_dry_run"}'
             }
@@ -369,7 +413,18 @@ class ApiFuzzer:
         if mutation["type"] == "AUTH_OMISSION" and status_code in (200, 201):
             alarms.append("AUTH_BYPASS_VULNERABILITY: Endpoint returned 200 OK without Authorization header")
 
+        # Alarm 5: Target unreachable - an endpoint that could not be tested
+        # must NEVER be reported as PASS (Truth Anchor discipline).
+        if status_code < 0:
+            alarms.append("CONNECTION_ERROR: Target unreachable or transport failure - endpoint could not be verified")
+
         verdict = "FAIL" if alarms else "PASS"
+        severity = "INFO"
+        if alarms:
+            severity = max(
+                (classify_alarm_severity(a) for a in alarms),
+                key=lambda s: SEVERITY_LEVELS.index(s)
+            )
 
         return {
             "name": mutation["name"],
@@ -379,6 +434,7 @@ class ApiFuzzer:
             "status_code": status_code,
             "duration_ms": duration_ms,
             "verdict": verdict,
+            "severity": severity,
             "alarms": alarms,
             "response_preview": response_body[:300]
         }
@@ -419,11 +475,13 @@ class ApiFuzzer:
         scorecard = {
             "base_url": self.base_url,
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "mode": "ACTIVE",
             "total_mutations": len(all_mutations),
             "passed": len(all_mutations) - total_failures,
             "failed": total_failures,
             "sla_ms": self.sla_ms,
             "dry_run": dry_run,
+            "severity_summary": self._severity_summary(results),
             "results": results
         }
 
@@ -434,6 +492,7 @@ class ApiFuzzer:
         print(f"  Mutations Executed: {scorecard['total_mutations']}")
         print(f"  Clean Handled     : {GREEN}{scorecard['passed']}{RESET}")
         print(f"  Defects Detected  : {RED if total_failures > 0 else GREEN}{scorecard['failed']}{RESET}")
+        print(f"  Severity Mix      : {scorecard['severity_summary']}")
         if total_failures == 0:
             print(f"  Verdict           : {GREEN}[PASS] API resilient against input fuzzing & chaos.{RESET}")
         else:
@@ -449,6 +508,117 @@ class ApiFuzzer:
 
         return scorecard
 
+    @staticmethod
+    def _severity_summary(results: List[Dict[str, Any]]) -> Dict[str, int]:
+        """Counts findings per severity level (ZAP-style risk mix)."""
+        summary = {level: 0 for level in SEVERITY_LEVELS}
+        for res in results:
+            sev = res.get("severity", "INFO")
+            if sev in summary:
+                summary[sev] += 1
+        return summary
+
+    def run_passive_scan(self) -> Dict[str, Any]:
+        """Offline spec-level audit (no HTTP dispatched).
+
+        Concept borrowed from OWASP ZAP's passive scanning (Apache-2.0):
+        findings are pre-flight advisories derived purely from the OpenAPI/
+        Swagger document - unreachable endpoints cannot fake a pass here
+        because nothing is dispatched at all.
+        """
+        spec = self.load_spec()
+        has_global_security = bool(spec.get("security"))
+        findings: List[Dict[str, Any]] = []
+
+        for path, methods in spec.get("paths", {}).items():
+            for method, op in methods.items():
+                if method.lower() not in ("get", "post", "put", "patch", "delete"):
+                    continue
+                op_security = op.get("security") if isinstance(op, dict) else None
+                is_protected = has_global_security or bool(op_security)
+                label = f"{method.upper()} {path}"
+
+                if not is_protected and method.lower() in ("post", "put", "patch", "delete"):
+                    severity = "HIGH" if re.search(r"admin|internal|user", path, re.IGNORECASE) else "MEDIUM"
+                    findings.append({
+                        "finding": f"AUTH_NOT_DECLARED: Mutating endpoint declares no security requirement",
+                        "severity": severity,
+                        "target": label,
+                        "recommendation": "Declare securitySchemes/security for this operation or document why it is public.",
+                    })
+
+                if not is_protected and re.search(r"admin|internal", path, re.IGNORECASE):
+                    findings.append({
+                        "finding": "SENSITIVE_PATH_UNPROTECTED: Administrative/internal path is publicly declared",
+                        "severity": "HIGH",
+                        "target": label,
+                        "recommendation": "Gate this path behind an authentication scheme and network policy.",
+                    })
+
+                body = op.get("requestBody", {}) if isinstance(op, dict) else {}
+                content = body.get("content", {}).get("application/json", {}) if isinstance(body, dict) else {}
+                schema = content.get("schema", {})
+                props = schema.get("properties", {}) if isinstance(schema, dict) else {}
+                unbounded = [
+                    p_name for p_name, p_schema in props.items()
+                    if isinstance(p_schema, dict)
+                    and p_schema.get("type") == "string"
+                    and not any(k in p_schema for k in ("maxLength", "pattern", "enum", "format"))
+                ]
+                if unbounded:
+                    findings.append({
+                        "finding": f"NO_INPUT_VALIDATION_DECLARED: unbounded string props {unbounded[:5]}",
+                        "severity": "LOW",
+                        "target": label,
+                        "recommendation": "Add maxLength/pattern/enum constraints so the contract rejects oversized input.",
+                    })
+
+        if not spec.get("info") and spec.get("paths"):
+            findings.append({
+                "finding": "SPEC_METADATA_MISSING: OpenAPI info block absent",
+                "severity": "INFO",
+                "target": self.spec_path or "inline-spec",
+                "recommendation": "Document title/version/contact so scan reports are traceable to an owner.",
+            })
+
+        severity_summary = {level: 0 for level in SEVERITY_LEVELS}
+        for f in findings:
+            severity_summary[f["severity"]] += 1
+
+        blocking = severity_summary["HIGH"] + severity_summary["CRITICAL"]
+
+        print(f"\n{BOLD}{CYAN}======================================================================{RESET}")
+        print(f"{BOLD}{CYAN}          API PASSIVE SCAN (Offline Spec Audit - Zero Traffic)        {RESET}")
+        print(f"{BOLD}{CYAN}======================================================================{RESET}")
+        print(f"  Spec Source        : {self.spec_path or 'Default Archetype'}")
+        print(f"  Findings           : {YELLOW if findings else GREEN}{len(findings)}{RESET}")
+        print(f"  Severity Mix       : {severity_summary}")
+        if blocking:
+            print(f"  Verdict            : {RED}[FAIL] {blocking} HIGH/CRITICAL pre-flight finding(s).{RESET}")
+        else:
+            print(f"  Verdict            : {GREEN}[PASS] No HIGH/CRITICAL spec-level finding.{RESET}")
+        print(f"======================================================================\n")
+        for f in findings:
+            print(f"  - [{f['severity']}] {f['target']} - {f['finding']}")
+            print(f"      👉 {f['recommendation']}")
+
+        os.makedirs(REPORTS_DIR, exist_ok=True)
+        report_path = os.path.join(REPORTS_DIR, "api_fuzz_report.json")
+        scorecard = {
+            "base_url": self.base_url,
+            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "mode": "PASSIVE",
+            "spec_source": self.spec_path or "Default Archetype",
+            "total_findings": len(findings),
+            "severity_summary": severity_summary,
+            "findings": findings,
+        }
+        with open(report_path, "w", encoding="utf-8") as f:
+            json.dump(scorecard, f, indent=2)
+        print(f"\nFull telemetry report saved to: {report_path}")
+
+        return scorecard
+
 
 def main():
     parser = argparse.ArgumentParser(description="Enterprise Autonomous API Fuzzer & Chaos Breaker")
@@ -456,6 +626,8 @@ def main():
     parser.add_argument("--spec", default=None, help="Path or URL to OpenAPI/Swagger JSON specification")
     parser.add_argument("--token", default=None, help="Bearer token for authenticated endpoints")
     parser.add_argument("--sla-ms", type=float, default=3000.0, help="SLA latency ceiling in ms (default: 3000ms)")
+    parser.add_argument("--mode", choices=["active", "passive"], default="active",
+                        help="active = live fuzzing (default); passive = offline spec audit, zero traffic")
     parser.add_argument("--dry-run", action="store_true", help="Simulate mutation generation without live requests")
     parser.add_argument("--json", action="store_true", help="Output summary in JSON format")
 
@@ -472,10 +644,20 @@ def main():
         sla_ms=args.sla_ms
     )
 
+    if args.mode == "passive":
+        scorecard = fuzzer.run_passive_scan()
+        if args.json:
+            print(json.dumps(scorecard, indent=2))
+        blocking = scorecard["severity_summary"]["HIGH"] + scorecard["severity_summary"]["CRITICAL"]
+        return 1 if blocking > 0 else 0
+
     scorecard = fuzzer.run_fuzz_suite(dry_run=args.dry_run)
     if args.json:
         print(json.dumps(scorecard, indent=2))
 
+    critical = scorecard["severity_summary"].get("CRITICAL", 0)
+    if critical > 0:
+        return 1
     return 1 if scorecard["failed"] > 0 else 0
 
 
